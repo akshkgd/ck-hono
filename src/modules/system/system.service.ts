@@ -21,6 +21,7 @@ export class SystemService {
       message: isSystemHealthy ? 'all systems running good' : 'database connection error',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
+      test: true,
       system: {
         platform: process.platform,
         nodeVersion: process.version,

@@ -13,6 +13,7 @@ describe('System Module', () => {
     expect(body).toHaveProperty('timestamp');
     expect(body).toHaveProperty('uptime');
     expect(typeof body.uptime).toBe('number');
+    expect(body).toHaveProperty('test', true);
     expect(body).toHaveProperty('system');
     expect(body.system).toHaveProperty('platform');
     expect(body.system).toHaveProperty('nodeVersion');
