@@ -8,8 +8,8 @@ export class SystemController {
     this.systemService = new SystemService();
   }
 
-  public getStatus = (c: Context) => {
-    const status = this.systemService.getStatus();
-    return c.json(status, 200);
+  public getStatus = async (c: Context) => {
+    const status = await this.systemService.getStatus();
+    return c.json(status, status.status === 'UP' ? 200 : 503);
   };
 }

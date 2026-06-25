@@ -1,12 +1,24 @@
 import os from 'os';
+import { db } from '../../db/index.js';
+import { sql } from 'drizzle-orm';
 
 export class SystemService {
-  public getStatus() {
+  public async getStatus() {
     const memoryUsage = process.memoryUsage();
     
+    let dbStatus = 'unhealthy';
+    try {
+      await db.execute(sql`SELECT 1`);
+      dbStatus = 'healthy';
+    } catch (err) {
+      console.error('Database health check failed:', err);
+    }
+
+    const isSystemHealthy = dbStatus === 'healthy';
+    
     return {
-      status: 'UP',
-      message: 'all systems running good',
+      status: isSystemHealthy ? 'UP' : 'DEGRADED',
+      message: isSystemHealthy ? 'all systems running good' : 'database connection error',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       system: {
@@ -21,7 +33,7 @@ export class SystemService {
         }
       },
       checks: {
-        database: 'unconfigured'
+        database: dbStatus
       }
     };
   }
