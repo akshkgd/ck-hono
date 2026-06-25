@@ -21,7 +21,7 @@ export class SystemService {
       message: isSystemHealthy ? 'all systems running good' : 'database connection error',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      test: true,
+      test: 'ci/cd pipeline final test success',
       system: {
         platform: process.platform,
         nodeVersion: process.version,
