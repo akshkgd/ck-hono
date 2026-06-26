@@ -3,7 +3,7 @@ import app from '../../app.js';
 
 describe('System Module', () => {
   it('should return 200 and health check message on GET /', async () => {
-    const res = await app.request('/');
+    const res = await app.request('/v1');
     
     expect([200, 503]).toContain(res.status);
     

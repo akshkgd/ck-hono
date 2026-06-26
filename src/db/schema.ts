@@ -1,8 +1,11 @@
-import { pgTable, uuid, varchar, text, smallint, boolean, integer, jsonb, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, smallint, boolean, integer, jsonb, timestamp, pgEnum, bigserial, bigint, date, index } from 'drizzle-orm/pg-core';
 
 export const occupationTypeEnum = pgEnum('occupation_type', ['student', 'professional', 'academic', 'other']);
 export const roleEnum = pgEnum('role', ['student', 'admin', 'user', 'moderator']);
 export const statusEnum = pgEnum('status', ['active', 'inactive', 'suspended']);
+
+export const batchTypeEnum = pgEnum('batch_type', ['cohort', 'live', 'webinar', 'callBooking', 'mentorship']);
+export const batchStatusEnum = pgEnum('batch_status', ['active', 'private', 'completed']);
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -29,3 +32,94 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const batches = pgTable('batches', {
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  topic: varchar('topic', { length: 255 }),
+  name: varchar('name', { length: 255 }).notNull(),
+  description: varchar('description', { length: 255 }),
+  slug: varchar('slug', { length: 255 }),
+  price: integer('price'),
+  certificateFee: integer('certificate_fee').default(0).notNull(),
+  limit: integer('limit').default(0),
+  img: varchar('img', { length: 255 }),
+  association: varchar('association', { length: 255 }),
+  logo: varchar('logo', { length: 255 }),
+  type: batchTypeEnum('type').default('cohort').notNull(),
+  startDate: date('start_date').notNull(),
+  endDate: date('end_date').notNull(),
+  whatsAppLink: varchar('whatsapp_link', { length: 255 }),
+  telegramLink: varchar('telegram_link', { length: 255 }),
+  telegramBroadcast: varchar('telegram_broadcast', { length: 255 }),
+  teacherId: uuid('teacher_id').references(() => users.id),
+  teacherPayment: boolean('teacher_payment').default(false).notNull(),
+  meetingLink: varchar('meeting_link', { length: 255 }),
+  nextClassTopic: varchar('next_class_topic', { length: 255 }),
+  desc: varchar('desc', { length: 255 }),
+  nextClass: timestamp('next_class'),
+  status: batchStatusEnum('status').default('private').notNull(),
+  metadata: jsonb('metadata').default({}),
+  accessTillDate: date('access_till_date'),
+  accessTillYear: integer('access_till_year').default(1),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => [
+  index('batches_slug_idx').on(table.slug),
+]);
+
+export const enrollmentTypeEnum = pgEnum('enrollment_type', ['oneTime', 'Subscription', 'free']);
+export const paymentStatusEnum = pgEnum('payment_status', ['captured', 'failed', 'created', 'refunded']);
+export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', 'expired', 'pending']);
+
+export const batchEnrollments = pgTable('batch_enrollments', {
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  userId: uuid('user_id').references(() => users.id).notNull(),
+  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id).notNull(),
+  amountPayable: integer('amount_payable'),
+  enrollmentType: enrollmentTypeEnum('enrollment_type').default('oneTime').notNull(),
+  status: smallint('status').default(0).notNull(), // Active, Inactive, Cancelled, Suspended default inactive (0)
+  progress: integer('progress').default(0).notNull(),
+  timeSpentSeconds: integer('time_spent_seconds').default(0).notNull(),
+  amountPaid: integer('amount_paid'),
+  certificateFee: integer('certificate_fee'),
+  paymentStatus: paymentStatusEnum('payment_status').default('created').notNull(),
+  paymentMethod: varchar('payment_method', { length: 50 }),
+  couponCode: varchar('coupon_code', { length: 100 }),
+  transactionId: varchar('transaction_id', { length: 255 }),
+  invoiceId: varchar('invoice_id', { length: 255 }),
+  subscriptionId: varchar('subscription_id', { length: 255 }),
+  subscriptionStatus: subscriptionStatusEnum('subscription_status'),
+  subscriptionActiveOn: date('subscription_active_on'),
+  subscriptionExpiresOn: date('subscription_expires_on'),
+  paidAt: timestamp('paid_at'),
+  certificateId: varchar('certificate_id', { length: 255 }).unique(),
+  certificateGeneratedAt: timestamp('certificate_generated_at'),
+  startedAt: timestamp('started_at'),
+  accessTill: date('access_till'),
+  overrideAccessDays: integer('override_access_days'),
+  utmSource: varchar('utm_source', { length: 100 }),
+  utmMedium: varchar('utm_medium', { length: 100 }),
+  utmCampaign: varchar('utm_campaign', { length: 150 }),
+  remark: text('remark'),
+  metadata: jsonb('metadata').default({}),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  batchEnrollmentId: bigint('batch_enrollment_id', { mode: 'number' }).references(() => batchEnrollments.id).notNull(),
+  amount: integer('amount').notNull(),
+  paidAt: timestamp('paid_at').notNull(),
+  paymentMethod: varchar('payment_method', { length: 100 }),
+  transactionId: varchar('transaction_id', { length: 255 }).unique(),
+  invoiceId: varchar('invoice_id', { length: 255 }).unique(),
+  purpose: varchar('purpose', { length: 50 }).default('enrollment').notNull(),
+  isGstApplicable: boolean('is_gst_applicable').default(true).notNull(),
+  remarks: text('remarks'),
+  metadata: jsonb('metadata').default({}),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+

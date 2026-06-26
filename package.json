@@ -10,7 +10,9 @@
     "test": "vitest run",
     "db:init": "tsx scripts/init-db.ts",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx scripts/seed-users.ts",
+    "db:seed:all": "tsx scripts/seed-all.ts"
   },
   "keywords": [],
   "author": "",
