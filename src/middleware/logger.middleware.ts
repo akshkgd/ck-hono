@@ -13,13 +13,32 @@ export const loggerMiddleware = (): MiddlewareHandler => {
     const status = c.res.status;
 
     const message = `${method} ${path} ${status} - ${duration}ms`;
-    const meta = {
+    
+    let responseBody: any = undefined;
+    const contentType = c.res.headers.get('content-type') || '';
+    
+    // Only capture JSON responses to avoid logging HTML page markups
+    if (contentType.includes('application/json')) {
+      try {
+        const clone = c.res.clone();
+        const text = await clone.text();
+        responseBody = JSON.parse(text);
+      } catch {
+        // Ignore parsing exceptions
+      }
+    }
+
+    const meta: any = {
       requestId,
       method,
       path,
       status,
       durationMs: duration,
     };
+
+    if (responseBody) {
+      meta.responseBody = responseBody;
+    }
 
     if (status >= 500) {
       logger.error(message, meta);
