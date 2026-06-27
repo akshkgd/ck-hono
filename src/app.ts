@@ -1,9 +1,10 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
 import { secureHeaders } from 'hono/secure-headers';
 import { compress } from 'hono/compress';
 import { requestId } from 'hono/request-id';
+import { loggerMiddleware } from './middleware/logger.middleware.js';
+import { logger } from './utils/logger.js';
 
 import systemRouter from './modules/system/system.route.js';
 import authRouter from './modules/auth/auth.route.js';
@@ -13,8 +14,12 @@ import adminEnrollmentsRouter from './modules/admin/enrollments/admin-enrollment
 import adminPaymentsRouter from './modules/admin/payments/admin-payments.route.js';
 import adminBatchSectionsRouter from './modules/admin/batch-sections/admin-batch-sections.route.js';
 import adminContentLibraryRouter from './modules/admin/content-library/admin-content-library.route.js';
+import adminLogsRouter from './modules/admin/logs/admin-logs.route.js';
 import docsRouter from './modules/docs/docs.route.js';
 import { activityMiddleware } from './middleware/activity.middleware.js';
+import { authMiddleware } from './middleware/auth.middleware.js';
+import { adminMiddleware } from './middleware/admin.middleware.js';
+import { renderLogsView } from './modules/admin/logs/logs.view.js';
 
 export type AppEnv = {
   Variables: {
@@ -28,7 +33,7 @@ const app = new Hono<AppEnv>();
 app.use('*', requestId());
 
 // Global Middleware
-app.use('*', logger());
+app.use('*', loggerMiddleware());
 app.use('*', cors());
 app.use('*', secureHeaders());
 app.use('*', compress());
@@ -36,7 +41,10 @@ app.use('*', compress());
 // Global Error Handler
 app.onError((err, c) => {
   const reqId = c.get('requestId');
-  console.error(`[Error] Request ID: ${reqId} - ${err.message}`, err.stack);
+  logger.error(`Request ID: ${reqId} - ${err.message}`, {
+    requestId: reqId,
+    stack: err.stack,
+  });
   
   return c.json({ 
     status: 'error', 
@@ -56,10 +64,12 @@ v1.route('/admin/enrollments', adminEnrollmentsRouter);
 v1.route('/admin/enrollment-payments', adminPaymentsRouter);
 v1.route('/admin/batch-sections', adminBatchSectionsRouter);
 v1.route('/admin/content-library', adminContentLibraryRouter);
+v1.route('/admin/logs', adminLogsRouter);
 
 // Register Routes
 app.route('/v1', v1);
 app.route('/docs', docsRouter);
+app.get('/admin/logs', (c) => c.html(renderLogsView()));
 
 // Global 404 Handler
 app.notFound((c) => {

@@ -7,12 +7,18 @@ export const authMiddleware = (): MiddlewareHandler => {
   const userRepository = new UserRepository();
 
   return async (c, next) => {
+    let token = '';
     const authHeader = c.req.header('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else {
+      token = c.req.query('token') || '';
+    }
+
+    if (!token) {
       return c.json({ status: 'error', message: 'Unauthorized: Missing or invalid token' }, 401);
     }
 
-    const token = authHeader.substring(7);
     const jwtSecret = process.env.JWT_SECRET;
     
     if (!jwtSecret) {

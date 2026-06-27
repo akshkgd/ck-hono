@@ -32,7 +32,11 @@ export const users = pgTable('users', {
   lastActiveAt: timestamp('last_active_at').defaultNow().notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('users_name_idx').on(table.name),
+  index('users_email_idx').on(table.email),
+  index('users_mobile_idx').on(table.mobile)
+]);
 
 export const batches = pgTable('batches', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),

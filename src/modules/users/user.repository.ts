@@ -65,14 +65,15 @@ export class UserRepository {
   }
 
   public async search(queryText: string, limit: number, offset: number): Promise<User[]> {
-    const searchPattern = `%${queryText}%`;
+    const searchPattern = `${queryText}%`;
     return db
       .select()
       .from(users)
       .where(
         or(
           ilike(users.name, searchPattern),
-          ilike(users.email, searchPattern)
+          ilike(users.email, searchPattern),
+          ilike(users.mobile, searchPattern)
         )
       )
       .limit(limit)

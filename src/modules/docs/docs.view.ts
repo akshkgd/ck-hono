@@ -1084,7 +1084,7 @@ export function getDocsHtml(): string {
           <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px] font-semibold uppercase font-mono">GET</span>
           <h2 class="text-lg font-semibold text-neutral-50 font-mono">/v1/admin/users</h2>
         </div>
-        <p class="text-neutral-400 mt-1 text-xs">Search all registered users by email or name with pagination support. <span class="text-indigo-400 font-medium">Requires Admin role.</span></p>
+        <p class="text-neutral-400 mt-1 text-xs">Search all registered users by email, name, or phone number with pagination support. <span class="text-indigo-400 font-medium">Requires Admin role.</span></p>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1104,7 +1104,7 @@ export function getDocsHtml(): string {
                 <tr>
                   <td class="py-2 text-indigo-400 font-mono">q</td>
                   <td class="py-2">string</td>
-                  <td class="py-2">Search term (matches name or email). Defaults to empty (returns all).</td>
+                  <td class="py-2">Search term (matches name, email, or mobile/phone). Defaults to empty (returns all).</td>
                 </tr>
                 <tr>
                   <td class="py-2 text-indigo-400 font-mono">limit</td>
