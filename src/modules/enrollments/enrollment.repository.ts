@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batchEnrollments, users, batches } from '../../db/schema.js';
-import { eq, or, ilike, sql } from 'drizzle-orm';
+import { eq, or, ilike, sql, and } from 'drizzle-orm';
 
 export type Enrollment = typeof batchEnrollments.$inferSelect;
 export type NewEnrollment = typeof batchEnrollments.$inferInsert;
@@ -102,7 +102,7 @@ export class EnrollmentRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number) {
+  public async search(queryText: string, limit: number, offset: number, batchId?: number) {
     let query = db
       .select({
         id: batchEnrollments.id,
@@ -124,11 +124,13 @@ export class EnrollmentRepository {
       })
       .from(batchEnrollments)
       .leftJoin(users, eq(batchEnrollments.userId, users.id))
-      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id));
+      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id))
+      .$dynamic();
 
+    const conditions = [];
     if (queryText) {
       const searchPattern = `%${queryText}%`;
-      query = query.where(
+      conditions.push(
         or(
           ilike(users.name, searchPattern),
           ilike(users.email, searchPattern),
@@ -136,28 +138,44 @@ export class EnrollmentRepository {
           ilike(batchEnrollments.couponCode, searchPattern),
           ilike(batchEnrollments.transactionId, searchPattern)
         )
-      ) as any;
+      );
+    }
+    if (batchId !== undefined) {
+      conditions.push(eq(batchEnrollments.batchId, batchId));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
 
     return query.limit(limit).offset(offset);
   }
 
-  public async count(queryText: string): Promise<number> {
+  public async count(queryText: string, batchId?: number): Promise<number> {
     let query = db
       .select({ count: sql<number>`count(*)` })
       .from(batchEnrollments)
       .leftJoin(users, eq(batchEnrollments.userId, users.id))
-      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id));
+      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id))
+      .$dynamic();
 
+    const conditions = [];
     if (queryText) {
       const searchPattern = `%${queryText}%`;
-      query = query.where(
+      conditions.push(
         or(
           ilike(users.name, searchPattern),
           ilike(users.email, searchPattern),
           ilike(batches.name, searchPattern)
         )
-      ) as any;
+      );
+    }
+    if (batchId !== undefined) {
+      conditions.push(eq(batchEnrollments.batchId, batchId));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
 
     const results = await query;

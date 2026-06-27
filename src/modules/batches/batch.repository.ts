@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batches } from '../../db/schema.js';
-import { eq, or, ilike, sql } from 'drizzle-orm';
+import { eq, or, ilike, sql, and } from 'drizzle-orm';
 
 export type Batch = typeof batches.$inferSelect;
 export type NewBatch = typeof batches.$inferInsert;
@@ -57,49 +57,72 @@ export class BatchRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number): Promise<Batch[]> {
-    if (!queryText) {
-      return db
-        .select()
-        .from(batches)
-        .limit(limit)
-        .offset(offset);
-    }
-
-    const searchPattern = `%${queryText}%`;
-    return db
+  public async search(queryText: string, limit: number, offset: number, type?: string, status?: string): Promise<Batch[]> {
+    let query = db
       .select()
       .from(batches)
-      .where(
-        or(
-          ilike(batches.name, searchPattern),
-          ilike(batches.topic, searchPattern),
-          ilike(batches.slug, searchPattern)
-        )
-      )
-      .limit(limit)
-      .offset(offset);
-  }
+      .$dynamic();
 
-  public async count(queryText: string): Promise<number> {
-    if (!queryText) {
-      const results = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(batches);
-      return Number(results[0]?.count || 0);
-    }
+    const conditions = [];
 
-    const searchPattern = `%${queryText}%`;
-    const results = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(batches)
-      .where(
+    if (queryText) {
+      const searchPattern = `%${queryText}%`;
+      conditions.push(
         or(
           ilike(batches.name, searchPattern),
           ilike(batches.topic, searchPattern),
           ilike(batches.slug, searchPattern)
         )
       );
+    }
+
+    if (type) {
+      conditions.push(eq(batches.type, type as any));
+    }
+
+    if (status) {
+      conditions.push(eq(batches.status, status as any));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    return query.limit(limit).offset(offset);
+  }
+
+  public async count(queryText: string, type?: string, status?: string): Promise<number> {
+    let query = db
+      .select({ count: sql<number>`count(*)` })
+      .from(batches)
+      .$dynamic();
+
+    const conditions = [];
+
+    if (queryText) {
+      const searchPattern = `%${queryText}%`;
+      conditions.push(
+        or(
+          ilike(batches.name, searchPattern),
+          ilike(batches.topic, searchPattern),
+          ilike(batches.slug, searchPattern)
+        )
+      );
+    }
+
+    if (type) {
+      conditions.push(eq(batches.type, type as any));
+    }
+
+    if (status) {
+      conditions.push(eq(batches.status, status as any));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    const results = await query;
     return Number(results[0]?.count || 0);
   }
 }

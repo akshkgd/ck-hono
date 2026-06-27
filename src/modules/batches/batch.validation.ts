@@ -36,6 +36,8 @@ export const updateBatchSchema = createBatchSchema.partial();
 
 export const batchSearchQuerySchema = z.object({
   q: z.string().default(''),
+  type: batchTypeEnumSchema.optional(),
+  status: batchStatusEnumSchema.optional(),
   limit: z.preprocess((val) => parseInt(val as string, 10), z.number().int().min(1).max(50).default(10)),
   page: z.preprocess((val) => parseInt(val as string, 10), z.number().int().min(1).default(1)),
 });

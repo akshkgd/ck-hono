@@ -29,6 +29,7 @@ export const users = pgTable('users', {
   currentStreak: integer('current_streak').default(0).notNull(),
   longestStreak: integer('longest_streak').default(0).notNull(),
   metadata: jsonb('metadata').default({}),
+  lastActiveAt: timestamp('last_active_at').defaultNow().notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -121,5 +122,37 @@ export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const batchSections = pgTable('batch_sections', {
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  title: varchar('title', { length: 255 }).notNull(),
+  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id),
+  order: integer('order'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('batch_sections_batch_id_idx').on(table.batchId),
+]);
+
+export const contentLibraryTypeEnum = pgEnum('content_library_type', ['video', 'coding lab', 'assignment', 'article']);
+export const contentTypeClassEnum = pgEnum('content_type_class', ['primary', 'secondary']);
+
+export const contentLibrary = pgTable('content_library', {
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  title: varchar('title', { length: 255 }).notNull(),
+  desc: text('desc'),
+  type: contentLibraryTypeEnum('type').notNull(),
+  contentType: contentTypeClassEnum('content_type').default('primary').notNull(),
+  videoLink: varchar('video_link', { length: 255 }),
+  solutionCode: text('solution_code'),
+  hints: jsonb('hints'),
+  metadata: jsonb('metadata').default({}),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('content_library_type_idx').on(table.type),
+]);
+
+
 
 

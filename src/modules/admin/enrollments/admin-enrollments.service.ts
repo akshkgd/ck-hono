@@ -52,8 +52,8 @@ export class AdminEnrollmentsService {
 
   public async searchEnrollments(input: EnrollmentSearchQueryInput) {
     const offset = (input.page - 1) * input.limit;
-    const enrollments = await this.enrollmentRepository.search(input.q, input.limit, offset);
-    const total = await this.enrollmentRepository.count(input.q);
+    const enrollments = await this.enrollmentRepository.search(input.q, input.limit, offset, input.batchId);
+    const total = await this.enrollmentRepository.count(input.q, input.batchId);
 
     return {
       enrollments,

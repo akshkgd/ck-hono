@@ -26,8 +26,8 @@ export class AdminBatchesService {
 
   public async searchBatches(input: BatchSearchQueryInput) {
     const offset = (input.page - 1) * input.limit;
-    const batches = await this.batchRepository.search(input.q, input.limit, offset);
-    const total = await this.batchRepository.count(input.q);
+    const batches = await this.batchRepository.search(input.q, input.limit, offset, input.type, input.status);
+    const total = await this.batchRepository.count(input.q, input.type, input.status);
 
     return {
       batches,

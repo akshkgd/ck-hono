@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
+import 'dotenv/config';
 import app from '../../../app.js';
 
 describe('Admin Batches CRUD Module', () => {
@@ -117,6 +118,35 @@ describe('Admin Batches CRUD Module', () => {
       expect(body.data.batches).toBeInstanceOf(Array);
       expect(body.data.batches.length).toBeGreaterThan(0);
       expect(body.data.pagination.total).toBeGreaterThan(0);
+    });
+
+    it('should allow admin to filter batches by type and status', async () => {
+      const res1 = await app.request(`/v1/admin/batches?type=cohort&status=private&limit=10&page=1`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res1.status).toBe(200);
+      const body1 = await res1.json();
+      expect(body1.status).toBe('success');
+      expect(body1.data.batches).toBeInstanceOf(Array);
+      for (const batch of body1.data.batches) {
+        expect(batch.type).toBe('cohort');
+        expect(batch.status).toBe('private');
+      }
+
+      const res2 = await app.request(`/v1/admin/batches?type=webinar&limit=10&page=1`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res2.status).toBe(200);
+      const body2 = await res2.json();
+      expect(body2.status).toBe('success');
+      expect(body2.data.batches).toBeInstanceOf(Array);
+      for (const batch of body2.data.batches) {
+        expect(batch.type).toBe('webinar');
+      }
     });
 
     it('should allow admin to fetch a single batch by ID', async () => {

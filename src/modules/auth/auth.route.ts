@@ -10,5 +10,6 @@ const controller = new AuthController();
 authRouter.post('/register', zValidator('json', registerSchema), controller.register);
 authRouter.post('/login', zValidator('json', loginSchema), controller.login);
 authRouter.get('/me', authMiddleware(), controller.me);
+authRouter.post('/logout', authMiddleware(), controller.logout);
 
 export default authRouter;

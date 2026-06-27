@@ -1,6 +1,7 @@
 import type { Context } from 'hono';
 import { AuthService } from './auth.service.js';
 import { loginSchema, registerSchema } from './auth.validation.js';
+import { redis, isRedisReady } from '../../utils/redis.js';
 
 export class AuthController {
   private authService: AuthService;
@@ -41,7 +42,10 @@ export class AuthController {
         }, 500);
       }
 
-      const data = await this.authService.login(body, jwtSecret);
+      const ipAddress = c.req.header('x-forwarded-for') || 'unknown';
+      const userAgent = c.req.header('user-agent') || 'unknown';
+
+      const data = await this.authService.login(body, jwtSecret, ipAddress, userAgent);
       return c.json({
         status: 'success',
         message: 'Login successful',
@@ -52,6 +56,31 @@ export class AuthController {
         status: 'error',
         message: err.message || 'Login failed',
       }, 401);
+    }
+  };
+
+  public logout = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      const sessionId = c.get('sessionId');
+
+      if (sessionId && user?.id && redis && isRedisReady()) {
+        try {
+          await redis.del(`session:${user.id}:${sessionId}`);
+        } catch (err) {
+          console.error('[Redis] Failed to delete session on logout:', err);
+        }
+      }
+
+      return c.json({
+        status: 'success',
+        message: 'Logout successful',
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Logout failed',
+      }, 400);
     }
   };
 

@@ -1,6 +1,7 @@
 import type { MiddlewareHandler } from 'hono';
 import { verify } from 'hono/jwt';
 import { UserRepository } from '../modules/users/user.repository.js';
+import { redis, isRedisReady } from '../utils/redis.js';
 
 export const authMiddleware = (): MiddlewareHandler => {
   const userRepository = new UserRepository();
@@ -30,10 +31,23 @@ export const authMiddleware = (): MiddlewareHandler => {
         return c.json({ status: 'error', message: 'Unauthorized: User not found' }, 401);
       }
 
+      // Verify session exists in Redis (if Redis is connected)
+      if (redis && isRedisReady() && decoded.sessionId) {
+        try {
+          const sessionExists = await redis.exists(`session:${user.id}:${decoded.sessionId}`);
+          if (!sessionExists) {
+            return c.json({ status: 'error', message: 'Unauthorized: Session has expired or been logged out' }, 401);
+          }
+        } catch (err) {
+          console.error('[Redis] Session validation failed:', err);
+        }
+      }
+
       const { password, ...userWithoutPassword } = user;
       
-      // Store user in context variables
+      // Store user and sessionId in context variables
       c.set('user', userWithoutPassword);
+      c.set('sessionId', decoded.sessionId as string);
       await next();
     } catch (err) {
       return c.json({ status: 'error', message: 'Unauthorized: Token verification failed' }, 401);
