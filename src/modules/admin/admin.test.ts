@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
+import 'dotenv/config';
 import app from '../../app.js';
 
 describe('Admin User Management Module', () => {
@@ -177,6 +178,24 @@ describe('Admin User Management Module', () => {
       const body = await res.json();
       expect(body.status).toBe('success');
       expect(body.data.status).toBe('suspended');
+    });
+
+    it('should allow admin to retrieve detailed user profile stats', async () => {
+      expect(adminToken).toBeTruthy();
+      expect(targetUserId).toBeTruthy();
+
+      const res = await app.request(`/v1/admin/users/${targetUserId}/details`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data).toHaveProperty('user');
+      expect(body.data).toHaveProperty('enrollments');
+      expect(body.data).toHaveProperty('activeSessions');
+      expect(body.data.user.id).toBe(targetUserId);
     });
 
     it('should allow admin to delete a user', async () => {

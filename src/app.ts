@@ -16,6 +16,7 @@ import adminBatchSectionsRouter from './modules/admin/batch-sections/admin-batch
 import adminContentLibraryRouter from './modules/admin/content-library/admin-content-library.route.js';
 import adminLogsRouter from './modules/admin/logs/admin-logs.route.js';
 import docsRouter from './modules/docs/docs.route.js';
+import playgroundRouter from './modules/playground/playground.route.js';
 import { activityMiddleware } from './middleware/activity.middleware.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
@@ -69,6 +70,7 @@ v1.route('/admin/logs', adminLogsRouter);
 // Register Routes
 app.route('/v1', v1);
 app.route('/docs', docsRouter);
+app.route('/playground', playgroundRouter);
 app.get('/admin/logs', (c) => c.html(renderLogsView()));
 
 // Global 404 Handler

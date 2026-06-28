@@ -15,5 +15,6 @@ adminRouter.put('/:id', controller.edit);
 adminRouter.delete('/:id', controller.delete);
 adminRouter.patch('/:id/role', controller.changeRole);
 adminRouter.patch('/:id/status', controller.changeStatus);
+adminRouter.get('/:id/details', controller.getDetails);
 
 export default adminRouter;

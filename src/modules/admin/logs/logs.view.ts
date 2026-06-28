@@ -210,9 +210,9 @@ export function renderLogsView() {
     async function init() {
       const token = getAuthToken();
       if (!token) {
-        renderEmptyState('Unauthorized: Missing or invalid token. Please log in at the Interactive API Docs (/docs) first, or pass the token in the URL: /admin/logs?token=YOUR_TOKEN');
-        alert('You are not logged in. Please login via the Interactive Docs (/docs) first, or visit /admin/logs?token=YOUR_JWT_TOKEN');
-        window.location.href = '/docs';
+        renderEmptyState('Unauthorized: Missing or invalid token. Please log in at the Playground (/playground) first, or pass the token in the URL: /admin/logs?token=YOUR_TOKEN');
+        alert('You are not logged in. Please login via the Playground (/playground) first, or visit /admin/logs?token=YOUR_JWT_TOKEN');
+        window.location.href = '/playground';
         return;
       }
 
@@ -306,8 +306,8 @@ export function renderLogsView() {
     // Helper to check response status
     function handleUnauthorized(res) {
       if (res.status === 401) {
-        alert('Session expired or unauthorized. Redirecting to Interactive Docs...');
-        window.location.href = '/docs';
+        alert('Session expired or unauthorized. Redirecting to Playground...');
+        window.location.href = '/playground';
         return true;
       }
       return false;

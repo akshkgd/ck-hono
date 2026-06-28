@@ -181,4 +181,26 @@ export class EnrollmentRepository {
     const results = await query;
     return Number(results[0]?.count || 0);
   }
+
+  public async findByUserId(userId: string) {
+    return db
+      .select({
+        id: batchEnrollments.id,
+        batchId: batchEnrollments.batchId,
+        amountPayable: batchEnrollments.amountPayable,
+        enrollmentType: batchEnrollments.enrollmentType,
+        status: batchEnrollments.status,
+        progress: batchEnrollments.progress,
+        timeSpentSeconds: batchEnrollments.timeSpentSeconds,
+        amountPaid: batchEnrollments.amountPaid,
+        paymentStatus: batchEnrollments.paymentStatus,
+        createdAt: batchEnrollments.createdAt,
+        batchName: batches.name,
+        batchSlug: batches.slug,
+        batchType: batches.type,
+      })
+      .from(batchEnrollments)
+      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id))
+      .where(eq(batchEnrollments.userId, userId));
+  }
 }

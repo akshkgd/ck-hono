@@ -128,4 +128,21 @@ export class AdminController {
       }, 400);
     }
   };
+
+  public getDetails = async (c: Context) => {
+    try {
+      const id = c.req.param('id')!;
+      const result = await this.adminService.getUserDetails(id);
+      
+      return c.json({
+        status: 'success',
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to fetch user details',
+      }, 400);
+    }
+  };
 }

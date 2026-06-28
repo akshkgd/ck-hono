@@ -1,5 +1,7 @@
 import argon2 from 'argon2';
 import { UserRepository, type NewUser } from '../users/user.repository.js';
+import { EnrollmentRepository } from '../enrollments/enrollment.repository.js';
+import { redis, isRedisReady } from '../../utils/redis.js';
 import type {
   AdminAddUserInput,
   AdminUpdateUserInput,
@@ -10,9 +12,11 @@ import type {
 
 export class AdminService {
   private userRepository: UserRepository;
+  private enrollmentRepository: EnrollmentRepository;
 
   constructor() {
     this.userRepository = new UserRepository();
+    this.enrollmentRepository = new EnrollmentRepository();
   }
 
   public async searchUsers(input: AdminSearchQueryInput) {
@@ -112,5 +116,49 @@ export class AdminService {
     }
 
     return this.userRepository.delete(id);
+  }
+
+  public async getUserDetails(id: string) {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const { password, ...userWithoutPassword } = user;
+
+    // Fetch enrolled courses and progress
+    const enrollments = await this.enrollmentRepository.findByUserId(id);
+
+    // Fetch active login sessions from Redis
+    const activeSessions: any[] = [];
+    if (redis && isRedisReady()) {
+      try {
+        const sessionKeys = await redis.keys(`session:${id}:*`);
+        for (const key of sessionKeys) {
+          const sessionDataStr = await redis.get(key);
+          if (sessionDataStr) {
+            try {
+              const sessionData = JSON.parse(sessionDataStr);
+              const parts = key.split(':');
+              const sessionId = parts[parts.length - 1];
+              activeSessions.push({
+                sessionId,
+                ...sessionData,
+              });
+            } catch {
+              // Ignore invalid json
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[Redis] Failed to fetch active sessions for user details:', err);
+      }
+    }
+
+    return {
+      user: userWithoutPassword,
+      enrollments,
+      activeSessions,
+    };
   }
 }
