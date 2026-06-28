@@ -1077,6 +1077,52 @@ export function getDocsHtml(): string {
       </div>
     </section>
 
+    <!-- Section: Logout -->
+    <section id="auth-logout" class="scroll-mt-20 space-y-5">
+      <div class="border-b border-neutral-900 pb-3">
+        <div class="flex items-center space-x-2.5">
+          <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-[10px] font-semibold uppercase font-mono">POST</span>
+          <h2 class="text-lg font-semibold text-neutral-50 font-mono">/v1/auth/logout</h2>
+        </div>
+        <p class="text-neutral-400 mt-1 text-xs">Invalidate the current user session and logout.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Details & Playground -->
+        <div class="space-y-5">
+          <div>
+            <h3 class="text-xs font-semibold uppercase text-neutral-400 tracking-wider mb-2">Authentication Headers</h3>
+            <p class="text-neutral-400 text-xs leading-relaxed mb-3">You must pass the token inside the <code class="text-xs bg-neutral-900 px-1 py-0.5 rounded text-indigo-400 font-mono">Authorization</code> header.</p>
+            <div class="bg-neutral-900 border border-neutral-800 rounded p-3 font-mono text-[11px] space-y-1">
+              <span class="text-neutral-500 font-medium">Headers:</span>
+              <div class="text-neutral-200">Authorization: Bearer <span id="logoutTokenPlaceholder" class="text-indigo-400 truncate inline-block max-w-[220px] align-bottom">&lt;token-missing&gt;</span></div>
+            </div>
+          </div>
+
+          <div class="bg-neutral-900/60 border border-neutral-850 rounded p-5 space-y-3.5">
+            <h4 class="text-xs font-semibold text-neutral-300 uppercase tracking-wider">Playground</h4>
+            <div class="flex items-center space-x-3">
+              <button onclick="runLogout()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-neutral-50 rounded text-xs font-medium transition shadow-sm">Logout Session</button>
+            </div>
+            
+            <div id="logoutResponseWrapper" class="hidden space-y-1.5">
+              <span class="text-[11px] text-neutral-500 font-medium">Response Status: <span id="logoutResponseCode" class="font-mono">200</span></span>
+              <pre class="bg-neutral-950 p-3 rounded border border-neutral-850 max-h-52 overflow-y-auto text-xs font-mono"><code class="language-json text-neutral-300" id="logoutResponseJson"></code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Snippets -->
+        <div class="space-y-3">
+          <h3 class="text-xs font-semibold uppercase text-neutral-400 tracking-wider">Response Example (200 OK)</h3>
+          <pre class="bg-neutral-900 border border-neutral-800/85 rounded p-4 max-h-72 overflow-y-auto text-xs"><code class="language-json">{
+  "status": "success",
+  "message": "Logout successful"
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
     <!-- Section: Admin Search Users -->
     <section id="admin-search" class="scroll-mt-20 space-y-5">
       <div class="border-b border-neutral-900 pb-3">
@@ -3143,14 +3189,30 @@ export function getDocsHtml(): string {
     function updateTokenPlaceholder() {
       var token = localStorage.getItem('jwt_token');
       var placeholder = document.getElementById('tokenPlaceholder');
+      var logoutPlaceholder = document.getElementById('logoutTokenPlaceholder');
+      
       if (token) {
-        placeholder.innerText = token;
-        placeholder.classList.remove('text-neutral-500');
-        placeholder.classList.add('text-green-400');
+        if (placeholder) {
+          placeholder.innerText = token;
+          placeholder.classList.remove('text-neutral-500');
+          placeholder.classList.add('text-green-400');
+        }
+        if (logoutPlaceholder) {
+          logoutPlaceholder.innerText = token;
+          logoutPlaceholder.classList.remove('text-neutral-500');
+          logoutPlaceholder.classList.add('text-green-400');
+        }
       } else {
-        placeholder.innerText = '<token-missing>';
-        placeholder.classList.remove('text-green-400');
-        placeholder.classList.add('text-neutral-500');
+        if (placeholder) {
+          placeholder.innerText = '<token-missing>';
+          placeholder.classList.remove('text-green-400');
+          placeholder.classList.add('text-neutral-500');
+        }
+        if (logoutPlaceholder) {
+          logoutPlaceholder.innerText = '<token-missing>';
+          logoutPlaceholder.classList.remove('text-green-400');
+          logoutPlaceholder.classList.add('text-neutral-500');
+        }
       }
     }
 
@@ -3303,6 +3365,37 @@ export function getDocsHtml(): string {
       } catch (err) {
         document.getElementById('meResponseCode').innerText = 'Failed';
         document.getElementById('meResponseJson').innerText = err.message;
+      }
+    }
+
+    // API Call: POST Logout
+    async function runLogout() {
+      var token = localStorage.getItem('jwt_token');
+      if (!token) {
+        alert('No JWT Token found! Please log in first.');
+        return;
+      }
+
+      document.getElementById('logoutResponseWrapper').classList.remove('hidden');
+      document.getElementById('logoutResponseJson').innerText = 'Logging out session...';
+
+      try {
+        var res = await fetch('/v1/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        var data = await res.json();
+        displayResponse('logoutResponseWrapper', 'logoutResponseCode', 'logoutResponseJson', res, data);
+        
+        if (res.status === 200) {
+          localStorage.removeItem('jwt_token');
+          updateTokenPlaceholder();
+        }
+      } catch (err) {
+        document.getElementById('logoutResponseCode').innerText = 'Failed';
+        document.getElementById('logoutResponseJson').innerText = err.message;
       }
     }
 
