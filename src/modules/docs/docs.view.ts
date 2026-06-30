@@ -107,11 +107,11 @@ export function getDocsHtml(): string {
         </div>
 
         <div>
-          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Batches & Sections</div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Batches</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
-              <a href="#batches-search" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Search batches</a>
+              <a href="#batches-search" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List batches</a>
             </li>
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
@@ -129,9 +129,31 @@ export function getDocsHtml(): string {
               <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
               <a href="#batches-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete batch</a>
             </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Batch Sections</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#sections-search" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List sections</a>
+            </li>
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
-              <a href="#batches-sections" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Create section</a>
+              <a href="#sections-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Create section</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#sections-get" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get section</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
+              <a href="#sections-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update section</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
+              <a href="#sections-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete section</a>
             </li>
           </ul>
         </div>
@@ -145,11 +167,45 @@ export function getDocsHtml(): string {
             </li>
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
-              <a href="#enrollments-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Enroll student</a>
+              <a href="#enrollments-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Create enrollment</a>
             </li>
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#enrollments-get" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get enrollment</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
+              <a href="#enrollments-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update enrollment</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
+              <a href="#enrollments-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete enrollment</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Payments</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
               <a href="#payments-search" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List payments</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#payments-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Log payment</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#payments-get" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get payment</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
+              <a href="#payments-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update payment</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
+              <a href="#payments-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete payment</a>
             </li>
           </ul>
         </div>
@@ -199,7 +255,7 @@ export function getDocsHtml(): string {
         </p>
         <div class="bg-zinc-900/50 border border-zinc-900 rounded-lg p-5 text-sm font-mono max-w-xl space-y-1">
           <span class="text-zinc-500 font-normal">Base API endpoint:</span>
-          <div class="text-zinc-200">https://live.codekaro.in/v1</div>
+          <div class="text-zinc-200">https://api.codekaro.in/v1</div>
         </div>
       </section>
 
@@ -277,27 +333,61 @@ export function getDocsHtml(): string {
         </p>
 
         <pre class="bg-zinc-900/50 border border-zinc-900 p-5 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>export interface User {
-  id: string;
+  id: string; // Default: uuid_generate_v4()
   email: string;
   name: string | null;
   mobile: string | null;
-  role: 'student' | 'admin' | 'user' | 'moderator';
-  status: 'active' | 'inactive' | 'suspended';
-  xp: number;
-  currentStreak: number;
-  longestStreak: number;
-  createdAt: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  occupationType: 'student' | 'professional' | 'academic' | 'other'; // Default: 'other'
+  occupationTitle: string | null;
+  organization: string | null;
+  experienceYears: number | null;
+  role: 'student' | 'admin' | 'user' | 'moderator'; // Default: 'student'
+  status: 'active' | 'inactive' | 'suspended'; // Default: 'active'
+  googleId: string | null;
+  emailVerified: boolean; // Default: false
+  xp: number; // Default: 0
+  currentStreak: number; // Default: 0
+  longestStreak: number; // Default: 0
+  metadata: Record&lt;string, any&gt;; // Default: {}
+  lastActiveAt: string; // Default: CURRENT_TIMESTAMP
+  createdAt: string; // Default: CURRENT_TIMESTAMP
+  updatedAt: string; // Default: CURRENT_TIMESTAMP
 }
 
 export interface Batch {
   id: number;
-  name: string;
   topic: string | null;
+  name: string;
+  description: string | null;
+  slug: string | null;
   price: number | null;
-  type: 'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship';
+  certificateFee: number; // Default: 0
+  limit: number | null; // Default: 0
+  img: string | null;
+  association: string | null;
+  logo: string | null;
+  type: 'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship'; // Default: 'cohort'
   startDate: string;
   endDate: string;
-  status: 'active' | 'private' | 'completed';
+  whatsAppLink: string | null;
+  telegramLink: string | null;
+  telegramBroadcast: string | null;
+  teacherId: string | null;
+  teacherPayment: boolean; // Default: false
+  meetingLink: string | null;
+  nextClassTopic: string | null;
+  desc: string | null;
+  nextClass: string | null;
+  status: 'active' | 'private' | 'completed'; // Default: 'private'
+  metadata: Record&lt;string, any&gt;; // Default: {}
+  accessTillDate: string | null;
+  accessTillYear: number; // Default: 1
+  createdAt: string | null; // Default: CURRENT_TIMESTAMP
+  updatedAt: string | null; // Default: CURRENT_TIMESTAMP
 }
 
 export interface BatchEnrollment {
@@ -305,11 +395,59 @@ export interface BatchEnrollment {
   userId: string;
   batchId: number;
   amountPayable: number | null;
-  enrollmentType: 'oneTime' | 'Subscription' | 'free';
-  status: number;
-  progress: number;
-  timeSpentSeconds: number;
-  paymentStatus: 'captured' | 'failed' | 'created' | 'refunded';
+  enrollmentType: 'oneTime' | 'Subscription' | 'free'; // Default: 'oneTime'
+  status: number; // Default: 0 (Inactive)
+  progress: number; // Default: 0
+  timeSpentSeconds: number; // Default: 0
+  amountPaid: number | null;
+  certificateFee: number | null;
+  paymentStatus: 'captured' | 'failed' | 'created' | 'refunded'; // Default: 'created'
+  paymentMethod: string | null;
+  couponCode: string | null;
+  transactionId: string | null;
+  invoiceId: string | null;
+  subscriptionId: string | null;
+  subscriptionStatus: 'active' | 'expired' | 'pending' | null;
+  subscriptionActiveOn: string | null;
+  subscriptionExpiresOn: string | null;
+  paidAt: string | null;
+  certificateId: string | null;
+  certificateGeneratedAt: string | null;
+  startedAt: string | null;
+  accessTill: string | null;
+  overrideAccessDays: number | null;
+  utmSource: string | null;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  remark: string | null;
+  metadata: Record&lt;string, any&gt;; // Default: {}
+  createdAt: string; // Default: CURRENT_TIMESTAMP
+  updatedAt: string; // Default: CURRENT_TIMESTAMP
+}
+
+export interface BatchSection {
+  id: number;
+  title: string;
+  batchId: number | null;
+  order: number | null;
+  createdAt: string; // Default: CURRENT_TIMESTAMP
+  updatedAt: string; // Default: CURRENT_TIMESTAMP
+}
+
+export interface BatchEnrollmentPayment {
+  id: number;
+  batchEnrollmentId: number;
+  amount: number;
+  paidAt: string;
+  paymentMethod: string | null;
+  transactionId: string | null;
+  invoiceId: string | null;
+  purpose: string; // Default: 'enrollment'
+  isGstApplicable: boolean; // Default: true
+  remarks: string | null;
+  metadata: Record&lt;string, any&gt;; // Default: {}
+  createdAt: string; // Default: CURRENT_TIMESTAMP
+  updatedAt: string; // Default: CURRENT_TIMESTAMP
 }</code></pre>
       </section>
 
@@ -324,9 +462,8 @@ export interface BatchEnrollment {
 
         <!-- Endpoint: POST /auth/register -->
         <div id="endpoint-register" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
-          <!-- Left/Middle Panel: Specs & Details -->
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Authentication</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Authentication</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Register account</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Creates a new student account record in the database. Defaults to role 'student' and status 'active'.
@@ -337,24 +474,12 @@ export interface BatchEnrollment {
             </div>
             
             <div class="space-y-2 pt-4">
-              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Request Headers</div>
-              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
-                <thead>
-                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Name</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2">Description</th></tr>
-                </thead>
-                <tbody>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">Content-Type</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 text-zinc-400">Must be 'application/json'</td></tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
-              <table class="w-full text-xs font-sans border-collapse border border-zinc-900 text-left">
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
-                <tbody class="font-sans">
+                <tbody>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">email</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Valid email format.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">password</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Minimum 6 characters.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">name</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Minimum 2 characters.</td></tr>
@@ -363,11 +488,10 @@ export interface BatchEnrollment {
             </div>
           </div>
 
-          <!-- Right Panel: Code Blocks & Responses -->
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/auth/register', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/auth/register', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -402,7 +526,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: POST /auth/login -->
         <div id="endpoint-login" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Authentication</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Authentication</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Login to account</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Verifies email and password, creates a unique session block in Redis, and returns the JWT Bearer Token.
@@ -414,7 +538,7 @@ export interface BatchEnrollment {
 
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
-              <table class="w-full text-xs font-sans border-collapse border border-zinc-900 text-left font-normal">
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
@@ -429,7 +553,7 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/auth/login', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/auth/login', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -463,7 +587,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: GET /auth/me -->
         <div id="endpoint-me" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Authentication</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Authentication</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Get Profile details</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Returns profile fields of the currently logged-in user. Requires valid JWT Token.
@@ -489,27 +613,12 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/auth/me', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/auth/me', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
 });</code></pre>
-            </div>
-            <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "data": {
-    "user": {
-      "id": "8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1",
-      "email": "student@example.com",
-      "name": "Jane Doe",
-      "role": "student",
-      "status": "active"
-    }
-  }
-}</code></pre>
             </div>
           </div>
         </div>
@@ -519,7 +628,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: POST /auth/logout -->
         <div id="endpoint-logout" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Authentication</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Authentication</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Logout user</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Removes the session block identifier from Redis, rendering the JWT token invalid for future requests.
@@ -533,19 +642,12 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/auth/logout', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/auth/logout', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
 });</code></pre>
-            </div>
-            <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "message": "Logout successful"
-}</code></pre>
             </div>
           </div>
         </div>
@@ -556,7 +658,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: GET /admin/users -->
         <div id="users-search" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Users</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Users</div>
             <h3 class="text-2xl font-semibold text-zinc-100">List and Search Users</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Query registered user records with paginated limits and optional keyword match on name, email, or mobile prefixes. Requires Admin Role.
@@ -568,7 +670,7 @@ export interface BatchEnrollment {
 
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
-              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Default</th><th class="p-2">Description</th></tr>
                 </thead>
@@ -584,30 +686,12 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/users?q=Aarav&limit=10&page=1', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/users?q=Aarav&limit=10&page=1', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
 });</code></pre>
-            </div>
-            <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "data": {
-    "users": [
-      {
-        "id": "a908a8f1-c4d3-4673-982c-47ea1fb1f2c2",
-        "email": "aarav.sharma@example.com",
-        "name": "Aarav Sharma",
-        "role": "student",
-        "status": "active"
-      }
-    ],
-    "pagination": { "page": 1, "limit": 10 }
-  }
-}</code></pre>
             </div>
           </div>
         </div>
@@ -617,7 +701,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: POST /admin/users -->
         <div id="users-create" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Users</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Users</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Create new user</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Forces creation of a new user account profile from the admin interface. Requires Admin Role.
@@ -629,7 +713,7 @@ export interface BatchEnrollment {
 
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
-              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left font-normal">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
@@ -647,7 +731,7 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/users', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/users', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -662,20 +746,6 @@ export interface BatchEnrollment {
   })
 });</code></pre>
             </div>
-            <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (201 Created)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "message": "User added successfully",
-  "data": {
-    "id": "c902b4d1-c221-4fb2-b7e1-88ffae28d9c2",
-    "email": "staff.moderator@example.com",
-    "name": "Staff Moderator",
-    "role": "moderator",
-    "status": "active"
-  }
-}</code></pre>
-            </div>
           </div>
         </div>
 
@@ -684,7 +754,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: PUT /admin/users/:id -->
         <div id="users-update" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Users</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Users</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Update User Profile</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Updates specific details for the user record matching the UUID in the URL path. Requires Admin Role.
@@ -705,17 +775,12 @@ export interface BatchEnrollment {
                 </tbody>
               </table>
             </div>
-
-            <div class="space-y-2 pt-4">
-              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON - Optional/Partial)</div>
-              <p class="text-xs text-zinc-500">Modify select fields such as name, bio, experienceYears, occupationType, organization, xp, or metadata.</p>
-            </div>
           </div>
 
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/users/8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/users/8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1', {
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json',
@@ -728,20 +793,6 @@ export interface BatchEnrollment {
   })
 });</code></pre>
             </div>
-            <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "data": {
-    "id": "8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1",
-    "name": "Jane Smith Updated",
-    "bio": "Professional Software Engineer",
-    "experienceYears": 4,
-    "email": "student@example.com",
-    "role": "student"
-  }
-}</code></pre>
-            </div>
           </div>
         </div>
 
@@ -750,71 +801,26 @@ export interface BatchEnrollment {
         <!-- Endpoint: GET /admin/users/:id/details -->
         <div id="users-details" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Users</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Users</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Get User Profile Details</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Fetches comprehensive user details including profile info, course enrollments history, progress percentages, and active device login session objects parsed from Redis. Requires Admin Role.
+              Retrieves a student's comprehensive unified details profile. Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
               <span class="text-zinc-200">/v1/admin/users/:id/details</span>
-            </div>
-            
-            <div class="space-y-2 pt-4">
-              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
-              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
-                <thead>
-                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
-                </thead>
-                <tbody>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">id</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">UUID identifier of the student.</td></tr>
-                </tbody>
-              </table>
             </div>
           </div>
 
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/users/8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1/details', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/users/8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1/details', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
 });</code></pre>
-            </div>
-            <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "data": {
-    "user": {
-      "id": "8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1",
-      "email": "student@example.com",
-      "name": "Jane Doe",
-      "role": "student",
-      "status": "active"
-    },
-    "enrollments": [
-      {
-        "id": 1,
-        "batchId": 4,
-        "batchName": "Full-Stack Web Cohort",
-        "progress": 75,
-        "timeSpentSeconds": 14400,
-        "paymentStatus": "captured"
-      }
-    ],
-    "activeSessions": [
-      {
-        "sessionId": "4b68ca90-8c2d-4dc0-891a-ddfe515bf7ed",
-        "ipAddress": "127.0.0.1",
-        "userAgent": "Mozilla/5.0...",
-        "createdAt": "2026-06-28T12:00:00.000Z"
-      }
-    ]
-  }
-}</code></pre>
             </div>
           </div>
         </div>
@@ -825,10 +831,10 @@ export interface BatchEnrollment {
         <!-- Endpoint: GET /admin/batches -->
         <div id="batches-search" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Batches</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batches</div>
             <h3 class="text-2xl font-semibold text-zinc-100">List and Filter Batches</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Searches course cohorts, webinars, and bookings using filters. Requires Admin Role.
+              Searches course batches using text keywords or type/status enums. Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
@@ -842,7 +848,7 @@ export interface BatchEnrollment {
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2">Description</th></tr>
                 </thead>
                 <tbody>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 text-zinc-400">Filter matches name or topic prefixes.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 text-zinc-400">Filter matches name, topic, or slug.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">type</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 text-zinc-400">'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship'</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">status</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 text-zinc-400">'active' | 'private' | 'completed'</td></tr>
                 </tbody>
@@ -853,7 +859,7 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/batches?type=cohort&status=active', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches?type=cohort&status=active', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
@@ -868,10 +874,10 @@ export interface BatchEnrollment {
         <!-- Endpoint: POST /admin/batches -->
         <div id="batches-create" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Batches</div>
-            <h3 class="text-2xl font-semibold text-zinc-100">Create new batch course</h3>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batches</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Create new batch</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Creates a new batch course cohort. Requires Admin Role.
+              Creates a new batch cohort course record. Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
@@ -881,7 +887,7 @@ export interface BatchEnrollment {
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
               <div class="max-h-[300px] overflow-y-auto border border-zinc-900 rounded-lg custom-scrollbar">
-                <table class="w-full text-xs border-collapse text-left">
+                <table class="w-full text-xs border-collapse text-left font-normal">
                   <thead>
                     <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono sticky top-0"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                   </thead>
@@ -918,7 +924,7 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/batches', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -942,7 +948,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: GET /admin/batches/:id -->
         <div id="batches-get" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Batches</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batches</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Get batch details</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Retrieves the complete profile data of a single course batch cohort by its ID. Requires Admin Role.
@@ -968,27 +974,12 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/batches/4', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches/4', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
 });</code></pre>
-            </div>
-            <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "data": {
-    "id": 4,
-    "name": "Next.js Frontend Engineering",
-    "startDate": "2026-07-01",
-    "endDate": "2026-09-01",
-    "price": 2499,
-    "type": "cohort",
-    "status": "active"
-  }
-}</code></pre>
             </div>
           </div>
         </div>
@@ -998,7 +989,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: PUT /admin/batches/:id -->
         <div id="batches-update" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Batches</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batches</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Update batch</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Updates specific parameters on a batch. Only the fields present in the JSON body will be validated and updated in the database. Requires Admin Role.
@@ -1010,7 +1001,7 @@ export interface BatchEnrollment {
 
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
-              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
@@ -1019,17 +1010,12 @@ export interface BatchEnrollment {
                 </tbody>
               </table>
             </div>
-
-            <div class="space-y-2 pt-4">
-              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON - Optional/Partial)</div>
-              <p class="text-xs text-zinc-500">Any valid batch field name, e.g. name, price, type, startDate, status, or whatsAppLink.</p>
-            </div>
           </div>
 
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/batches/4', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches/4', {
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json',
@@ -1041,19 +1027,6 @@ export interface BatchEnrollment {
   })
 });</code></pre>
             </div>
-            <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "message": "Batch updated successfully",
-  "data": {
-    "id": 4,
-    "name": "Next.js Advanced Workshop",
-    "price": 3499,
-    "status": "active"
-  }
-}</code></pre>
-            </div>
           </div>
         </div>
 
@@ -1062,7 +1035,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: DELETE /admin/batches/:id -->
         <div id="batches-delete" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Batches</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batches</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Delete batch</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Deletes a batch cohort course record from the database. Requires Admin Role.
@@ -1074,7 +1047,7 @@ export interface BatchEnrollment {
 
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
-              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
@@ -1088,19 +1061,55 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/batches/4', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches/4', {
   method: 'DELETE',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
 });</code></pre>
             </div>
+          </div>
+        </div>
+
+
+        <!-- -------------------- ADMIN: BATCH SECTIONS GROUP -------------------- -->
+
+        <!-- Endpoint: GET /admin/batch-sections -->
+        <div id="sections-search" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Sections</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">List curriculum sections</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Searches and lists sections headers mapping to batch courses. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/batch-sections</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 text-zinc-400">Keyword filter matching title.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 text-zinc-400">Numerical ID of the batch.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
-  "status": "success",
-  "message": "Batch deleted successfully"
-}</code></pre>
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-sections?batchId=4', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
             </div>
           </div>
         </div>
@@ -1108,12 +1117,12 @@ export interface BatchEnrollment {
         <hr class="border-zinc-900" />
 
         <!-- Endpoint: POST /admin/batch-sections -->
-        <div id="batches-sections" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+        <div id="sections-create" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Batches</div>
-            <h3 class="text-2xl font-semibold text-zinc-100">Create batch section</h3>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Sections</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Create section</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Adds a curriculum segment section header under a batch course. Requires Admin Role.
+              Adds a curriculum segment section header. Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
@@ -1122,7 +1131,7 @@ export interface BatchEnrollment {
             
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
-              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left font-normal font-sans">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
@@ -1138,7 +1147,7 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/batch-sections', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-sections', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -1154,27 +1163,132 @@ export interface BatchEnrollment {
           </div>
         </div>
 
+        <hr class="border-zinc-900" />
 
-        <!-- -------------------- ADMIN: ENROLLMENTS GROUP -------------------- -->
-
-        <!-- Endpoint: GET /admin/enrollments -->
-        <div id="enrollments-search" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+        <!-- Endpoint: GET /admin/batch-sections/:id -->
+        <div id="sections-get" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Enrollments</div>
-            <h3 class="text-2xl font-semibold text-zinc-100">List Student Enrollments</h3>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Sections</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get section details</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Searches active registrations and progresses. Requires Admin Role.
+              Retrieves profile details of a single section header by its database ID. Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
-              <span class="text-zinc-200">/v1/admin/enrollments</span>
+              <span class="text-zinc-200">/v1/admin/batch-sections/:id</span>
             </div>
           </div>
 
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/enrollments?limit=10', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-sections/12', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: PUT /admin/batch-sections/:id -->
+        <div id="sections-update" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Sections</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Update section</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates specific properties on a batch section. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">PUT</span>
+              <span class="text-zinc-200">/v1/admin/batch-sections/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-sections/12', {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  },
+  body: JSON.stringify({
+    title: 'Updated Section Name',
+    order: 2
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: DELETE /admin/batch-sections/:id -->
+        <div id="sections-delete" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Sections</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Delete section</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Permanently deletes a batch curriculum section from the database. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-bold">DELETE</span>
+              <span class="text-zinc-200">/v1/admin/batch-sections/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-sections/12', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- -------------------- ADMIN: ENROLLMENTS GROUP -------------------- -->
+
+        <!-- Endpoint: GET /admin/enrollments -->
+        <div id="enrollments-search" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Enrollments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">List Enrollments</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Queries registered student enrollments list with pagination. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/enrollments</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900 font-mono">Param</th><th class="p-2 border-r border-zinc-900 font-mono">Type</th><th class="p-2 font-mono">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 text-zinc-400">Filter matches name, email, transactionId.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 text-zinc-400">Numerical ID of the batch.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollments?limit=10', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
@@ -1189,10 +1303,10 @@ export interface BatchEnrollment {
         <!-- Endpoint: POST /admin/enrollments -->
         <div id="enrollments-create" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Enrollments</div>
-            <h3 class="text-2xl font-semibold text-zinc-100">Enroll student in batch</h3>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Enrollments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Create new enrollment</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Directly registers a student inside a course batch cohort. Requires Admin Role.
+              Enrolls a student inside a course batch. Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
@@ -1201,14 +1315,14 @@ export interface BatchEnrollment {
 
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
-              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left font-normal font-sans">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
                 <tbody>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">userId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Target User UUID.</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Target batch numerical ID.</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">amountPayable</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Agreed price amount.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">userId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Student User UUID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Batch numerical ID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">amountPayable</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Total pricing.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">enrollmentType</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'oneTime' | 'Subscription' | 'free'</td></tr>
                 </tbody>
               </table>
@@ -1218,7 +1332,7 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/enrollments', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollments', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -1237,13 +1351,107 @@ export interface BatchEnrollment {
 
         <hr class="border-zinc-900" />
 
-        <!-- Endpoint: GET /admin/enrollment-payments -->
+        <!-- Endpoint: GET /admin/enrollments/:id -->
+        <div id="enrollments-get" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Enrollments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get enrollment details</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Retrieves the profile fields of a single enrollment record by its ID. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/enrollments/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollments/48', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: PUT /admin/enrollments/:id -->
+        <div id="enrollments-update" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Enrollments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Update enrollment</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates tracking fields (progress percentage, time spent) or payment status for a student enrollment. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">PUT</span>
+              <span class="text-zinc-200">/v1/admin/enrollments/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollments/48', {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  },
+  body: JSON.stringify({
+    progress: 80,
+    timeSpentSeconds: 18000,
+    paymentStatus: 'captured'
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: DELETE /admin/enrollments/:id -->
+        <div id="enrollments-delete" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Enrollments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Delete enrollment</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Removes student registration from the batch course. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-bold">DELETE</span>
+              <span class="text-zinc-200">/v1/admin/enrollments/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollments/48', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- -------------------- ADMIN: PAYMENTS GROUP -------------------- -->
+
+        <!-- Endpoint: GET /admin/payments -->
         <div id="payments-search" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Payments</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Payments</div>
             <h3 class="text-2xl font-semibold text-zinc-100">List payment transactions</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Queries invoice transaction audits in the database. Requires Admin Role.
+              Queries billing transaction receipts logs with text and key filters. Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
@@ -1254,8 +1462,150 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/enrollment-payments', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollment-payments', {
   method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /admin/payments -->
+        <div id="payments-create" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Log payment transaction</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Logs a new transaction receipt mapping to student course enrollment. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/enrollment-payments</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">batchEnrollmentId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">ID of the enrollment.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">amount</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Price paid.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">paidAt</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">ISO Date string of transaction.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">purpose</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'enrollment', 'renewal', 'certificate', 'upgrade', 'refund'</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollment-payments', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  },
+  body: JSON.stringify({
+    batchEnrollmentId: 48,
+    amount: 1999,
+    paidAt: '2026-06-30T12:00:00.000Z',
+    purpose: 'enrollment'
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /admin/payments/:id -->
+        <div id="payments-get" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get payment transaction</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Gets details of a logged payment audit record by its ID. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/enrollment-payments/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollment-payments/5', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: PUT /admin/payments/:id -->
+        <div id="payments-update" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Update payment transaction</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates select fields of a transaction log. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">PUT</span>
+              <span class="text-zinc-200">/v1/admin/enrollment-payments/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollment-payments/5', {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  },
+  body: JSON.stringify({
+    remarks: 'Stripe webhook payment settled.'
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: DELETE /admin/payments/:id -->
+        <div id="payments-delete" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Delete payment transaction</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Removes the transaction log record. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-bold">DELETE</span>
+              <span class="text-zinc-200">/v1/admin/enrollment-payments/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollment-payments/5', {
+  method: 'DELETE',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
@@ -1270,7 +1620,7 @@ export interface BatchEnrollment {
         <!-- Endpoint: GET /admin/logs -->
         <div id="endpoint-system-logs" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
-            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Diagnostics</div>
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Diagnostics</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Fetch System Logs</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
               Reads real-time rotating structured logging entries from disk storage. Requires Admin Role.
@@ -1282,7 +1632,7 @@ export interface BatchEnrollment {
 
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
-              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal">
                 <thead>
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
@@ -1297,7 +1647,7 @@ export interface BatchEnrollment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://live.codekaro.in/v1/admin/logs/data?file=app-2026-06-28.log&level=error', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/logs/data?file=app-2026-06-28.log&level=error', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
