@@ -79,7 +79,7 @@ export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', '
 export const batchEnrollments = pgTable('batch_enrollments', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
   userId: uuid('user_id').references(() => users.id).notNull(),
-  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id).notNull(),
+  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id, { onDelete: 'cascade' }).notNull(),
   amountPayable: integer('amount_payable'),
   enrollmentType: enrollmentTypeEnum('enrollment_type').default('oneTime').notNull(),
   status: smallint('status').default(0).notNull(), // Active, Inactive, Cancelled, Suspended default inactive (0)
@@ -113,7 +113,7 @@ export const batchEnrollments = pgTable('batch_enrollments', {
 
 export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
-  batchEnrollmentId: bigint('batch_enrollment_id', { mode: 'number' }).references(() => batchEnrollments.id).notNull(),
+  batchEnrollmentId: bigint('batch_enrollment_id', { mode: 'number' }).references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
   amount: integer('amount').notNull(),
   paidAt: timestamp('paid_at').notNull(),
   paymentMethod: varchar('payment_method', { length: 100 }),
@@ -130,7 +130,7 @@ export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
 export const batchSections = pgTable('batch_sections', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
-  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id),
+  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id, { onDelete: 'cascade' }),
   order: integer('order'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
