@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batchEnrollments, users, batches } from '../../db/schema.js';
-import { eq, or, ilike, sql, and } from 'drizzle-orm';
+import { eq, or, ilike, sql, and, asc, desc } from 'drizzle-orm';
 
 export type Enrollment = typeof batchEnrollments.$inferSelect;
 export type NewEnrollment = typeof batchEnrollments.$inferInsert;
@@ -102,7 +102,15 @@ export class EnrollmentRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number, batchId?: number) {
+  public async search(
+    queryText: string,
+    limit: number,
+    offset: number,
+    batchId?: number,
+    paymentStatus?: 'captured' | 'failed' | 'created' | 'refunded',
+    sortBy: 'createdAt' | 'progress' | 'amountPaid' | 'timeSpentSeconds' = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ) {
     let query = db
       .select({
         id: batchEnrollments.id,
@@ -143,15 +151,42 @@ export class EnrollmentRepository {
     if (batchId !== undefined) {
       conditions.push(eq(batchEnrollments.batchId, batchId));
     }
+    if (paymentStatus) {
+      conditions.push(eq(batchEnrollments.paymentStatus, paymentStatus));
+    }
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
     }
 
-    return query.limit(limit).offset(offset);
+    let orderColumn;
+    switch (sortBy) {
+      case 'progress':
+        orderColumn = batchEnrollments.progress;
+        break;
+      case 'amountPaid':
+        orderColumn = batchEnrollments.amountPaid;
+        break;
+      case 'timeSpentSeconds':
+        orderColumn = batchEnrollments.timeSpentSeconds;
+        break;
+      case 'createdAt':
+      default:
+        orderColumn = batchEnrollments.createdAt;
+        break;
+    }
+
+    const sortFn = sortOrder === 'asc' ? asc : desc;
+    const orderByClause = orderColumn ? sortFn(orderColumn) : desc(batchEnrollments.createdAt);
+
+    return query.orderBy(orderByClause).limit(limit).offset(offset);
   }
 
-  public async count(queryText: string, batchId?: number): Promise<number> {
+  public async count(
+    queryText: string,
+    batchId?: number,
+    paymentStatus?: 'captured' | 'failed' | 'created' | 'refunded'
+  ): Promise<number> {
     let query = db
       .select({ count: sql<number>`count(*)` })
       .from(batchEnrollments)
@@ -172,6 +207,9 @@ export class EnrollmentRepository {
     }
     if (batchId !== undefined) {
       conditions.push(eq(batchEnrollments.batchId, batchId));
+    }
+    if (paymentStatus) {
+      conditions.push(eq(batchEnrollments.paymentStatus, paymentStatus));
     }
 
     if (conditions.length > 0) {

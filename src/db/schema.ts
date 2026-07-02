@@ -56,7 +56,7 @@ export const batches = pgTable('batches', {
   whatsAppLink: varchar('whatsapp_link', { length: 255 }),
   telegramLink: varchar('telegram_link', { length: 255 }),
   telegramBroadcast: varchar('telegram_broadcast', { length: 255 }),
-  teacherId: uuid('teacher_id').references(() => users.id),
+  teacherId: uuid('teacher_id').references(() => users.id, { onDelete: 'set null' }),
   teacherPayment: boolean('teacher_payment').default(false).notNull(),
   meetingLink: varchar('meeting_link', { length: 255 }),
   nextClassTopic: varchar('next_class_topic', { length: 255 }),
@@ -78,7 +78,7 @@ export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', '
 
 export const batchEnrollments = pgTable('batch_enrollments', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id, { onDelete: 'cascade' }).notNull(),
   amountPayable: integer('amount_payable'),
   enrollmentType: enrollmentTypeEnum('enrollment_type').default('oneTime').notNull(),

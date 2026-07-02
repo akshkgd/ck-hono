@@ -21,7 +21,14 @@ export class AdminService {
 
   public async searchUsers(input: AdminSearchQueryInput) {
     const offset = (input.page - 1) * input.limit;
-    const usersList = await this.userRepository.search(input.q, input.limit, offset);
+    const usersList = await this.userRepository.search(
+      input.q,
+      input.limit,
+      offset,
+      input.role,
+      input.sortBy,
+      input.sortOrder
+    );
     
     // Omit passwords from search list
     const usersWithoutPassword = usersList.map(({ password, ...user }) => user);

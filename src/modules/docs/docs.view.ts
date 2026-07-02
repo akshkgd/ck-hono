@@ -103,6 +103,10 @@ export function getDocsHtml(): string {
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
               <a href="#users-details" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">User details</a>
             </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
+              <a href="#users-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete user</a>
+            </li>
           </ul>
         </div>
 
@@ -670,14 +674,17 @@ export interface BatchEnrollmentPayment {
 
             <div class="space-y-2 pt-4">
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
-              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal">
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
                 <thead>
-                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Default</th><th class="p-2">Description</th></tr>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900 font-mono">Param</th><th class="p-2 border-r border-zinc-900 font-mono">Type</th><th class="p-2 border-r border-zinc-900 font-mono">Default</th><th class="p-2 font-mono">Description</th></tr>
                 </thead>
                 <tbody>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">""</td><td class="p-2 text-zinc-400">Prefix filter matching name or email.</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">limit</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">10</td><td class="p-2 text-zinc-400">Max size (1 to 50).</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">page</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">1</td><td class="p-2 text-zinc-400">Offset multiplier.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">""</td><td class="p-2 text-zinc-400">Prefix filter matching name, email, or mobile.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">role</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">-</td><td class="p-2 text-zinc-400">Filter by user role: 'student' | 'admin' | 'user' | 'moderator'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">sortBy</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">'createdAt'</td><td class="p-2 text-zinc-400">Sort by field: 'createdAt' | 'name' | 'email' | 'xp' | 'lastActiveAt'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">sortOrder</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">'desc'</td><td class="p-2 text-zinc-400">Sort direction order: 'asc' | 'desc'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">limit</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">10</td><td class="p-2 text-zinc-400">Max page size (1 to 50).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">page</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">1</td><td class="p-2 text-zinc-400">Offset pagination page multiplier.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -686,7 +693,7 @@ export interface BatchEnrollmentPayment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/users?q=Aarav&limit=10&page=1', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/users?role=student&sortBy=createdAt&sortOrder=desc&limit=10&page=1', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
@@ -825,6 +832,55 @@ export interface BatchEnrollmentPayment {
           </div>
         </div>
 
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: DELETE /admin/users/:id -->
+        <div id="users-delete" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Users</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Delete user</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Permanently deletes the user record matching the UUID in the URL path. All associated enrollments are deleted cascade-style, and teacher association fields are set to null. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-bold">DELETE</span>
+              <span class="text-zinc-200">/v1/admin/users/:id</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900 font-mono">Param</th><th class="p-2 border-r border-zinc-900 font-mono">Type</th><th class="p-2 border-r border-zinc-900 font-mono">Required</th><th class="p-2 font-mono">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">id</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Numerical database ID of the batch.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/users/8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "User deleted successfully"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
 
         <!-- -------------------- ADMIN: BATCHES GROUP -------------------- -->
 
@@ -1275,11 +1331,16 @@ export interface BatchEnrollmentPayment {
               <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
               <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
                 <thead>
-                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900 font-mono">Param</th><th class="p-2 border-r border-zinc-900 font-mono">Type</th><th class="p-2 font-mono">Description</th></tr>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900 font-mono">Param</th><th class="p-2 border-r border-zinc-900 font-mono">Type</th><th class="p-2 border-r border-zinc-900 font-mono">Default</th><th class="p-2 font-mono">Description</th></tr>
                 </thead>
                 <tbody>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 text-zinc-400">Filter matches name, email, transactionId.</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 text-zinc-400">Numerical ID of the batch.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">""</td><td class="p-2 text-zinc-400">Filter matches name, email, couponCode, or transactionId.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">-</td><td class="p-2 text-zinc-400">Filter by numerical ID of the batch course.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">paymentStatus</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">-</td><td class="p-2 text-zinc-400">Filter by payment status: 'captured' | 'failed' | 'created' | 'refunded'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">sortBy</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">'createdAt'</td><td class="p-2 text-zinc-400">Sort by field: 'createdAt' | 'progress' | 'amountPaid' | 'timeSpentSeconds'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">sortOrder</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">'desc'</td><td class="p-2 text-zinc-400">Sort direction order: 'asc' | 'desc'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">limit</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">10</td><td class="p-2 text-zinc-400">Max page size (1 to 50).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">page</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">1</td><td class="p-2 text-zinc-400">Offset pagination page multiplier.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1288,7 +1349,7 @@ export interface BatchEnrollmentPayment {
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollments?limit=10', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollments?paymentStatus=captured&sortBy=createdAt&sortOrder=desc&limit=10&page=1', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'

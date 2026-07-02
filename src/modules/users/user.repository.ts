@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { users } from '../../db/schema.js';
-import { eq, or, ilike } from 'drizzle-orm';
+import { eq, or, ilike, and, asc, desc } from 'drizzle-orm';
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -64,18 +64,64 @@ export class UserRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number): Promise<User[]> {
-    const searchPattern = `${queryText}%`;
-    return db
-      .select()
-      .from(users)
-      .where(
+  public async search(
+    queryText: string,
+    limit: number,
+    offset: number,
+    role?: 'student' | 'admin' | 'user' | 'moderator',
+    sortBy: 'createdAt' | 'name' | 'email' | 'xp' | 'lastActiveAt' = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ): Promise<User[]> {
+    const conditions = [];
+
+    if (queryText) {
+      const searchPattern = `${queryText}%`;
+      conditions.push(
         or(
           ilike(users.name, searchPattern),
           ilike(users.email, searchPattern),
           ilike(users.mobile, searchPattern)
         )
-      )
+      );
+    }
+
+    if (role) {
+      conditions.push(eq(users.role, role));
+    }
+
+    let orderColumn;
+    switch (sortBy) {
+      case 'name':
+        orderColumn = users.name;
+        break;
+      case 'email':
+        orderColumn = users.email;
+        break;
+      case 'xp':
+        orderColumn = users.xp;
+        break;
+      case 'lastActiveAt':
+        orderColumn = users.lastActiveAt;
+        break;
+      case 'createdAt':
+      default:
+        orderColumn = users.createdAt;
+        break;
+    }
+
+    const sortFn = sortOrder === 'asc' ? asc : desc;
+    const orderByClause = orderColumn ? sortFn(orderColumn) : desc(users.createdAt);
+
+    const query = db
+      .select()
+      .from(users);
+
+    if (conditions.length > 0) {
+      query.where(and(...conditions));
+    }
+
+    return query
+      .orderBy(orderByClause)
       .limit(limit)
       .offset(offset);
   }
