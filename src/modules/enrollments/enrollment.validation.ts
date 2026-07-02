@@ -45,8 +45,8 @@ export const enrollmentSearchQuerySchema = z.object({
   paymentStatus: paymentStatusSchema.optional(),
   sortBy: z.enum(['createdAt', 'progress', 'amountPaid', 'timeSpentSeconds']).optional().default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
-  limit: z.preprocess((val) => parseInt(val as string, 10), z.number().int().min(1).max(50).default(10)),
-  page: z.preprocess((val) => parseInt(val as string, 10), z.number().int().min(1).default(1)),
+  limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(50).default(10)),
+  page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
 });
 
 export type CreateEnrollmentInput = z.infer<typeof createEnrollmentSchema>;

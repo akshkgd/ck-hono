@@ -192,14 +192,18 @@ export class EnrollmentRepository {
     userId?: string,
     paymentStatus?: 'captured' | 'failed' | 'created' | 'refunded'
   ): Promise<number> {
-    let query = db
-      .select({ count: sql<number>`count(*)` })
-      .from(batchEnrollments)
-      .leftJoin(users, eq(batchEnrollments.userId, users.id))
-      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id))
-      .$dynamic();
-
     const conditions = [];
+    if (batchId !== undefined) {
+      conditions.push(eq(batchEnrollments.batchId, batchId));
+    }
+    if (userId !== undefined) {
+      conditions.push(eq(batchEnrollments.userId, userId));
+    }
+    if (paymentStatus) {
+      conditions.push(eq(batchEnrollments.paymentStatus, paymentStatus));
+    }
+
+    let query;
     if (queryText) {
       const searchPattern = `%${queryText}%`;
       conditions.push(
@@ -209,15 +213,17 @@ export class EnrollmentRepository {
           ilike(batches.name, searchPattern)
         )
       );
-    }
-    if (batchId !== undefined) {
-      conditions.push(eq(batchEnrollments.batchId, batchId));
-    }
-    if (userId !== undefined) {
-      conditions.push(eq(batchEnrollments.userId, userId));
-    }
-    if (paymentStatus) {
-      conditions.push(eq(batchEnrollments.paymentStatus, paymentStatus));
+      query = db
+        .select({ count: sql<number>`count(*)` })
+        .from(batchEnrollments)
+        .leftJoin(users, eq(batchEnrollments.userId, users.id))
+        .leftJoin(batches, eq(batchEnrollments.batchId, batches.id))
+        .$dynamic();
+    } else {
+      query = db
+        .select({ count: sql<number>`count(*)` })
+        .from(batchEnrollments)
+        .$dynamic();
     }
 
     if (conditions.length > 0) {
