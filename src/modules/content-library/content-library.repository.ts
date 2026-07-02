@@ -47,7 +47,13 @@ export class ContentLibraryRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number, type?: 'video' | 'coding lab' | 'assignment' | 'article'): Promise<ContentLibraryItem[]> {
+  public async search(
+    queryText: string,
+    limit: number,
+    offset: number,
+    type?: 'video' | 'coding lab' | 'assignment' | 'article',
+    contentType?: 'primary' | 'secondary'
+  ): Promise<ContentLibraryItem[]> {
     let query = db.select().from(contentLibrary).$dynamic();
     
     const conditions = [];
@@ -57,6 +63,9 @@ export class ContentLibraryRepository {
     if (type !== undefined) {
       conditions.push(eq(contentLibrary.type, type));
     }
+    if (contentType !== undefined) {
+      conditions.push(eq(contentLibrary.contentType, contentType));
+    }
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
@@ -65,7 +74,11 @@ export class ContentLibraryRepository {
     return query.limit(limit).offset(offset);
   }
 
-  public async count(queryText: string, type?: 'video' | 'coding lab' | 'assignment' | 'article'): Promise<number> {
+  public async count(
+    queryText: string,
+    type?: 'video' | 'coding lab' | 'assignment' | 'article',
+    contentType?: 'primary' | 'secondary'
+  ): Promise<number> {
     let query = db.select({ count: sql<number>`count(*)` }).from(contentLibrary).$dynamic();
     
     const conditions = [];
@@ -74,6 +87,9 @@ export class ContentLibraryRepository {
     }
     if (type !== undefined) {
       conditions.push(eq(contentLibrary.type, type));
+    }
+    if (contentType !== undefined) {
+      conditions.push(eq(contentLibrary.contentType, contentType));
     }
 
     if (conditions.length > 0) {

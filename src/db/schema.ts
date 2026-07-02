@@ -160,6 +160,8 @@ export const contentLibrary = pgTable('content_library', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   index('content_library_type_idx').on(table.type),
+  index('content_library_content_type_idx').on(table.contentType),
+  index('content_library_title_idx').on(table.title),
 ]);
 
 

@@ -75,7 +75,7 @@ export class UserRepository {
     const conditions = [];
 
     if (queryText) {
-      const searchPattern = `${queryText}%`;
+      const searchPattern = `%${queryText}%`;
       conditions.push(
         or(
           ilike(users.name, searchPattern),

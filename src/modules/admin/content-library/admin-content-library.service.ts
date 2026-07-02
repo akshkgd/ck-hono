@@ -54,8 +54,8 @@ export class AdminContentLibraryService {
 
   public async searchItems(input: ContentLibrarySearchQueryInput) {
     const offset = (input.page - 1) * input.limit;
-    const items = await this.contentLibraryRepository.search(input.q, input.limit, offset, input.type);
-    const total = await this.contentLibraryRepository.count(input.q, input.type);
+    const items = await this.contentLibraryRepository.search(input.q, input.limit, offset, input.type, input.contentType);
+    const total = await this.contentLibraryRepository.count(input.q, input.type, input.contentType);
 
     return {
       items,
