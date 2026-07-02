@@ -35,7 +35,8 @@ export const users = pgTable('users', {
 }, (table) => [
   index('users_name_idx').on(table.name),
   index('users_email_idx').on(table.email),
-  index('users_mobile_idx').on(table.mobile)
+  index('users_mobile_idx').on(table.mobile),
+  index('users_created_at_idx').on(table.createdAt)
 ]);
 
 export const batches = pgTable('batches', {
@@ -130,7 +131,9 @@ export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
   metadata: jsonb('metadata').default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('batch_payments_paid_at_idx').on(table.paidAt),
+]);
 
 export const batchSections = pgTable('batch_sections', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),

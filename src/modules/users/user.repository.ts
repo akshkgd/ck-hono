@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { users } from '../../db/schema.js';
-import { eq, or, ilike, and, asc, desc } from 'drizzle-orm';
+import { eq, or, ilike, and, asc, desc, sql } from 'drizzle-orm';
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -124,5 +124,24 @@ export class UserRepository {
       .orderBy(orderByClause)
       .limit(limit)
       .offset(offset);
+  }
+
+  public async count(role?: 'student' | 'admin' | 'user' | 'moderator'): Promise<number> {
+    const query = db
+      .select({ count: sql<number>`count(*)` })
+      .from(users)
+      .$dynamic();
+
+    const conditions = [];
+    if (role) {
+      conditions.push(eq(users.role, role));
+    }
+
+    if (conditions.length > 0) {
+      query.where(and(...conditions));
+    }
+
+    const results = await query;
+    return Number(results[0]?.count || 0);
   }
 }
