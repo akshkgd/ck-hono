@@ -107,6 +107,7 @@ export class EnrollmentRepository {
     limit: number,
     offset: number,
     batchId?: number,
+    userId?: string,
     paymentStatus?: 'captured' | 'failed' | 'created' | 'refunded',
     sortBy: 'createdAt' | 'progress' | 'amountPaid' | 'timeSpentSeconds' = 'createdAt',
     sortOrder: 'asc' | 'desc' = 'desc'
@@ -151,6 +152,9 @@ export class EnrollmentRepository {
     if (batchId !== undefined) {
       conditions.push(eq(batchEnrollments.batchId, batchId));
     }
+    if (userId !== undefined) {
+      conditions.push(eq(batchEnrollments.userId, userId));
+    }
     if (paymentStatus) {
       conditions.push(eq(batchEnrollments.paymentStatus, paymentStatus));
     }
@@ -185,6 +189,7 @@ export class EnrollmentRepository {
   public async count(
     queryText: string,
     batchId?: number,
+    userId?: string,
     paymentStatus?: 'captured' | 'failed' | 'created' | 'refunded'
   ): Promise<number> {
     let query = db
@@ -207,6 +212,9 @@ export class EnrollmentRepository {
     }
     if (batchId !== undefined) {
       conditions.push(eq(batchEnrollments.batchId, batchId));
+    }
+    if (userId !== undefined) {
+      conditions.push(eq(batchEnrollments.userId, userId));
     }
     if (paymentStatus) {
       conditions.push(eq(batchEnrollments.paymentStatus, paymentStatus));

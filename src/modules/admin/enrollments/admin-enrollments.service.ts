@@ -57,11 +57,17 @@ export class AdminEnrollmentsService {
       input.limit,
       offset,
       input.batchId,
+      input.userId,
       input.paymentStatus,
       input.sortBy,
       input.sortOrder
     );
-    const total = await this.enrollmentRepository.count(input.q, input.batchId, input.paymentStatus);
+    const total = await this.enrollmentRepository.count(
+      input.q,
+      input.batchId,
+      input.userId,
+      input.paymentStatus
+    );
 
     return {
       enrollments,
