@@ -45,6 +45,7 @@ export class EnrollmentRepository {
           id: users.id,
           name: users.name,
           email: users.email,
+          mobile: users.mobile,
         },
         batch: {
           id: batches.id,
@@ -121,11 +122,13 @@ export class EnrollmentRepository {
         enrollmentType: batchEnrollments.enrollmentType,
         status: batchEnrollments.status,
         progress: batchEnrollments.progress,
+        timeSpentSeconds: batchEnrollments.timeSpentSeconds,
         paymentStatus: batchEnrollments.paymentStatus,
         createdAt: batchEnrollments.createdAt,
         user: {
           name: users.name,
           email: users.email,
+          mobile: users.mobile,
         },
         batch: {
           name: batches.name,
