@@ -20,6 +20,7 @@ import adminBatchContentRouter from './modules/admin/batch-content/admin-batch-c
 import adminLogsRouter from './modules/admin/logs/admin-logs.route.js';
 import docsRouter from './modules/docs/docs.route.js';
 import playgroundRouter from './modules/playground/playground.route.js';
+import courseProgressRouter from './modules/course-progress/course-progress.route.js';
 import { activityMiddleware } from './middleware/activity.middleware.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
@@ -72,6 +73,7 @@ v1.route('/admin/reports', adminReportsRouter);
 v1.route('/admin/analytics', adminAnalyticsRouter);
 v1.route('/admin/batch-contents', adminBatchContentRouter);
 v1.route('/admin/logs', adminLogsRouter);
+v1.route('/course-progress', courseProgressRouter);
 
 // Register Routes
 app.route('/v1', v1);

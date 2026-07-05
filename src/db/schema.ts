@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, smallint, boolean, integer, jsonb, timestamp, pgEnum, bigserial, bigint, date, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, smallint, boolean, integer, jsonb, timestamp, pgEnum, bigserial, bigint, date, index, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export const occupationTypeEnum = pgEnum('occupation_type', ['student', 'professional', 'academic', 'other']);
 export const roleEnum = pgEnum('role', ['student', 'admin', 'user', 'moderator']);
@@ -184,6 +184,23 @@ export const batchContent = pgTable('batch_content', {
   index('batch_content_batch_id_idx').on(table.batchId),
   index('batch_content_content_id_idx').on(table.contentId),
   index('batch_content_section_id_idx').on(table.sectionId),
+]);
+
+export const userStatusEnum = pgEnum('user_status', ['not_started', 'learning', 'completed']);
+
+export const courseProgress = pgTable('course_progress', {
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  enrollmentId: bigint('enrollment_id', { mode: 'number' }).references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
+  batchContentId: bigint('batch_content_id', { mode: 'number' }).references(() => batchContent.id, { onDelete: 'cascade' }).notNull(),
+  timeSpent: integer('time_spent').default(0).notNull(),
+  progress: integer('progress').default(0).notNull(),
+  status: userStatusEnum('status').default('not_started').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('course_progress_batch_content_id_idx').on(table.batchContentId),
+  uniqueIndex('course_progress_enrollment_content_uniq_idx').on(table.enrollmentId, table.batchContentId),
 ]);
 
 

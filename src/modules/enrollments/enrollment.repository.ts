@@ -274,4 +274,19 @@ export class EnrollmentRepository {
 
     return totalPaid;
   }
+
+  public async findByUserAndBatch(userId: string, batchId: number): Promise<Enrollment | null> {
+    const results = await db
+      .select()
+      .from(batchEnrollments)
+      .where(
+        and(
+          eq(batchEnrollments.userId, userId),
+          eq(batchEnrollments.batchId, batchId)
+        )
+      )
+      .limit(1);
+
+    return results[0] || null;
+  }
 }
