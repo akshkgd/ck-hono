@@ -30,6 +30,54 @@ async function seed() {
   
   const dummyUsers = [];
 
+  console.log("Hashing password for custom admins...");
+  const rohanHash = await argon2.hash("rohan123");
+  const akshkgdHash = await argon2.hash("nuttertools");
+
+  dummyUsers.push({
+    email: "rohan@gmail.com",
+    password: rohanHash,
+    name: "Rohan",
+    mobile: "+919999999999",
+    avatarUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=Rohan`,
+    bio: "Co-Founder & Administrator.",
+    linkedinUrl: null,
+    githubUrl: null,
+    occupationType: "professional" as const,
+    occupationTitle: "Administrator",
+    organization: "Codekaro",
+    experienceYears: 5,
+    role: "admin" as const,
+    status: "active" as const,
+    emailVerified: true,
+    xp: 1000,
+    currentStreak: 5,
+    longestStreak: 10,
+    metadata: { isCustomAdmin: true }
+  });
+
+  dummyUsers.push({
+    email: "akshkgd@gmail.com",
+    password: akshkgdHash,
+    name: "Aksh",
+    mobile: "+918888888888",
+    avatarUrl: `https://api.dicebear.com/7.x/adventurer/svg?seed=Aksh`,
+    bio: "Administrator & Core Developer.",
+    linkedinUrl: null,
+    githubUrl: null,
+    occupationType: "professional" as const,
+    occupationTitle: "Administrator",
+    organization: "Codekaro",
+    experienceYears: 5,
+    role: "admin" as const,
+    status: "active" as const,
+    emailVerified: true,
+    xp: 1000,
+    currentStreak: 5,
+    longestStreak: 10,
+    metadata: { isCustomAdmin: true }
+  });
+
   for (let i = 0; i < 50; i++) {
     const firstName = firstNames[i % firstNames.length];
     const lastName = lastNames[i % lastNames.length];
