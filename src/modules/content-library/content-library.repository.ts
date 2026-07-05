@@ -99,4 +99,13 @@ export class ContentLibraryRepository {
     const results = await query;
     return Number(results[0]?.count || 0);
   }
+
+  public async createMany(data: NewContentLibraryItem[]): Promise<ContentLibraryItem[]> {
+    const results = await db
+      .insert(contentLibrary)
+      .values(data)
+      .returning();
+    
+    return results;
+  }
 }
