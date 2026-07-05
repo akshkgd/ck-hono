@@ -543,6 +543,21 @@ export interface ContentLibraryItem {
   metadata: Record&lt;string, any&gt;; // Default: {}
   createdAt: string; // Default: CURRENT_TIMESTAMP
   updatedAt: string; // Default: CURRENT_TIMESTAMP
+}
+
+export interface BatchContent {
+  id: number;
+  batchId: number;
+  contentId: number;
+  sectionId: number;
+  order: number | null;
+  accessOn: number; // Default: 0
+  accessTill: number; // Default: 0
+  accessOnDate: string | null;
+  accessTillDate: string | null;
+  metadata: Record&lt;string, any&gt;; // Default: {}
+  createdAt: string; // Default: CURRENT_TIMESTAMP
+  updatedAt: string; // Default: CURRENT_TIMESTAMP
 }</code></pre>
       </section>
 
