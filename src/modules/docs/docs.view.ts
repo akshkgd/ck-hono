@@ -156,8 +156,14 @@ export function getDocsHtml(): string {
               <a href="#sections-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update section</a>
             </li>
             <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
+              <a href="#sections-reorder" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Reorder sections</a>
+            </li>
+            <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
               <a href="#sections-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete section</a>
+            </li>
+          </ul>
         </div>
 
         <div>
@@ -182,6 +188,36 @@ export function getDocsHtml(): string {
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
               <a href="#content-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete item</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Batch Content</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#batch-content-search" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List batch content</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#batch-content-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Associate content</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#batch-content-get" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get linkage</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
+              <a href="#batch-content-reorder" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Reorder content</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
+              <a href="#batch-content-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update linkage</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
+              <a href="#batch-content-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete linkage</a>
             </li>
           </ul>
         </div>
@@ -1365,6 +1401,44 @@ export interface ContentLibraryItem {
             </div>
           </div>
         </div>
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: PUT /admin/batch-sections/reorder -->
+        <div id="sections-reorder" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Sections</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Reorder sections</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates ordering positions for multiple curriculum sections at once. Supports drag-and-drop hierarchy syncing. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">PUT</span>
+              <span class="text-zinc-200">/v1/admin/batch-sections/reorder</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-sections/reorder', {
+  method: 'PUT',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    orders: [
+      { id: 12, order: 1 },
+      { id: 14, order: 2 }
+    ]
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+
+        <hr class="border-zinc-900" />
 
 
         <!-- -------------------- ADMIN: CONTENT LIBRARY GROUP -------------------- -->
@@ -1585,6 +1659,218 @@ export interface ContentLibraryItem {
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
               <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/content-library/1', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+
+        <!-- -------------------- ADMIN: BATCH CONTENT GROUP -------------------- -->
+
+        <!-- Endpoint: GET /admin/batch-contents -->
+        <div id="batch-content-search" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Content</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">List batch content mappings</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Searches and lists learning resources mapped to curriculum sections under specific batches. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/batch-contents</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900 font-mono">Param</th><th class="p-2 border-r border-zinc-900 font-mono">Type</th><th class="p-2 border-r border-zinc-900 font-mono">Default</th><th class="p-2 font-mono">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">-</td><td class="p-2 text-zinc-400">Filter by batch ID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-400">sectionId</td><td class="p-2 border-r border-zinc-900 text-zinc-500">-</td><td class="p-2 text-zinc-400">Filter by batch section ID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">limit</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">10</td><td class="p-2 text-zinc-400">Max page size.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">page</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">1</td><td class="p-2 text-zinc-400">Offset pagination page.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-contents?batchId=2&limit=10', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /admin/batch-contents -->
+        <div id="batch-content-create" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Content</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Associate learning resource</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Links a content library item to a curriculum section under a specific batch, with optional access release controls and automatically assigned order value. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/batch-contents</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-contents', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    batchId: 2,
+    sectionId: 12,
+    contentId: 4,
+    accessOn: 0,
+    accessTill: 30
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /admin/batch-contents/:id -->
+        <div id="batch-content-get" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Content</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get linkage details</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Returns specific curriculum association details by its ID. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/batch-contents/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-contents/8', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: PUT /admin/batch-contents/reorder -->
+        <div id="batch-content-reorder" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Content</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Reorder curriculum contents</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates ordering positions for multiple associated chapters or resource files at once, enabling drag-and-drop ordering. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">PUT</span>
+              <span class="text-zinc-200">/v1/admin/batch-contents/reorder</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-contents/reorder', {
+  method: 'PUT',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    orders: [
+      { id: 8, order: 1 },
+      { id: 10, order: 2 }
+    ]
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: PUT /admin/batch-contents/:id -->
+        <div id="batch-content-update" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Content</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Update content linkage</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates release date fields, metadata, or linked section for an associated chapter. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">PUT</span>
+              <span class="text-zinc-200">/v1/admin/batch-contents/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-contents/8', {
+  method: 'PUT',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    accessOn: 1,
+    accessTillDate: "2026-12-31"
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: DELETE /admin/batch-contents/:id -->
+        <div id="batch-content-delete" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Content</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Delete content linkage</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Removes the curriculum section linkage for a content item. The item itself is NOT deleted from the central library. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-bold">DELETE</span>
+              <span class="text-zinc-200">/v1/admin/batch-contents/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-contents/8', {
   method: 'DELETE',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'

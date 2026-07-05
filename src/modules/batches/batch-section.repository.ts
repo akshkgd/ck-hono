@@ -83,4 +83,15 @@ export class BatchSectionRepository {
     const results = await query;
     return Number(results[0]?.count || 0);
   }
+
+  public async updateOrders(orders: { id: number; order: number }[]): Promise<void> {
+    await db.transaction(async (tx) => {
+      for (const item of orders) {
+        await tx
+          .update(batchSections)
+          .set({ order: item.order, updatedAt: new Date() })
+          .where(eq(batchSections.id, item.id));
+      }
+    });
+  }
 }

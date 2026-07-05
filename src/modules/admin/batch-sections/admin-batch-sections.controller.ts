@@ -3,7 +3,8 @@ import { AdminBatchSectionsService } from './admin-batch-sections.service.js';
 import {
   createBatchSectionSchema,
   updateBatchSectionSchema,
-  batchSectionSearchQuerySchema
+  batchSectionSearchQuerySchema,
+  batchSectionReorderSchema,
 } from '../../batches/batch-section.validation.js';
 
 export class AdminBatchSectionsController {
@@ -108,6 +109,24 @@ export class AdminBatchSectionsController {
       return c.json({
         status: 'error',
         message: err.message || 'Failed to delete batch section',
+      }, 400);
+    }
+  };
+
+  public reorder = async (c: Context) => {
+    try {
+      const rawBody = await c.req.json();
+      const body = batchSectionReorderSchema.parse(rawBody);
+
+      await this.adminBatchSectionsService.reorderSections(body.orders);
+      return c.json({
+        status: 'success',
+        message: 'Batch sections reordered successfully',
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to reorder batch sections',
       }, 400);
     }
   };

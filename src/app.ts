@@ -16,6 +16,7 @@ import adminBatchSectionsRouter from './modules/admin/batch-sections/admin-batch
 import adminContentLibraryRouter from './modules/admin/content-library/admin-content-library.route.js';
 import adminReportsRouter from './modules/reports/reports.route.js';
 import adminAnalyticsRouter from './modules/admin/analytics/analytics.route.js';
+import adminBatchContentRouter from './modules/admin/batch-content/admin-batch-content.route.js';
 import adminLogsRouter from './modules/admin/logs/admin-logs.route.js';
 import docsRouter from './modules/docs/docs.route.js';
 import playgroundRouter from './modules/playground/playground.route.js';
@@ -69,6 +70,7 @@ v1.route('/admin/batch-sections', adminBatchSectionsRouter);
 v1.route('/admin/content-library', adminContentLibraryRouter);
 v1.route('/admin/reports', adminReportsRouter);
 v1.route('/admin/analytics', adminAnalyticsRouter);
+v1.route('/admin/batch-contents', adminBatchContentRouter);
 v1.route('/admin/logs', adminLogsRouter);
 
 // Register Routes

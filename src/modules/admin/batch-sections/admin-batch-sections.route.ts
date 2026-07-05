@@ -14,6 +14,7 @@ adminBatchSectionsRouter.use('*', authMiddleware(), adminMiddleware());
 adminBatchSectionsRouter.get('/', controller.search);
 adminBatchSectionsRouter.get('/:id', controller.get);
 adminBatchSectionsRouter.post('/', zValidator('json', createBatchSectionSchema), controller.create);
+adminBatchSectionsRouter.put('/reorder', controller.reorder);
 adminBatchSectionsRouter.put('/:id', zValidator('json', updateBatchSectionSchema), controller.edit);
 adminBatchSectionsRouter.delete('/:id', controller.delete);
 

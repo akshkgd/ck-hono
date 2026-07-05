@@ -18,3 +18,14 @@ export const batchSectionSearchQuerySchema = z.object({
 export type CreateBatchSectionInput = z.infer<typeof createBatchSectionSchema>;
 export type UpdateBatchSectionInput = z.infer<typeof updateBatchSectionSchema>;
 export type BatchSectionSearchQueryInput = z.infer<typeof batchSectionSearchQuerySchema>;
+
+export const batchSectionReorderSchema = z.object({
+  orders: z.array(
+    z.object({
+      id: z.number().int().positive(),
+      order: z.number().int(),
+    })
+  ),
+});
+
+export type BatchSectionReorderInput = z.infer<typeof batchSectionReorderSchema>;

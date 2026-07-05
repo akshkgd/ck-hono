@@ -42,6 +42,7 @@ export class AdminEnrollmentsService {
     // 4. Create record (parsing date strings to Date objects)
     const newEnrollment = await this.enrollmentRepository.create({
       ...input,
+      amountPaid: input.amountPaid ?? 0,
       paidAt: input.paidAt ? new Date(input.paidAt) : null,
       certificateGeneratedAt: input.certificateGeneratedAt ? new Date(input.certificateGeneratedAt) : null,
       startedAt: input.startedAt ? new Date(input.startedAt) : null,
@@ -116,6 +117,7 @@ export class AdminEnrollmentsService {
 
     const updated = await this.enrollmentRepository.update(id, {
       ...input,
+      amountPaid: input.amountPaid ?? undefined,
       paidAt: input.paidAt ? new Date(input.paidAt) : undefined,
       certificateGeneratedAt: input.certificateGeneratedAt ? new Date(input.certificateGeneratedAt) : undefined,
       startedAt: input.startedAt ? new Date(input.startedAt) : undefined,

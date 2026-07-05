@@ -78,4 +78,9 @@ export class AdminBatchSectionsService {
       }
     };
   }
+
+  public async reorderSections(orders: { id: number; order: number }[]) {
+    await this.batchSectionRepository.updateOrders(orders);
+    return true;
+  }
 }

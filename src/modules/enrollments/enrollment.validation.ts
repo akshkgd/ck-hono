@@ -12,7 +12,7 @@ export const createEnrollmentSchema = z.object({
   status: z.number().int().min(0).max(4).default(0),
   progress: z.number().int().min(0).max(100).default(0),
   timeSpentSeconds: z.number().int().nonnegative().default(0),
-  amountPaid: z.number().int().nonnegative().optional().nullable(),
+  amountPaid: z.number().int().nonnegative().optional(),
   certificateFee: z.number().int().nonnegative().optional().nullable(),
   paymentStatus: paymentStatusSchema.default('created'),
   paymentMethod: z.string().max(50).optional().nullable(),

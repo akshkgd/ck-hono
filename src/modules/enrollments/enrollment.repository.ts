@@ -1,5 +1,5 @@
 import { db } from '../../db/index.js';
-import { batchEnrollments, users, batches } from '../../db/schema.js';
+import { batchEnrollments, users, batches, batchEnrollmentPayments } from '../../db/schema.js';
 import { eq, or, ilike, sql, and, asc, desc } from 'drizzle-orm';
 
 export type Enrollment = typeof batchEnrollments.$inferSelect;
@@ -257,5 +257,21 @@ export class EnrollmentRepository {
       .from(batchEnrollments)
       .leftJoin(batches, eq(batchEnrollments.batchId, batches.id))
       .where(eq(batchEnrollments.userId, userId));
+   }
+
+  public async recalculateAmountPaid(enrollmentId: number): Promise<number> {
+    const sumResult = await db
+      .select({ sum: sql<number>`coalesce(sum(${batchEnrollmentPayments.amount}), 0)` })
+      .from(batchEnrollmentPayments)
+      .where(eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId));
+
+    const totalPaid = Number(sumResult[0]?.sum || 0);
+
+    await db
+      .update(batchEnrollments)
+      .set({ amountPaid: totalPaid })
+      .where(eq(batchEnrollments.id, enrollmentId));
+
+    return totalPaid;
   }
 }

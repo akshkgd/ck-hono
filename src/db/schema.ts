@@ -86,7 +86,7 @@ export const batchEnrollments = pgTable('batch_enrollments', {
   status: smallint('status').default(0).notNull(), // Active, Inactive, Cancelled, Suspended default inactive (0)
   progress: integer('progress').default(0).notNull(),
   timeSpentSeconds: integer('time_spent_seconds').default(0).notNull(),
-  amountPaid: integer('amount_paid'),
+  amountPaid: integer('amount_paid').default(0).notNull(),
   certificateFee: integer('certificate_fee'),
   paymentStatus: paymentStatusEnum('payment_status').default('created').notNull(),
   paymentMethod: varchar('payment_method', { length: 50 }),
@@ -165,6 +165,25 @@ export const contentLibrary = pgTable('content_library', {
   index('content_library_type_idx').on(table.type),
   index('content_library_content_type_idx').on(table.contentType),
   index('content_library_title_idx').on(table.title),
+]);
+
+export const batchContent = pgTable('batch_content', {
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id, { onDelete: 'cascade' }).notNull(),
+  contentId: bigint('content_id', { mode: 'number' }).references(() => contentLibrary.id, { onDelete: 'cascade' }).notNull(),
+  sectionId: bigint('section_id', { mode: 'number' }).references(() => batchSections.id, { onDelete: 'cascade' }).notNull(),
+  order: integer('order'),
+  accessOn: integer('access_on').default(0).notNull(),
+  accessTill: integer('access_till').default(0).notNull(),
+  accessOnDate: date('access_on_date'),
+  accessTillDate: date('access_till_date'),
+  metadata: jsonb('metadata').default({}),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('batch_content_batch_id_idx').on(table.batchId),
+  index('batch_content_content_id_idx').on(table.contentId),
+  index('batch_content_section_id_idx').on(table.sectionId),
 ]);
 
 

@@ -44,6 +44,9 @@ export class AdminPaymentsService {
       paidAt: new Date(input.paidAt),
     });
 
+    // Recalculate total amount paid on batch enrollment
+    await this.enrollmentRepository.recalculateAmountPaid(input.batchEnrollmentId);
+
     return newPayment;
   }
 
@@ -106,6 +109,12 @@ export class AdminPaymentsService {
       throw new Error('Failed to update payment');
     }
 
+    // Recalculate total amount paid on batch enrollment(s)
+    await this.enrollmentRepository.recalculateAmountPaid(updated.batchEnrollmentId);
+    if (payment.batchEnrollmentId !== updated.batchEnrollmentId) {
+      await this.enrollmentRepository.recalculateAmountPaid(payment.batchEnrollmentId);
+    }
+
     return updated;
   }
 
@@ -115,6 +124,10 @@ export class AdminPaymentsService {
       throw new Error('Payment not found');
     }
     await this.paymentRepository.delete(id);
+
+    // Recalculate total amount paid on batch enrollment
+    await this.enrollmentRepository.recalculateAmountPaid(payment.batchEnrollmentId);
+
     return true;
   }
 }
