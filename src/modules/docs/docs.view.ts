@@ -2211,12 +2211,27 @@ export interface BatchContent {
               <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
               <span class="text-zinc-200">/v1/admin/enrollment-payments</span>
             </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Parameter</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Search query matching student name, email, transactionId, etc.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">batchEnrollmentId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Retrieve payments only for a specific enrollment ID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">limit</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Maximum records to return (default: 10, max: 50).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">page</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Page number for pagination (default: 1).</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
-              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollment-payments', {
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/enrollment-payments?batchEnrollmentId=48&limit=10&page=1', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
@@ -2252,6 +2267,10 @@ export interface BatchContent {
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">amount</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Price paid.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">paidAt</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">ISO Date string of transaction.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">purpose</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'enrollment', 'renewal', 'certificate', 'upgrade', 'refund'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">paymentMethod</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Payment method (e.g. 'UPI', 'Card').</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">transactionId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Unique transaction reference.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">invoiceId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Unique invoice reference.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">remarks</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Admin comments or notes.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -2270,7 +2289,11 @@ export interface BatchContent {
     batchEnrollmentId: 48,
     amount: 1999,
     paidAt: '2026-06-30T12:00:00.000Z',
-    purpose: 'enrollment'
+    purpose: 'enrollment',
+    paymentMethod: 'UPI',
+    transactionId: 'tx_12345',
+    invoiceId: 'inv_67890',
+    remarks: 'Stripe webhook payment settled.'
   })
 });</code></pre>
             </div>
