@@ -224,5 +224,70 @@ describe('Admin Enrollments CRUD Module', () => {
       const checkBody = await checkRes.json();
       expect(checkBody.message).toContain('not found');
     });
+
+    it('should automatically log transaction ledger entries when creating or updating enrollment with amountPaid', async () => {
+      // 1. Create enrollment with amountPaid = 350
+      const createRes = await app.request('/v1/admin/enrollments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          userId: targetUserId,
+          batchId: testBatchId,
+          amountPayable: 500,
+          amountPaid: 350,
+          enrollmentType: 'oneTime',
+          status: 0,
+        })
+      });
+      expect(createRes.status).toBe(201);
+      const createBody = await createRes.json();
+      const localEnrollmentId = createBody.data.id;
+      expect(createBody.data.amountPaid).toBe(350);
+
+      // Verify a corresponding payment record was logged
+      const getPaymentsRes = await app.request(`/v1/admin/enrollment-payments?batchEnrollmentId=${localEnrollmentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      expect(getPaymentsRes.status).toBe(200);
+      const getPaymentsBody = await getPaymentsRes.json();
+      expect(getPaymentsBody.data.payments.length).toBe(1);
+      expect(getPaymentsBody.data.payments[0].amount).toBe(350);
+
+      // 2. Update enrollment directly, setting amountPaid = 500 (+150 diff)
+      const updateRes = await app.request(`/v1/admin/enrollments/${localEnrollmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          amountPaid: 500
+        })
+      });
+      expect(updateRes.status).toBe(200);
+      const updateBody = await updateRes.json();
+      expect(updateBody.data.amountPaid).toBe(500);
+      expect(updateBody.data.paymentStatus).toBe('captured');
+
+      // Verify that a second transaction was added to the payments table (totaling 2 payments)
+      const getPayments2Res = await app.request(`/v1/admin/enrollment-payments?batchEnrollmentId=${localEnrollmentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      expect(getPayments2Res.status).toBe(200);
+      const getPayments2Body = await getPayments2Res.json();
+      expect(getPayments2Body.data.payments.length).toBe(2);
+
+      // Clean up enrollment
+      await app.request(`/v1/admin/enrollments/${localEnrollmentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+    });
   });
 });
+

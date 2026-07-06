@@ -1,6 +1,7 @@
 import { EnrollmentRepository, type NewEnrollment } from '../../enrollments/enrollment.repository.js';
 import { UserRepository } from '../../users/user.repository.js';
 import { BatchRepository } from '../../batches/batch.repository.js';
+import { PaymentRepository } from '../../payments/payment.repository.js';
 import type {
   CreateEnrollmentInput,
   UpdateEnrollmentInput,
@@ -11,11 +12,13 @@ export class AdminEnrollmentsService {
   private enrollmentRepository: EnrollmentRepository;
   private userRepository: UserRepository;
   private batchRepository: BatchRepository;
+  private paymentRepository: PaymentRepository;
 
   constructor() {
     this.enrollmentRepository = new EnrollmentRepository();
     this.userRepository = new UserRepository();
     this.batchRepository = new BatchRepository();
+    this.paymentRepository = new PaymentRepository();
   }
 
   public async createEnrollment(input: CreateEnrollmentInput) {
@@ -47,6 +50,29 @@ export class AdminEnrollmentsService {
       certificateGeneratedAt: input.certificateGeneratedAt ? new Date(input.certificateGeneratedAt) : null,
       startedAt: input.startedAt ? new Date(input.startedAt) : null,
     });
+
+    // Automatically create a matching transaction in batch_enrollment_payments if amountPaid > 0
+    if (newEnrollment.amountPaid > 0) {
+      await this.paymentRepository.create({
+        batchEnrollmentId: newEnrollment.id,
+        amount: newEnrollment.amountPaid,
+        paidAt: newEnrollment.paidAt ?? new Date(),
+        paymentMethod: newEnrollment.paymentMethod || 'Manual',
+        transactionId: newEnrollment.transactionId || `tx-init-${newEnrollment.id}-${Date.now()}`,
+        invoiceId: newEnrollment.invoiceId || `inv-init-${newEnrollment.id}-${Date.now()}`,
+        purpose: 'enrollment',
+        isGstApplicable: true,
+        remarks: newEnrollment.remark || 'Logged automatically on enrollment creation',
+      });
+      // Recalculate to ensure everything, including status, is perfectly in sync
+      await this.enrollmentRepository.recalculateAmountPaid(newEnrollment.id);
+      
+      // Fetch the updated enrollment to return it with the updated state
+      const updatedEnrollment = await this.enrollmentRepository.findById(newEnrollment.id);
+      if (updatedEnrollment) {
+        return updatedEnrollment;
+      }
+    }
 
     return newEnrollment;
   }
@@ -125,6 +151,33 @@ export class AdminEnrollmentsService {
 
     if (!updated) {
       throw new Error('Failed to update enrollment');
+    }
+
+    // Automatically synchronize transaction logs if amountPaid is modified directly
+    if (input.amountPaid !== undefined && input.amountPaid !== enrollment.amountPaid) {
+      const diff = input.amountPaid - enrollment.amountPaid;
+      if (diff !== 0) {
+        await this.paymentRepository.create({
+          batchEnrollmentId: id,
+          amount: Math.abs(diff),
+          paidAt: input.paidAt ? new Date(input.paidAt) : new Date(),
+          paymentMethod: input.paymentMethod || enrollment.paymentMethod || 'Manual',
+          transactionId: input.transactionId || `tx-update-${id}-${Date.now()}`,
+          invoiceId: input.invoiceId || `inv-update-${id}-${Date.now()}`,
+          purpose: diff > 0 ? 'enrollment' : 'refund',
+          isGstApplicable: true,
+          remarks: input.remark || `Logged automatically on enrollment update (amountPaid changed from ${enrollment.amountPaid} to ${input.amountPaid})`,
+        });
+        
+        // Recalculate enrollment total & status
+        await this.enrollmentRepository.recalculateAmountPaid(id);
+        
+        // Return refreshed enrollment
+        const refreshed = await this.enrollmentRepository.findById(id);
+        if (refreshed) {
+          return refreshed;
+        }
+      }
     }
 
     return updated;
