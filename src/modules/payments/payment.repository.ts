@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batchEnrollmentPayments, batchEnrollments, users, batches } from '../../db/schema.js';
-import { eq, or, ilike, sql } from 'drizzle-orm';
+import { eq, or, ilike, sql, and } from 'drizzle-orm';
 
 export type Payment = typeof batchEnrollmentPayments.$inferSelect;
 export type NewPayment = typeof batchEnrollmentPayments.$inferInsert;
@@ -98,7 +98,7 @@ export class PaymentRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number) {
+  public async search(queryText: string, limit: number, offset: number, batchEnrollmentId?: number) {
     let query = db
       .select({
         id: batchEnrollmentPayments.id,
@@ -122,9 +122,13 @@ export class PaymentRepository {
       .leftJoin(users, eq(batchEnrollments.userId, users.id))
       .leftJoin(batches, eq(batchEnrollments.batchId, batches.id));
 
+    const conditions = [];
+    if (batchEnrollmentId) {
+      conditions.push(eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollmentId));
+    }
     if (queryText) {
       const searchPattern = `%${queryText}%`;
-      query = query.where(
+      conditions.push(
         or(
           ilike(users.name, searchPattern),
           ilike(users.email, searchPattern),
@@ -133,13 +137,17 @@ export class PaymentRepository {
           ilike(batchEnrollmentPayments.invoiceId, searchPattern),
           ilike(batchEnrollmentPayments.paymentMethod, searchPattern)
         )
-      ) as any;
+      );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
     }
 
     return query.limit(limit).offset(offset);
   }
 
-  public async count(queryText: string): Promise<number> {
+  public async count(queryText: string, batchEnrollmentId?: number): Promise<number> {
     let query = db
       .select({ count: sql<number>`count(*)` })
       .from(batchEnrollmentPayments)
@@ -147,9 +155,13 @@ export class PaymentRepository {
       .leftJoin(users, eq(batchEnrollments.userId, users.id))
       .leftJoin(batches, eq(batchEnrollments.batchId, batches.id));
 
+    const conditions = [];
+    if (batchEnrollmentId) {
+      conditions.push(eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollmentId));
+    }
     if (queryText) {
       const searchPattern = `%${queryText}%`;
-      query = query.where(
+      conditions.push(
         or(
           ilike(users.name, searchPattern),
           ilike(users.email, searchPattern),
@@ -157,7 +169,11 @@ export class PaymentRepository {
           ilike(batchEnrollmentPayments.transactionId, searchPattern),
           ilike(batchEnrollmentPayments.invoiceId, searchPattern)
         )
-      ) as any;
+      );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
     }
 
     const results = await query;

@@ -228,4 +228,179 @@ describe('Admin Payments CRUD Module', () => {
       expect(checkBody.message).toContain('not found');
     });
   });
+
+  describe('Query Filtering & Calculation Sync Operations', () => {
+    let secondEnrollmentId: number;
+
+    beforeAll(async () => {
+      // Create a second test enrollment to verify filtering
+      const enrollmentRes = await app.request('/v1/admin/enrollments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          userId: targetUserId,
+          batchId: testBatchId,
+          amountPayable: 500,
+          enrollmentType: 'oneTime',
+          status: 0,
+        })
+      });
+      if (enrollmentRes.status === 201) {
+        const body = await enrollmentRes.json();
+        secondEnrollmentId = body.data.id;
+      }
+    });
+
+    it('should filter payments by batchEnrollmentId query parameter', async () => {
+      // 1. Record a payment for first enrollment (testEnrollmentId)
+      const pay1Res = await app.request('/v1/admin/enrollment-payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          batchEnrollmentId: testEnrollmentId,
+          amount: 399,
+          paidAt: new Date().toISOString(),
+          purpose: 'enrollment'
+        })
+      });
+      expect(pay1Res.status).toBe(201);
+      const pay1Body = await pay1Res.json();
+      const pay1Id = pay1Body.data.id;
+
+      // 2. Record a payment for second enrollment (secondEnrollmentId)
+      const pay2Res = await app.request('/v1/admin/enrollment-payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          batchEnrollmentId: secondEnrollmentId,
+          amount: 250,
+          paidAt: new Date().toISOString(),
+          purpose: 'enrollment'
+        })
+      });
+      expect(pay2Res.status).toBe(201);
+      const pay2Body = await pay2Res.json();
+      const pay2Id = pay2Body.data.id;
+
+      // 3. Search payments filtering by secondEnrollmentId
+      const filterRes = await app.request(`/v1/admin/enrollment-payments?batchEnrollmentId=${secondEnrollmentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      expect(filterRes.status).toBe(200);
+      const filterBody = await filterRes.json();
+      expect(filterBody.status).toBe('success');
+      expect(filterBody.data.payments.length).toBe(1);
+      expect(filterBody.data.payments[0].batchEnrollmentId).toBe(secondEnrollmentId);
+
+      // Clean up recorded payments
+      await app.request(`/v1/admin/enrollment-payments/${pay1Id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+      await app.request(`/v1/admin/enrollment-payments/${pay2Id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+    });
+
+    it('should automatically sync and calculate amountPaid and paymentStatus on the enrollment', async () => {
+      // 1. Initial State Check
+      const initEnrollmentRes = await app.request(`/v1/admin/enrollments/${secondEnrollmentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      expect(initEnrollmentRes.status).toBe(200);
+      const initEnrollmentBody = await initEnrollmentRes.json();
+      expect(initEnrollmentBody.data.amountPaid).toBe(0);
+      expect(initEnrollmentBody.data.paymentStatus).toBe('created');
+
+      // 2. Partial Payment Check
+      const pay1Res = await app.request('/v1/admin/enrollment-payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          batchEnrollmentId: secondEnrollmentId,
+          amount: 200,
+          paidAt: new Date().toISOString(),
+          purpose: 'enrollment'
+        })
+      });
+      expect(pay1Res.status).toBe(201);
+      const pay1Body = await pay1Res.json();
+      const pay1Id = pay1Body.data.id;
+
+      const partialEnrollmentRes = await app.request(`/v1/admin/enrollments/${secondEnrollmentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      const partialEnrollmentBody = await partialEnrollmentRes.json();
+      expect(partialEnrollmentBody.data.amountPaid).toBe(200);
+      expect(partialEnrollmentBody.data.paymentStatus).toBe('created');
+
+      // 3. Full Payment Check (Captured)
+      const pay2Res = await app.request('/v1/admin/enrollment-payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          batchEnrollmentId: secondEnrollmentId,
+          amount: 300,
+          paidAt: new Date().toISOString(),
+          purpose: 'enrollment'
+        })
+      });
+      expect(pay2Res.status).toBe(201);
+      const pay2Body = await pay2Res.json();
+      const pay2Id = pay2Body.data.id;
+
+      const fullEnrollmentRes = await app.request(`/v1/admin/enrollments/${secondEnrollmentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      const fullEnrollmentBody = await fullEnrollmentRes.json();
+      expect(fullEnrollmentBody.data.amountPaid).toBe(500);
+      expect(fullEnrollmentBody.data.paymentStatus).toBe('captured');
+
+      // 4. Refund Payment Check (Refunded)
+      const refundRes = await app.request('/v1/admin/enrollment-payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
+        body: JSON.stringify({
+          batchEnrollmentId: secondEnrollmentId,
+          amount: 500,
+          paidAt: new Date().toISOString(),
+          purpose: 'refund'
+        })
+      });
+      expect(refundRes.status).toBe(201);
+      const refundBody = await refundRes.json();
+      const refundId = refundBody.data.id;
+
+      const refundEnrollmentRes = await app.request(`/v1/admin/enrollments/${secondEnrollmentId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      const refundEnrollmentBody = await refundEnrollmentRes.json();
+      expect(refundEnrollmentBody.data.amountPaid).toBe(0);
+      expect(refundEnrollmentBody.data.paymentStatus).toBe('refunded');
+
+      // Clean up recorded payments
+      await app.request(`/v1/admin/enrollment-payments/${pay1Id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+      await app.request(`/v1/admin/enrollment-payments/${pay2Id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+      await app.request(`/v1/admin/enrollment-payments/${refundId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
+    });
+  });
 });
+

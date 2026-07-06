@@ -260,16 +260,84 @@ export class EnrollmentRepository {
    }
 
   public async recalculateAmountPaid(enrollmentId: number): Promise<number> {
+    const enrollment = await db
+      .select({
+        amountPayable: batchEnrollments.amountPayable,
+        paymentStatus: batchEnrollments.paymentStatus,
+      })
+      .from(batchEnrollments)
+      .where(eq(batchEnrollments.id, enrollmentId))
+      .limit(1)
+      .then((res) => res[0]);
+
+    if (!enrollment) {
+      return 0;
+    }
+
+    // Sum non-refunds and subtract refunds
     const sumResult = await db
-      .select({ sum: sql<number>`coalesce(sum(${batchEnrollmentPayments.amount}), 0)` })
+      .select({
+        sum: sql<number>`coalesce(sum(case when ${batchEnrollmentPayments.purpose} = 'refund' then -${batchEnrollmentPayments.amount} else ${batchEnrollmentPayments.amount} end), 0)`
+      })
       .from(batchEnrollmentPayments)
       .where(eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId));
 
     const totalPaid = Number(sumResult[0]?.sum || 0);
 
+    // Count existing payments
+    const paymentsCountResult = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(batchEnrollmentPayments)
+      .where(eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId));
+    const hasPayments = Number(paymentsCountResult[0]?.count || 0) > 0;
+
+    // Check if there is any refund transaction
+    const hasRefund = await db
+      .select({ id: batchEnrollmentPayments.id })
+      .from(batchEnrollmentPayments)
+      .where(
+        and(
+          eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId),
+          eq(batchEnrollmentPayments.purpose, 'refund')
+        )
+      )
+      .limit(1)
+      .then((res) => res.length > 0);
+
+    const payable = enrollment.amountPayable ?? 0;
+    let newStatus = enrollment.paymentStatus;
+
+    if (hasRefund && totalPaid <= 0) {
+      newStatus = 'refunded';
+    } else if (hasPayments && totalPaid >= payable) {
+      newStatus = 'captured';
+    } else if (hasPayments && totalPaid < payable) {
+      newStatus = 'created';
+    } else if (!hasPayments) {
+      newStatus = 'created';
+    }
+
+    // Find the latest payment date to update paidAt if appropriate
+    const latestPaymentResult = await db
+      .select({ paidAt: batchEnrollmentPayments.paidAt })
+      .from(batchEnrollmentPayments)
+      .where(eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId))
+      .orderBy(desc(batchEnrollmentPayments.paidAt))
+      .limit(1);
+    const latestPaidAt = latestPaymentResult[0]?.paidAt || null;
+
+    const updateData: any = {
+      amountPaid: totalPaid,
+      paymentStatus: newStatus,
+    };
+
+    if (newStatus === 'captured' && latestPaidAt) {
+      updateData.paidAt = latestPaidAt;
+    }
+
     await db
       .update(batchEnrollments)
-      .set({ amountPaid: totalPaid })
+      .set(updateData)
       .where(eq(batchEnrollments.id, enrollmentId));
 
     return totalPaid;

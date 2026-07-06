@@ -133,6 +133,7 @@ export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   index('batch_payments_paid_at_idx').on(table.paidAt),
+  index('batch_payments_batch_enrollment_id_idx').on(table.batchEnrollmentId),
 ]);
 
 export const batchSections = pgTable('batch_sections', {

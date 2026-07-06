@@ -52,8 +52,8 @@ export class AdminPaymentsService {
 
   public async searchPayments(input: PaymentSearchQueryInput) {
     const offset = (input.page - 1) * input.limit;
-    const payments = await this.paymentRepository.search(input.q, input.limit, offset);
-    const total = await this.paymentRepository.count(input.q);
+    const payments = await this.paymentRepository.search(input.q, input.limit, offset, input.batchEnrollmentId);
+    const total = await this.paymentRepository.count(input.q, input.batchEnrollmentId);
 
     return {
       payments,
