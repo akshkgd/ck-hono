@@ -45,4 +45,8 @@ export class AnalyticsService {
       }
     };
   }
+
+  public async getDbStats() {
+    return this.analyticsRepository.getTableStats();
+  }
 }

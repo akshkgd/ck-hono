@@ -119,6 +119,8 @@ export class EnrollmentRepository {
         userId: batchEnrollments.userId,
         batchId: batchEnrollments.batchId,
         amountPayable: batchEnrollments.amountPayable,
+        amountPaid: batchEnrollments.amountPaid,
+        paidAt: batchEnrollments.paidAt,
         enrollmentType: batchEnrollments.enrollmentType,
         status: batchEnrollments.status,
         progress: batchEnrollments.progress,

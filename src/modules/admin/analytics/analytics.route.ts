@@ -10,5 +10,6 @@ const controller = new AnalyticsController();
 adminAnalyticsRouter.use('*', authMiddleware(), adminMiddleware());
 
 adminAnalyticsRouter.get('/overview', controller.getOverview);
+adminAnalyticsRouter.get('/db-stats', controller.getDbStats);
 
 export default adminAnalyticsRouter;

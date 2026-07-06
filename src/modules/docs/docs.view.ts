@@ -302,6 +302,10 @@ export function getDocsHtml(): string {
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
               <a href="#analytics-overview" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Analytics overview</a>
             </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#analytics-db-stats" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Database statistics</a>
+            </li>
           </ul>
         </div>
 
@@ -2517,6 +2521,63 @@ export interface BatchContent {
       "to": "2026-06-30T23:59:59.999Z"
     }
   }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /admin/analytics/db-stats -->
+        <div id="analytics-db-stats" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Analytics</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Database Statistics</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Provides size details and exact row counts for all database tables inside the public schema. Useful for storage analysis and monitoring table growth. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/analytics/db-stats</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/analytics/db-stats', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": [
+    {
+      "tableName": "users",
+      "totalSizeBytes": 49152,
+      "totalSizePretty": "48 KB",
+      "tableSizeBytes": 16384,
+      "tableSizePretty": "16 KB",
+      "indexSizeBytes": 32768,
+      "indexSizePretty": "32 KB",
+      "rowCount": 25
+    },
+    {
+      "tableName": "batch_enrollment_payments",
+      "totalSizeBytes": 32768,
+      "totalSizePretty": "32 KB",
+      "tableSizeBytes": 8192,
+      "tableSizePretty": "8 KB",
+      "indexSizeBytes": 24576,
+      "indexSizePretty": "24 KB",
+      "rowCount": 18
+    }
+  ]
 }</code></pre>
             </div>
           </div>

@@ -26,4 +26,19 @@ export class AnalyticsController {
       }, 400);
     }
   };
+
+  public getDbStats = async (c: Context) => {
+    try {
+      const stats = await this.analyticsService.getDbStats();
+      return c.json({
+        status: 'success',
+        data: stats
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to fetch database stats'
+      }, 400);
+    }
+  };
 }

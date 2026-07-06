@@ -161,6 +161,8 @@ describe('Admin Enrollments CRUD Module', () => {
       expect(body.status).toBe('success');
       expect(body.data.enrollments).toBeInstanceOf(Array);
       expect(body.data.enrollments.length).toBeGreaterThan(0);
+      expect(body.data.enrollments[0].amountPaid).toBeDefined();
+      expect(body.data.enrollments[0].paidAt).toBeDefined();
       expect(body.data.pagination.total).toBeGreaterThan(0);
     });
 

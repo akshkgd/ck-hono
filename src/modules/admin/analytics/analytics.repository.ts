@@ -81,4 +81,59 @@ export class AnalyticsRepository {
       ));
     return Number(results[0]?.count || 0);
   }
+
+  public async getTableStats(): Promise<Array<{
+    tableName: string;
+    totalSizeBytes: number;
+    totalSizePretty: string;
+    tableSizeBytes: number;
+    tableSizePretty: string;
+    indexSizeBytes: number;
+    indexSizePretty: string;
+    rowCount: number;
+  }>> {
+    const statsResult = await db.execute(sql`
+      SELECT 
+        c.relname AS table_name,
+        coalesce(pg_total_relation_size(c.oid), 0)::bigint AS total_size,
+        coalesce(pg_relation_size(c.oid), 0)::bigint AS table_size,
+        coalesce(pg_indexes_size(c.oid), 0)::bigint AS index_size,
+        coalesce(c.reltuples, 0)::bigint AS row_count
+      FROM 
+        pg_class c
+      JOIN 
+        pg_namespace n ON n.oid = c.relnamespace
+      WHERE 
+        n.nspname = 'public' 
+        AND c.relkind = 'r'
+      ORDER BY 
+        c.relname ASC
+    `);
+
+    const formatSize = (bytes: number) => {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    return statsResult.rows.map((row: any) => {
+      const totalSize = Number(row.total_size);
+      const tableSize = Number(row.table_size);
+      const indexSize = Number(row.index_size);
+      const rowCount = Number(row.row_count);
+
+      return {
+        tableName: row.table_name,
+        totalSizeBytes: totalSize,
+        totalSizePretty: formatSize(totalSize),
+        tableSizeBytes: tableSize,
+        tableSizePretty: formatSize(tableSize),
+        indexSizeBytes: indexSize,
+        indexSizePretty: formatSize(indexSize),
+        rowCount,
+      };
+    });
+  }
 }
