@@ -118,11 +118,26 @@ export class AnalyticsRepository {
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
-    return statsResult.rows.map((row: any) => {
+    const statsPromises = statsResult.rows.map(async (row: any) => {
       const totalSize = Number(row.total_size);
       const tableSize = Number(row.table_size);
       const indexSize = Number(row.index_size);
-      const rowCount = Number(row.row_count);
+      let rowCount = Number(row.row_count);
+
+      // Hybrid approach: for tables under 50 MB, query the exact count.
+      // For larger tables, fall back to pg_class estimates.
+      const sizeThresholdBytes = 50 * 1024 * 1024; // 50 MB
+      if (tableSize < sizeThresholdBytes) {
+        try {
+          const exactCountResult = await db.execute(sql`
+            SELECT count(*) AS exact_count 
+            FROM ${sql.identifier(row.table_name)}
+          `);
+          rowCount = Number(exactCountResult.rows[0]?.exact_count ?? rowCount);
+        } catch (e) {
+          // Fall back silently to estimate on error
+        }
+      }
 
       return {
         tableName: row.table_name,
@@ -135,5 +150,7 @@ export class AnalyticsRepository {
         rowCount,
       };
     });
+
+    return Promise.all(statsPromises);
   }
 }
