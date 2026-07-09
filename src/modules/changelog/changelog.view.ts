@@ -153,6 +153,18 @@ export function getChangelogHtml(): string {
                     <td class="py-2 pr-4 font-mono text-zinc-600">-</td>
                     <td class="py-2">End date in <code class="font-mono text-zinc-300">YYYY-MM-DD</code> format (required for <code class="font-mono text-zinc-300">custom</code> preset).</td>
                   </tr>
+                  <tr>
+                    <td class="py-2 pr-4 font-mono text-indigo-400 font-medium">limit</td>
+                    <td class="py-2 pr-4 font-mono text-zinc-500">integer</td>
+                    <td class="py-2 pr-4 font-mono text-zinc-600">50</td>
+                    <td class="py-2">Number of enrolled user records to return per page (min: 1, max: 100).</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 pr-4 font-mono text-indigo-400 font-medium">page</td>
+                    <td class="py-2 pr-4 font-mono text-zinc-500">integer</td>
+                    <td class="py-2 pr-4 font-mono text-zinc-600">1</td>
+                    <td class="py-2">Page number for list pagination.</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
