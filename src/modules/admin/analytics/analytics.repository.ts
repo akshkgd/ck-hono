@@ -157,7 +157,7 @@ export class AnalyticsRepository {
 
   public async getSignupTrend(from: Date, to: Date, interval: GroupInterval) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql`to_char(date_trunc(${trunc}, ${users.createdAt}), ${format})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${trunc}, ${users.createdAt}), ${format})`;
     
     return db
       .select({
@@ -174,7 +174,7 @@ export class AnalyticsRepository {
 
   public async getEnrollmentTrend(from: Date, to: Date, interval: GroupInterval) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql`to_char(date_trunc(${trunc}, ${batchEnrollments.createdAt}), ${format})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${trunc}, ${batchEnrollments.createdAt}), ${format})`;
     
     return db
       .select({
@@ -192,7 +192,7 @@ export class AnalyticsRepository {
 
   public async getRevenueTrend(from: Date, to: Date, interval: GroupInterval) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql`to_char(date_trunc(${trunc}, ${batchEnrollmentPayments.paidAt}), ${format})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${trunc}, ${batchEnrollmentPayments.paidAt}), ${format})`;
     
     return db
       .select({
