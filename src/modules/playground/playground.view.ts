@@ -545,6 +545,20 @@ export function getDocsHtml(): string {
           </ul>
         </div>
 
+        <!-- Analytics -->
+        <div class="border-b border-neutral-900/60 pb-2.5">
+          <button class="flex justify-between items-center w-full text-left text-[10px] font-bold text-neutral-500 hover:text-neutral-400 uppercase tracking-wider focus:outline-none group mb-2" onclick="toggleAccordion(this)">
+            <span>Analytics</span>
+            <svg class="h-3 w-3 text-neutral-500 group-hover:text-neutral-400 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <ul class="space-y-1.5 pl-1 hidden transition-all duration-200">
+            <li><a href="#admin-analytics-overview" class="block text-xs text-neutral-400 hover:text-indigo-400 transition font-medium font-mono">GET /admin/analytics/overview</a></li>
+            <li><a href="#admin-analytics-db" class="block text-xs text-neutral-400 hover:text-indigo-400 transition font-medium font-mono">GET /admin/analytics/db-stats</a></li>
+          </ul>
+        </div>
+
         <!-- User & Gamification -->
         <div>
           <button class="flex justify-between items-center w-full text-left text-[10px] font-bold text-neutral-500 hover:text-neutral-400 uppercase tracking-wider focus:outline-none group mb-2" onclick="toggleAccordion(this)">
@@ -716,6 +730,19 @@ export function getDocsHtml(): string {
               <li><a href="#admin-library-create" class="block py-1 text-xs text-neutral-400 hover:text-indigo-400">Create Item</a></li>
               <li><a href="#admin-library-update" class="block py-1 text-xs text-neutral-400 hover:text-indigo-400">Update Item</a></li>
               <li><a href="#admin-library-delete" class="block py-1 text-xs text-neutral-400 hover:text-indigo-400">Delete Item</a></li>
+            </ul>
+          </div>
+          <!-- Analytics -->
+          <div class="border-b border-neutral-900 pb-2">
+            <button class="flex justify-between items-center w-full text-left text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-2 focus:outline-none" onclick="toggleAccordion(this)">
+              <span>Analytics</span>
+              <svg class="h-3 w-3 text-neutral-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <ul class="space-y-1 pl-1 hidden transition-all duration-200">
+              <li><a href="#admin-analytics-overview" class="block py-1 text-xs text-neutral-400 hover:text-indigo-400">Analytics Overview</a></li>
+              <li><a href="#admin-analytics-db" class="block py-1 text-xs text-neutral-400 hover:text-indigo-400">Database Stats</a></li>
             </ul>
           </div>
         </nav>
@@ -3141,6 +3168,92 @@ export function getDocsHtml(): string {
       </div>
     </section>
 
+    <!-- Section: Admin Analytics -->
+    <section id="admin-analytics" class="scroll-mt-20 space-y-8">
+      <div class="border-b border-neutral-900 pb-5">
+        <h2 class="text-xl font-bold text-neutral-50 tracking-tight">Admin Analytics</h2>
+        <p class="text-neutral-400 mt-1.5 text-xs">Test the overview statistics and database stats endpoints.</p>
+      </div>
+
+      <!-- GET /v1/admin/analytics/overview -->
+      <div id="admin-analytics-overview" class="grid grid-cols-1 lg:grid-cols-2 gap-8 border-b border-neutral-900/60 pb-8 scroll-mt-20">
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20 font-mono">GET</span>
+            <span class="text-xs font-mono font-semibold text-neutral-200">/v1/admin/analytics/overview</span>
+          </div>
+          <p class="text-xs text-neutral-400 leading-relaxed">Fetch compared metrics and UTC-aligned trend history arrays.</p>
+          
+          <form class="space-y-3" onsubmit="event.preventDefault(); runAnalyticsOverview();">
+            <div>
+              <label class="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Timeframe Preset</label>
+              <select id="analyticsRange" class="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-1.5 text-xs text-neutral-200 focus:outline-none focus:border-indigo-500 font-mono">
+                <option value="last7Days">last7Days (Default)</option>
+                <option value="today">today</option>
+                <option value="yesterday">yesterday</option>
+                <option value="thisMonth">thisMonth</option>
+                <option value="lastMonth">lastMonth</option>
+                <option value="thisYear">thisYear</option>
+                <option value="custom">custom</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Start Date (YYYY-MM-DD)</label>
+                <input type="text" id="analyticsStartDate" class="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-1.5 text-xs text-neutral-200 focus:outline-none focus:border-indigo-500 font-mono" placeholder="2026-07-01" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">End Date (YYYY-MM-DD)</label>
+                <input type="text" id="analyticsEndDate" class="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-1.5 text-xs text-neutral-200 focus:outline-none focus:border-indigo-500 font-mono" placeholder="2026-07-09" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Limit (Default: 50)</label>
+                <input type="number" id="analyticsLimit" class="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-1.5 text-xs text-neutral-200 focus:outline-none focus:border-indigo-500 font-mono" placeholder="50" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">Page (Default: 1)</label>
+                <input type="number" id="analyticsPage" class="w-full bg-neutral-950 border border-neutral-800 rounded px-3 py-1.5 text-xs text-neutral-200 focus:outline-none focus:border-indigo-500 font-mono" placeholder="1" />
+              </div>
+            </div>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-zinc-50 font-semibold px-4 py-2 rounded text-xs transition duration-150 shadow-md shadow-indigo-600/10">Send Request</button>
+          </form>
+        </div>
+
+        <div class="space-y-4">
+          <div id="analyticsOverviewResponseWrapper" class="hidden space-y-1.5">
+            <div class="flex justify-between items-center text-[10px] font-mono text-neutral-500">
+              <span>Status: <span id="analyticsOverviewResponseCode" class="font-bold text-green-400">200 OK</span></span>
+            </div>
+            <pre class="bg-neutral-950 border border-neutral-900 rounded p-4 text-xs font-mono text-neutral-200 overflow-auto max-h-[300px] custom-scrollbar"><code id="analyticsOverviewResponseJson">{}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- GET /v1/admin/analytics/db-stats -->
+      <div id="admin-analytics-db" class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-8 scroll-mt-20">
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20 font-mono">GET</span>
+            <span class="text-xs font-mono font-semibold text-neutral-200">/v1/admin/analytics/db-stats</span>
+          </div>
+          <p class="text-xs text-neutral-400 leading-relaxed">Retrieve database table sizes, row counts, and disk space details.</p>
+          
+          <button onclick="runAnalyticsDbStats();" class="bg-indigo-600 hover:bg-indigo-500 text-zinc-50 font-semibold px-4 py-2 rounded text-xs transition duration-150 shadow-md shadow-indigo-600/10">Send Request</button>
+        </div>
+
+        <div class="space-y-4">
+          <div id="analyticsDbStatsResponseWrapper" class="hidden space-y-1.5">
+            <div class="flex justify-between items-center text-[10px] font-mono text-neutral-500">
+              <span>Status: <span id="analyticsDbStatsResponseCode" class="font-bold text-green-400">200 OK</span></span>
+            </div>
+            <pre class="bg-neutral-950 border border-neutral-900 rounded p-4 text-xs font-mono text-neutral-200 overflow-auto max-h-[300px] custom-scrollbar"><code id="analyticsDbStatsResponseJson">{}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Script for Interactive Playground & Menu -->
@@ -4133,6 +4246,59 @@ export function getDocsHtml(): string {
       } catch (err) {
         document.getElementById('paymentDeleteResponseCode').innerText = 'Failed';
         document.getElementById('paymentDeleteResponseJson').innerText = err.message;
+      }
+    }
+
+    // ========================================================
+    // ANALYTICS ACTIONS
+    // ========================================================
+
+    async function runAnalyticsOverview() {
+      var token = localStorage.getItem('jwt_token');
+      var range = document.getElementById('analyticsRange').value;
+      var startDate = document.getElementById('analyticsStartDate').value;
+      var endDate = document.getElementById('analyticsEndDate').value;
+      var limit = document.getElementById('analyticsLimit').value;
+      var page = document.getElementById('analyticsPage').value;
+
+      document.getElementById('analyticsOverviewResponseWrapper').classList.remove('hidden');
+      document.getElementById('analyticsOverviewResponseJson').innerText = 'Fetching analytics overview...';
+
+      var url = '/v1/admin/analytics/overview?range=' + range;
+      if (startDate) url += '&startDate=' + startDate;
+      if (endDate) url += '&endDate=' + endDate;
+      if (limit) url += '&limit=' + limit;
+      if (page) url += '&page=' + page;
+
+      try {
+        var res = await fetch(url, {
+          method: 'GET',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        var data = await res.json();
+        displayResponse('analyticsOverviewResponseWrapper', 'analyticsOverviewResponseCode', 'analyticsOverviewResponseJson', res, data);
+      } catch (err) {
+        document.getElementById('analyticsOverviewResponseCode').innerText = 'Failed';
+        document.getElementById('analyticsOverviewResponseJson').innerText = err.message;
+      }
+    }
+
+    async function runAnalyticsDbStats() {
+      var token = localStorage.getItem('jwt_token');
+      
+      document.getElementById('analyticsDbStatsResponseWrapper').classList.remove('hidden');
+      document.getElementById('analyticsDbStatsResponseJson').innerText = 'Fetching database stats...';
+
+      try {
+        var res = await fetch('/v1/admin/analytics/db-stats', {
+          method: 'GET',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        var data = await res.json();
+        displayResponse('analyticsDbStatsResponseWrapper', 'analyticsDbStatsResponseCode', 'analyticsDbStatsResponseJson', res, data);
+      } catch (err) {
+        document.getElementById('analyticsDbStatsResponseCode').innerText = 'Failed';
+        document.getElementById('analyticsDbStatsResponseJson').innerText = err.message;
       }
     }
   </script>
