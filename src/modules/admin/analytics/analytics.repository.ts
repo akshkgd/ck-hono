@@ -65,7 +65,8 @@ export class AnalyticsRepository {
       .leftJoin(batches, eq(batchEnrollments.batchId, batches.id))
       .where(and(
         gte(batchEnrollments.createdAt, from),
-        lte(batchEnrollments.createdAt, to)
+        lte(batchEnrollments.createdAt, to),
+        eq(batchEnrollments.paymentStatus, 'captured')
       ))
       .orderBy(desc(batchEnrollments.createdAt))
       .limit(limit)
@@ -78,7 +79,8 @@ export class AnalyticsRepository {
       .from(batchEnrollments)
       .where(and(
         gte(batchEnrollments.createdAt, from),
-        lte(batchEnrollments.createdAt, to)
+        lte(batchEnrollments.createdAt, to),
+        eq(batchEnrollments.paymentStatus, 'captured')
       ));
     return Number(results[0]?.count || 0);
   }
