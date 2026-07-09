@@ -1,6 +1,7 @@
 import { db } from '../../../db/index.js';
 import { users, batchEnrollments, batchEnrollmentPayments, batches } from '../../../db/schema.js';
 import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
+import { type GroupInterval } from '../../../utils/date-range.js';
 
 export class AnalyticsRepository {
   public async countSignups(from: Date, to: Date): Promise<number> {
@@ -153,4 +154,75 @@ export class AnalyticsRepository {
 
     return Promise.all(statsPromises);
   }
+
+  public async getSignupTrend(from: Date, to: Date, interval: GroupInterval) {
+    const { trunc, format } = getSqlFormatAndTrunc(interval);
+    const bucketExpr = sql`to_char(date_trunc(${trunc}, ${users.createdAt}), ${format})`;
+    
+    return db
+      .select({
+        bucket: bucketExpr,
+        count: sql<number>`cast(count(*) as integer)`
+      })
+      .from(users)
+      .where(and(
+        gte(users.createdAt, from),
+        lte(users.createdAt, to)
+      ))
+      .groupBy(bucketExpr);
+  }
+
+  public async getEnrollmentTrend(from: Date, to: Date, interval: GroupInterval) {
+    const { trunc, format } = getSqlFormatAndTrunc(interval);
+    const bucketExpr = sql`to_char(date_trunc(${trunc}, ${batchEnrollments.createdAt}), ${format})`;
+    
+    return db
+      .select({
+        bucket: bucketExpr,
+        count: sql<number>`cast(count(*) as integer)`
+      })
+      .from(batchEnrollments)
+      .where(and(
+        gte(batchEnrollments.createdAt, from),
+        lte(batchEnrollments.createdAt, to),
+        eq(batchEnrollments.paymentStatus, 'captured')
+      ))
+      .groupBy(bucketExpr);
+  }
+
+  public async getRevenueTrend(from: Date, to: Date, interval: GroupInterval) {
+    const { trunc, format } = getSqlFormatAndTrunc(interval);
+    const bucketExpr = sql`to_char(date_trunc(${trunc}, ${batchEnrollmentPayments.paidAt}), ${format})`;
+    
+    return db
+      .select({
+        bucket: bucketExpr,
+        sum: sql<number>`cast(coalesce(sum(${batchEnrollmentPayments.amount}), 0) as integer)`
+      })
+      .from(batchEnrollmentPayments)
+      .where(and(
+        gte(batchEnrollmentPayments.paidAt, from),
+        lte(batchEnrollmentPayments.paidAt, to)
+      ))
+      .groupBy(bucketExpr);
+  }
+}
+
+function getSqlFormatAndTrunc(interval: GroupInterval) {
+  if (interval === 'hour') {
+    return {
+      trunc: 'hour',
+      format: 'YYYY-MM-DD HH24:mi'
+    };
+  }
+  if (interval === 'day') {
+    return {
+      trunc: 'day',
+      format: 'YYYY-MM-DD'
+    };
+  }
+  return {
+    trunc: 'month',
+    format: 'YYYY-MM'
+  };
 }

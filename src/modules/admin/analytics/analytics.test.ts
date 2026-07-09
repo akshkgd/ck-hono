@@ -11,13 +11,15 @@ describe('Admin Analytics Module', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'aarav.sharma0@example.com',
-        password: 'Password123!'
+        email: 'rohan@gmail.com',
+        password: 'rohan123'
       })
     });
     if (adminRes.status === 200) {
       const body = await adminRes.json();
       adminToken = body.data.token;
+    } else {
+      console.error('ADMIN LOGIN FAILED:', adminRes.status, await adminRes.text());
     }
 
     // 2. Acquire Standard User Token
@@ -65,7 +67,7 @@ describe('Admin Analytics Module', () => {
 
   describe('Endpoints Functionality', () => {
     it('should allow admin to fetch overview stats', async () => {
-      const res = await app.request('/v1/admin/analytics/overview?range=last_30_days&limit=10&page=1', {
+      const res = await app.request('/v1/admin/analytics/overview?range=last7Days&limit=10&page=1', {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${adminToken}` }
       });
@@ -73,6 +75,31 @@ describe('Admin Analytics Module', () => {
       const body = await res.json();
       expect(body.status).toBe('success');
       expect(body.data.metrics).toBeDefined();
+      expect(body.data.metrics.usersSignedUp).toBeDefined();
+      expect(body.data.metrics.usersSignedUp.current).toBeTypeOf('number');
+      expect(body.data.metrics.usersSignedUp.previous).toBeTypeOf('number');
+      expect(body.data.metrics.usersSignedUp.percentageChange).toBeTypeOf('number');
+      expect(body.data.metrics.usersSignedUp.direction).toMatch(/^(up|down|flat)$/);
+      expect(body.data.metrics.usersSignedUp.trend).toBeInstanceOf(Array);
+      
+      expect(body.data.metrics.coursesEnrolled).toBeDefined();
+      expect(body.data.metrics.coursesEnrolled.current).toBeTypeOf('number');
+      expect(body.data.metrics.coursesEnrolled.previous).toBeTypeOf('number');
+      expect(body.data.metrics.coursesEnrolled.percentageChange).toBeTypeOf('number');
+      expect(body.data.metrics.coursesEnrolled.direction).toMatch(/^(up|down|flat)$/);
+      expect(body.data.metrics.coursesEnrolled.trend).toBeInstanceOf(Array);
+
+      expect(body.data.metrics.revenue).toBeDefined();
+      expect(body.data.metrics.revenue.current).toBeTypeOf('number');
+      expect(body.data.metrics.revenue.previous).toBeTypeOf('number');
+      expect(body.data.metrics.revenue.percentageChange).toBeTypeOf('number');
+      expect(body.data.metrics.revenue.direction).toMatch(/^(up|down|flat)$/);
+      expect(body.data.metrics.revenue.trend).toBeInstanceOf(Array);
+
+      expect(body.data.comparisonTimeframe).toBeDefined();
+      expect(body.data.comparisonTimeframe.from).toBeTypeOf('string');
+      expect(body.data.comparisonTimeframe.to).toBeTypeOf('string');
+      
       expect(body.data.list).toBeInstanceOf(Array);
     });
 

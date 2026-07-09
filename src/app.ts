@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { secureHeaders } from 'hono/secure-headers';
@@ -19,6 +20,7 @@ import adminAnalyticsRouter from './modules/admin/analytics/analytics.route.js';
 import adminBatchContentRouter from './modules/admin/batch-content/admin-batch-content.route.js';
 import adminLogsRouter from './modules/admin/logs/admin-logs.route.js';
 import docsRouter from './modules/docs/docs.route.js';
+import changelogRouter from './modules/changelog/changelog.route.js';
 import playgroundRouter from './modules/playground/playground.route.js';
 import courseProgressRouter from './modules/course-progress/course-progress.route.js';
 import { activityMiddleware } from './middleware/activity.middleware.js';
@@ -78,6 +80,7 @@ v1.route('/course-progress', courseProgressRouter);
 // Register Routes
 app.route('/v1', v1);
 app.route('/docs', docsRouter);
+app.route('/changelog', changelogRouter);
 app.route('/playground', playgroundRouter);
 app.get('/admin/logs', (c) => c.html(renderLogsView()));
 
