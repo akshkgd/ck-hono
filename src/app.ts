@@ -41,7 +41,14 @@ app.use('*', requestId());
 
 // Global Middleware
 app.use('*', loggerMiddleware());
-app.use('*', cors());
+app.use('*', cors({
+  origin: (origin) => {
+    const allowedOrigins = ['https://codekaro.pages.dev', 'http://localhost:5173'];
+    if (!origin) return allowedOrigins[0];
+    return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  },
+  credentials: true,
+}));
 app.use('*', secureHeaders());
 app.use('*', compress());
 

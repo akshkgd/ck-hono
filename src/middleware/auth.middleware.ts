@@ -1,5 +1,6 @@
 import type { MiddlewareHandler } from 'hono';
 import { verify } from 'hono/jwt';
+import { getCookie } from 'hono/cookie';
 import { UserRepository } from '../modules/users/user.repository.js';
 import { redis, isRedisReady } from '../utils/redis.js';
 
@@ -7,12 +8,14 @@ export const authMiddleware = (): MiddlewareHandler => {
   const userRepository = new UserRepository();
 
   return async (c, next) => {
-    let token = '';
-    const authHeader = c.req.header('Authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-    } else {
-      token = c.req.query('token') || '';
+    let token = getCookie(c, 'token') || '';
+    if (!token) {
+      const authHeader = c.req.header('Authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      } else {
+        token = c.req.query('token') || '';
+      }
     }
 
     if (!token) {
