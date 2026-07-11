@@ -107,7 +107,7 @@ export function getChangelogHtml(): string {
             <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
           </h2>
           <p class="text-xs text-zinc-400 mb-6 leading-relaxed">
-            Released student dashboard API endpoints for course details, access controls, progress heartbeats, and assignment submissions. Added a dedicated administrator assignments grading dashboard with chronological graph chart analytics and composite database indexing.
+            Released student dashboard API endpoints for course details, access controls, progress heartbeats, and assignment submissions. Added a dedicated administrator assignments grading dashboard with chronological graph chart analytics and composite database indexing. Updated the content library schema and CRUD operations to support the new nullable <code class="font-mono text-zinc-200">videoDuration</code> field.
           </p>
 
           <!-- API Endpoint details -->
@@ -130,6 +130,13 @@ export function getChangelogHtml(): string {
               <div class="flex items-center gap-3">
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">GET</span>
                 <span class="text-zinc-200 font-semibold">/v1/admin/assignments</span>
+              </div>
+              <a href="/docs" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium transition">View Docs →</a>
+            </div>
+            <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">POST</span>
+                <span class="text-zinc-200 font-semibold">/v1/admin/batch-contents/bulk</span>
               </div>
               <a href="/docs" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium transition">View Docs →</a>
             </div>

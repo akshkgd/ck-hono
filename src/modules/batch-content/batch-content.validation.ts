@@ -34,3 +34,17 @@ export type CreateBatchContentInput = z.infer<typeof createBatchContentSchema>;
 export type UpdateBatchContentInput = z.infer<typeof updateBatchContentSchema>;
 export type BatchContentSearchQueryInput = z.infer<typeof batchContentSearchQuerySchema>;
 export type BatchContentReorderInput = z.infer<typeof batchContentReorderSchema>;
+
+export const createBulkBatchContentSchema = z.object({
+  batchId: z.number().int().positive(),
+  sectionId: z.number().int().positive(),
+  items: z.array(
+    z.object({
+      contentId: z.number().int().positive(),
+      accessOn: z.number().int().nonnegative().default(0),
+      accessTill: z.number().int().nonnegative().default(0),
+    })
+  ).min(1, 'At least one item is required'),
+});
+
+export type CreateBulkBatchContentInput = z.infer<typeof createBulkBatchContentSchema>;

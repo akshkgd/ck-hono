@@ -4,7 +4,8 @@ import {
   createBatchContentSchema,
   updateBatchContentSchema,
   batchContentSearchQuerySchema,
-  batchContentReorderSchema
+  batchContentReorderSchema,
+  createBulkBatchContentSchema
 } from '../../batch-content/batch-content.validation.js';
 
 export class AdminBatchContentController {
@@ -67,6 +68,25 @@ export class AdminBatchContentController {
       return c.json({
         status: 'error',
         message: err.message || 'Failed to associate batch content',
+      }, 400);
+    }
+  };
+
+  public createBulk = async (c: Context) => {
+    try {
+      const rawBody = await c.req.json();
+      const body = createBulkBatchContentSchema.parse(rawBody);
+
+      const records = await this.adminBatchContentService.createBulkBatchContent(body);
+      return c.json({
+        status: 'success',
+        message: 'Batch contents associated successfully in bulk',
+        data: records,
+      }, 201);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to associate batch contents in bulk',
       }, 400);
     }
   };

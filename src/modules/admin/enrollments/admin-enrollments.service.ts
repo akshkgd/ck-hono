@@ -111,7 +111,19 @@ export class AdminEnrollmentsService {
     if (!enrollment) {
       throw new Error('Enrollment not found');
     }
-    return enrollment;
+
+    const startDate = enrollment.startedAt 
+      ? new Date(enrollment.startedAt) 
+      : (enrollment.paidAt ? new Date(enrollment.paidAt) : new Date(enrollment.createdAt));
+
+    const now = new Date();
+    const diffTime = now.getTime() - startDate.getTime();
+    const daysPassed = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+
+    return {
+      ...enrollment,
+      daysPassed,
+    };
   }
 
   public async updateEnrollment(id: number, input: UpdateEnrollmentInput) {

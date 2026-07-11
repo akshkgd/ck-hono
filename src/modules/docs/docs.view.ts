@@ -310,6 +310,30 @@ export function getDocsHtml(): string {
         </div>
 
         <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Course Progress</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#course-progress-list" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Course Progress Report</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Assignments</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#assignments-list" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List Submissions</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#assignments-grade" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Grade Submission</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
           <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Diagnostics</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
@@ -1638,6 +1662,7 @@ export interface BatchContent {
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">contentType</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'primary' | 'secondary' (Default: 'primary')</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">desc</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Detailed description or body markdown text.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">videoLink</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">URL path to video hosting service.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">videoDuration</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Duration of the video in seconds (nullable).</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">solutionCode</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Reference solution code for labs or tests.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">hints</td><td class="p-2 border-r border-zinc-900 text-zinc-400">any</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">JSON array containing helpful hints.</td></tr>
                 </tbody>
@@ -1658,7 +1683,8 @@ export interface BatchContent {
     title: 'Introduction to Flexbox',
     type: 'video',
     contentType: 'primary',
-    videoLink: 'https://player.vimeo.com/video/123456789'
+    videoLink: 'https://player.vimeo.com/video/123456789',
+    videoDuration: 620
   })
 });</code></pre>
             </div>
@@ -2578,6 +2604,166 @@ export interface BatchContent {
       "rowCount": 18
     }
   ]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /v1/admin/course-progress -->
+        <div id="course-progress-list" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Course Progress</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Course Progress Report</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Retrieves paginated search results of student study progress logs and includes daily aggregation breakdown stats to render charts on the frontend admin dashboard. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/course-progress</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">timeRange</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'today' | 'yesterday' | 'this_week' | 'last_week' | 'this_month' | 'last_month' | 'custom' (Default: 'this_week')</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">startDate</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">YYYY-MM-DD (Required when timeRange is 'custom')</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">endDate</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">YYYY-MM-DD (Required when timeRange is 'custom')</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Filter by specific batch ID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">email</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Filter by student email substring.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "logs": [
+      {
+        "id": 8,
+        "timeSpent": 2400,
+        "progress": 75,
+        "status": "learning",
+        "updatedAt": "2026-07-11T12:00:00.000Z",
+        "user": { "name": "Aarav", "email": "aarav@example.com" },
+        "batch": { "name": "Web Dev" },
+        "content": { "title": "Flexbox" }
+      }
+    ],
+    "pagination": { "page": 1, "limit": 50, "total": 1 },
+    "analytics": { "totalUsers": 12, "totalTimeSpentSeconds": 10920, "dailyAverageTimeSpentSeconds": 1560, "totalViews": 45 },
+    "chartData": [
+      { "date": "2026-07-11", "usersCount": 10, "timeSpentSeconds": 9000, "viewsCount": 38 }
+    ]
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /v1/admin/assignments -->
+        <div id="assignments-list" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Assignments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">List Student Submissions</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Returns a paginated list of student assignment submissions filtered by calendar date ranges, status, or course. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/assignments</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">status</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'Submitted' | 'under review' | 'approved' | 'rejected'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">timeRange</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'today' | 'yesterday' | 'this_week' | 'last_week' | 'this_month' | 'last_month' | 'custom' (Default: 'this_week')</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "submissions": [
+      {
+        "id": 105,
+        "githubLink": "https://github.com/student/repo",
+        "deployedLink": "https://demo.vercel.app",
+        "assignmentStatus": "Submitted",
+        "user": { "name": "Aarav", "email": "aarav@example.com" },
+        "batch": { "name": "Tailwind CSS Workshop" }
+      }
+    ],
+    "pagination": { "page": 1, "limit": 50, "total": 1 }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /v1/admin/assignments/:progressId/grade -->
+        <div id="assignments-grade" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Assignments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Grade Student Submission</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates grading status, remarks, video reviews, and code statuses for a student submission. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/assignments/:progressId/grade</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">assignmentStatus</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">'Submitted' | 'under review' | 'approved' | 'rejected'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">teacherRemark</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Teacher's review feedback message.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">videoFeedback</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Video review URL link.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">codeSubmittedStatus</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'Accepted' | 'rejected' | 'attempted'</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": 105,
+    "assignmentStatus": "approved",
+    "teacherRemark": "Well structured project layout!",
+    "videoFeedback": "https://loom.com/share/review"
+  }
 }</code></pre>
             </div>
           </div>

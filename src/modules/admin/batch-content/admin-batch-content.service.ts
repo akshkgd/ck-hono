@@ -5,7 +5,8 @@ import { ContentLibraryRepository } from '../../content-library/content-library.
 import type {
   CreateBatchContentInput,
   UpdateBatchContentInput,
-  BatchContentSearchQueryInput
+  BatchContentSearchQueryInput,
+  CreateBulkBatchContentInput
 } from '../../batch-content/batch-content.validation.js';
 
 export class AdminBatchContentService {
@@ -51,6 +52,40 @@ export class AdminBatchContentService {
     });
 
     return record;
+  }
+
+  public async createBulkBatchContent(input: CreateBulkBatchContentInput) {
+    // 1. Verify Batch Exists
+    const batch = await this.batchRepository.findById(input.batchId);
+    if (!batch) {
+      throw new Error('Batch not found');
+    }
+
+    // 2. Verify Section Exists
+    const section = await this.batchSectionRepository.findById(input.sectionId);
+    if (!section) {
+      throw new Error('Batch section not found');
+    }
+    if (section.batchId !== input.batchId) {
+      throw new Error('Batch section does not belong to the specified batch');
+    }
+
+    // 3. Verify All Content Items Exist
+    for (const item of input.items) {
+      const content = await this.contentLibraryRepository.findById(item.contentId);
+      if (!content) {
+        throw new Error(`Content library item with ID ${item.contentId} not found`);
+      }
+    }
+
+    // 4. Create bulk records in transaction
+    const records = await this.batchContentRepository.createBulk(
+      input.batchId,
+      input.sectionId,
+      input.items
+    );
+
+    return records;
   }
 
   public async getBatchContent(id: number) {

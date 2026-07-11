@@ -168,4 +168,40 @@ export class BatchContentRepository {
       }
     });
   }
+
+  public async createBulk(
+    batchId: number,
+    sectionId: number,
+    items: { contentId: number; accessOn: number; accessTill: number }[]
+  ): Promise<BatchContent[]> {
+    return db.transaction(async (tx) => {
+      // 1. Find current max order for this section
+      const maxOrderResult = await tx
+        .select({ maxOrder: sql<number>`max(${batchContent.order})` })
+        .from(batchContent)
+        .where(eq(batchContent.sectionId, sectionId));
+
+      let currentMax = maxOrderResult[0]?.maxOrder ?? 0;
+      const inserted: BatchContent[] = [];
+
+      // 2. Insert sequentially to preserve order
+      for (const item of items) {
+        currentMax += 1;
+        const results = await tx
+          .insert(batchContent)
+          .values({
+            batchId,
+            sectionId,
+            contentId: item.contentId,
+            accessOn: item.accessOn,
+            accessTill: item.accessTill,
+            order: currentMax,
+          })
+          .returning();
+        inserted.push(results[0]);
+      }
+
+      return inserted;
+    });
+  }
 }

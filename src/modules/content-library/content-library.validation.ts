@@ -9,6 +9,7 @@ export const createContentLibrarySchema = z.object({
   type: contentLibraryTypeSchema,
   contentType: contentTypeClassSchema.default('primary'),
   videoLink: z.string().max(255).optional().nullable(),
+  videoDuration: z.number().int().nonnegative().optional().nullable(),
   solutionCode: z.string().optional().nullable(),
   hints: z.any().optional().nullable(),
   metadata: z.record(z.string(), z.any()).default({}),

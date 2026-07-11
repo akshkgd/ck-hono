@@ -45,6 +45,7 @@ export class StudentRepository {
         startedAt: batchEnrollments.startedAt,
         paidAt: batchEnrollments.paidAt,
         accessTill: batchEnrollments.accessTill,
+        overrideAccessDays: batchEnrollments.overrideAccessDays,
         createdAt: batchEnrollments.createdAt,
         amountPayable: batchEnrollments.amountPayable,
         amountPaid: batchEnrollments.amountPaid,
@@ -135,6 +136,7 @@ export class StudentRepository {
           startedAt: batchEnrollments.startedAt,
           paidAt: batchEnrollments.paidAt,
           accessTill: batchEnrollments.accessTill,
+          overrideAccessDays: batchEnrollments.overrideAccessDays,
           createdAt: batchEnrollments.createdAt,
         }
       })
