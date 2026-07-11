@@ -53,7 +53,7 @@ export function getChangelogHtml(): string {
       <div class="flex items-center space-x-6">
         <a href="/docs" class="text-xs text-zinc-400 hover:text-indigo-400 transition font-mono">← Back to Docs</a>
         <span class="h-4 w-px bg-zinc-800"></span>
-        <span class="text-xs font-mono text-zinc-500">API Version: 1.1.0</span>
+        <span class="text-xs font-mono text-zinc-500">API Version: 1.2.0</span>
       </div>
     </div>
   </header>
@@ -67,7 +67,7 @@ export function getChangelogHtml(): string {
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
         </span>
-        <span>Latest Update: July 9, 2026</span>
+        <span>Latest Update: July 11, 2026</span>
       </div>
       <h1 class="text-4xl font-bold tracking-tight text-zinc-50 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-zinc-50 via-zinc-100 to-zinc-400">
         Codekaro API Changelog
@@ -80,6 +80,63 @@ export function getChangelogHtml(): string {
     <!-- Timeline Entries -->
     <div class="relative border-l border-zinc-800 ml-4 md:ml-32 space-y-16">
       
+      <!-- Release Entry: v1.2.0 -->
+      <div class="relative pl-8 group mb-12">
+        <!-- Badge Indicator on Timeline -->
+        <span class="absolute -left-[9px] top-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 ring-4 ring-zinc-950 shadow-md">
+          <svg class="h-2 w-2 text-zinc-50" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>
+        </span>
+
+        <!-- Floating Date Left on Desktop -->
+        <div class="hidden md:block absolute -left-36 top-1 text-right w-28">
+          <span class="text-xs font-mono text-indigo-400 font-semibold block">v1.2.0</span>
+          <span class="text-[10px] font-mono text-zinc-500 block">July 11, 2026</span>
+        </div>
+
+        <!-- Mobile Date/Version Info -->
+        <div class="md:hidden flex items-center space-x-2 mb-2 font-mono text-xs">
+          <span class="text-indigo-400 font-semibold">v1.2.0</span>
+          <span class="text-zinc-600">•</span>
+          <span class="text-zinc-500">July 11, 2026</span>
+        </div>
+
+        <!-- Release Card -->
+        <div class="bg-zinc-900/40 border border-zinc-900 rounded-xl p-6 md:p-8 hover:border-zinc-800 transition shadow-sm">
+          <h2 class="text-lg font-semibold text-zinc-50 mb-2 flex items-center gap-3">
+            <span>Student & Admin Progress Tracking</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
+          </h2>
+          <p class="text-xs text-zinc-400 mb-6 leading-relaxed">
+            Released student dashboard API endpoints for course details, access controls, progress heartbeats, and assignment submissions. Added a dedicated administrator assignments grading dashboard with chronological graph chart analytics and composite database indexing.
+          </p>
+
+          <!-- API Endpoint details -->
+          <div class="space-y-3 font-mono text-xs">
+            <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">POST</span>
+                <span class="text-zinc-200 font-semibold">/v1/student/courses/content/progress</span>
+              </div>
+              <a href="/student-docs#endpoint-student-progress-log" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium transition">View Docs →</a>
+            </div>
+            <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">POST</span>
+                <span class="text-zinc-200 font-semibold">/v1/student/courses/content/:batchContentId/assignment</span>
+              </div>
+              <a href="/student-docs#endpoint-student-submit-assignment" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium transition">View Docs →</a>
+            </div>
+            <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">GET</span>
+                <span class="text-zinc-200 font-semibold">/v1/admin/assignments</span>
+              </div>
+              <a href="/docs" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium transition">View Docs →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Release Entry: v1.1.0 -->
       <div class="relative pl-8 group">
         <!-- Badge Indicator on Timeline -->

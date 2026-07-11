@@ -187,6 +187,8 @@ export const batchContent = pgTable('batch_content', {
 ]);
 
 export const userStatusEnum = pgEnum('user_status', ['not_started', 'learning', 'completed']);
+export const assignmentStatusEnum = pgEnum('assignment_status', ['Submitted', 'under review', 'approved', 'rejected']);
+export const codeSubmittedStatusEnum = pgEnum('code_submitted_status', ['Accepted', 'rejected', 'attempted']);
 
 export const courseProgress = pgTable('course_progress', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
@@ -196,11 +198,21 @@ export const courseProgress = pgTable('course_progress', {
   timeSpent: integer('time_spent').default(0).notNull(),
   progress: integer('progress').default(0).notNull(),
   status: userStatusEnum('status').default('not_started').notNull(),
+  githubLink: varchar('github_link', { length: 255 }),
+  deployedLink: varchar('deployed_link', { length: 255 }),
+  assignmentStatus: assignmentStatusEnum('assignment_status'),
+  userRemark: text('user_remark'),
+  teacherRemark: text('teacher_remark'),
+  videoFeedback: text('video_feedback'),
+  codeSubmitted: text('code_submitted'),
+  codeSubmittedStatus: codeSubmittedStatusEnum('code_submitted_status'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   index('course_progress_batch_content_id_idx').on(table.batchContentId),
   uniqueIndex('course_progress_enrollment_content_uniq_idx').on(table.enrollmentId, table.batchContentId),
+  index('course_progress_user_id_idx').on(table.userId),
+  index('course_progress_assignment_status_updated_at_idx').on(table.assignmentStatus, table.updatedAt),
 ]);
 
 

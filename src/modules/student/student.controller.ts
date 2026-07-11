@@ -123,4 +123,38 @@ export class StudentController {
       }, status);
     }
   };
+
+  public submitAssignment = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      if (!user || !user.id) {
+        return c.json({
+          status: 'error',
+          message: 'Unauthorized: Missing user context',
+        }, 401);
+      }
+
+      const batchContentId = parseInt(c.req.param('batchContentId') || '', 10);
+      if (isNaN(batchContentId)) {
+        return c.json({
+          status: 'error',
+          message: 'Bad Request: Invalid batch content ID',
+        }, 400);
+      }
+
+      const input = (c.req as any).valid('json');
+      const result = await this.studentService.submitAssignment(user.id, batchContentId, input);
+
+      return c.json({
+        status: 'success',
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      const status = err.message.includes('Access denied') ? 403 : 400;
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to submit assignment',
+      }, status);
+    }
+  };
 }

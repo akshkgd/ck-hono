@@ -106,6 +106,10 @@ export function getStudentDocsHtml(): string {
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
               <a href="#endpoint-student-progress-log" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update Progress Heartbeat</a>
             </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#endpoint-student-submit-assignment" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Submit Assignment</a>
+            </li>
           </ul>
         </div>
 
@@ -445,6 +449,7 @@ export function getStudentDocsHtml(): string {
     "courses": [
       {
         "enrollmentId": 12,
+        "batchId": 8,
         "status": 1,
         "progress": 45,
         "timeSpentSeconds": 18200,
@@ -695,6 +700,74 @@ export function getStudentDocsHtml(): string {
     "status": "learning",
     "createdAt": "2026-07-01T12:00:00.000Z",
     "updatedAt": "2026-07-11T12:30:00.000Z"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoint: POST /v1/student/courses/content/:batchContentId/assignment -->
+        <div id="endpoint-student-submit-assignment" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8 pt-12">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Dashboard</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Submit Assignment</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Submits assignment project URLs, text remarks, and solution source code for a specific course content item. Sets the assignment status to <code class="font-mono text-zinc-200">'Submitted'</code> and marks the item's completion status to <code class="font-mono text-zinc-200">100% completed</code>.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/student/courses/content/:batchContentId/assignment</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">githubLink</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Valid GitHub URL.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">deployedLink</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Valid live deployment URL.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">userRemark</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Optional text notes or comments for the teacher.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">codeSubmitted</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Source code text block.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/student/courses/content/44/assignment', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    githubLink: 'https://github.com/student/repo',
+    deployedLink: 'https://demo.vercel.app',
+    userRemark: 'Please check the layout responsive checks.'
+  })
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": 105,
+    "userId": "8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1",
+    "enrollmentId": 12,
+    "batchContentId": 44,
+    "timeSpent": 240,
+    "progress": 100,
+    "status": "completed",
+    "githubLink": "https://github.com/student/repo",
+    "deployedLink": "https://demo.vercel.app",
+    "assignmentStatus": "Submitted",
+    "userRemark": "Please check the layout responsive checks.",
+    "createdAt": "2026-07-01T12:00:00.000Z",
+    "updatedAt": "2026-07-11T12:40:00.000Z"
   }
 }</code></pre>
             </div>

@@ -10,3 +10,12 @@ export const studentProgressSchema = z.object({
 });
 
 export type StudentProgressInput = z.infer<typeof studentProgressSchema>;
+
+export const studentAssignmentSchema = z.object({
+  githubLink: z.string().url('Must be a valid URL').or(z.string().length(0)).nullable().optional(),
+  deployedLink: z.string().url('Must be a valid URL').or(z.string().length(0)).nullable().optional(),
+  userRemark: z.string().nullable().optional(),
+  codeSubmitted: z.string().nullable().optional(),
+});
+
+export type StudentAssignmentInput = z.infer<typeof studentAssignmentSchema>;

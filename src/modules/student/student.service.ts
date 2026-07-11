@@ -1,5 +1,5 @@
 import { StudentRepository } from './student.repository.js';
-import type { StudentProgressInput } from './student.validation.js';
+import type { StudentProgressInput, StudentAssignmentInput } from './student.validation.js';
 
 export class StudentService {
   private studentRepository: StudentRepository;
@@ -228,6 +228,45 @@ export class StudentService {
       await this.studentRepository.updateEnrollmentAggregates(
         enrollment.id,
         input.timeSpent,
+        totalContentCount
+      );
+    }
+
+    return progressRecord;
+  }
+
+  public async submitAssignment(userId: string, batchContentId: number, input: StudentAssignmentInput) {
+    // 1. Verify content and active captured enrollment
+    const details = await this.studentRepository.getBatchContentAccessDetails(batchContentId, userId);
+    if (!details) {
+      throw new Error('Batch content not found');
+    }
+
+    const enrollment = details.enrollment;
+    if (!enrollment) {
+      throw new Error('Access denied: You are not enrolled in the course associated with this content');
+    }
+
+    if (enrollment.paymentStatus !== 'captured') {
+      throw new Error('Access denied: Course requires a captured enrollment payment');
+    }
+
+    // 2. Perform atomic assignment submission (Query 1)
+    const progressRecord = await this.studentRepository.upsertAssignmentSubmission(
+      userId,
+      enrollment.id,
+      batchContentId,
+      input
+    );
+
+    // 3. Count all contents in the batch
+    const totalContentCount = await this.studentRepository.countBatchContents(details.batchId);
+
+    // 4. Update aggregates (Query 2) - Note: assignment submission adds 0 delta to timeSpent, but updates completion progress
+    if (totalContentCount > 0) {
+      await this.studentRepository.updateEnrollmentAggregates(
+        enrollment.id,
+        0,
         totalContentCount
       );
     }

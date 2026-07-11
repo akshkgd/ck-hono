@@ -7,6 +7,7 @@ export class StudentRepository {
     return db
       .select({
         enrollmentId: batchEnrollments.id,
+        batchId: batchEnrollments.batchId,
         status: batchEnrollments.status,
         progress: batchEnrollments.progress,
         timeSpentSeconds: batchEnrollments.timeSpentSeconds,
@@ -94,6 +95,15 @@ export class StudentRepository {
           status: courseProgress.status,
           timeSpent: courseProgress.timeSpent,
           progress: courseProgress.progress,
+          githubLink: courseProgress.githubLink,
+          deployedLink: courseProgress.deployedLink,
+          assignmentStatus: courseProgress.assignmentStatus,
+          userRemark: courseProgress.userRemark,
+          teacherRemark: courseProgress.teacherRemark,
+          videoFeedback: courseProgress.videoFeedback,
+          codeSubmitted: courseProgress.codeSubmitted,
+          codeSubmittedStatus: courseProgress.codeSubmittedStatus,
+          updatedAt: courseProgress.updatedAt,
         }
       })
       .from(batchContent)
@@ -196,5 +206,48 @@ export class StudentRepository {
         updatedAt: new Date(),
       })
       .where(eq(batchEnrollments.id, enrollmentId));
+  }
+
+  public async upsertAssignmentSubmission(
+    userId: string,
+    enrollmentId: number,
+    batchContentId: number,
+    data: {
+      githubLink?: string | null;
+      deployedLink?: string | null;
+      userRemark?: string | null;
+      codeSubmitted?: string | null;
+    }
+  ) {
+    const results = await db
+      .insert(courseProgress)
+      .values({
+        userId,
+        enrollmentId,
+        batchContentId,
+        timeSpent: 0,
+        progress: 100,
+        status: 'completed',
+        githubLink: data.githubLink,
+        deployedLink: data.deployedLink,
+        userRemark: data.userRemark,
+        codeSubmitted: data.codeSubmitted,
+        assignmentStatus: 'Submitted',
+      })
+      .onConflictDoUpdate({
+        target: [courseProgress.enrollmentId, courseProgress.batchContentId],
+        set: {
+          progress: 100,
+          status: 'completed',
+          githubLink: data.githubLink,
+          deployedLink: data.deployedLink,
+          userRemark: data.userRemark,
+          codeSubmitted: data.codeSubmitted,
+          assignmentStatus: 'Submitted',
+          updatedAt: new Date(),
+        }
+      })
+      .returning();
+    return results[0];
   }
 }
