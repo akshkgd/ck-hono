@@ -49,8 +49,10 @@ export class StudentRepository {
         createdAt: batchEnrollments.createdAt,
         amountPayable: batchEnrollments.amountPayable,
         amountPaid: batchEnrollments.amountPaid,
+        courseStartDate: batches.startDate,
       })
       .from(batchEnrollments)
+      .innerJoin(batches, eq(batchEnrollments.batchId, batches.id))
       .where(and(
         eq(batchEnrollments.userId, userId),
         eq(batchEnrollments.batchId, batchId)
@@ -138,9 +140,11 @@ export class StudentRepository {
           accessTill: batchEnrollments.accessTill,
           overrideAccessDays: batchEnrollments.overrideAccessDays,
           createdAt: batchEnrollments.createdAt,
+          courseStartDate: batches.startDate,
         }
       })
       .from(batchContent)
+      .innerJoin(batches, eq(batchContent.batchId, batches.id))
       .leftJoin(
         batchEnrollments,
         and(

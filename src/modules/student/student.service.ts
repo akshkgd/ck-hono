@@ -32,10 +32,9 @@ export class StudentService {
       throw new Error('Access denied: Course requires a captured enrollment payment');
     }
 
-    // Determine start date: startedAt || paidAt || createdAt
-    const startDate = enrollment.startedAt 
-      ? new Date(enrollment.startedAt) 
-      : (enrollment.paidAt ? new Date(enrollment.paidAt) : new Date(enrollment.createdAt));
+    const startedAtDate = enrollment.startedAt ? new Date(enrollment.startedAt) : null;
+    const paidAtDate = enrollment.paidAt ? new Date(enrollment.paidAt) : null;
+    const startDate = startedAtDate || paidAtDate || enrollment.createdAt;
 
     // Determine end date: accessTill || (startDate + 1 year)
     let endDate: Date;
@@ -140,10 +139,9 @@ export class StudentService {
       throw new Error('Access denied: Course requires a captured enrollment payment');
     }
 
-    // Determine start date: startedAt || paidAt || createdAt
-    const startDate = enrollment.startedAt 
-      ? new Date(enrollment.startedAt) 
-      : (enrollment.paidAt ? new Date(enrollment.paidAt) : new Date(enrollment.createdAt));
+    const startedAtDate = enrollment.startedAt ? new Date(enrollment.startedAt) : null;
+    const paidAtDate = enrollment.paidAt ? new Date(enrollment.paidAt) : null;
+    const startDate = startedAtDate || paidAtDate || (enrollment.createdAt ? new Date(enrollment.createdAt) : new Date());
 
     // Determine access limit date: accessTill || (startDate + 1 year)
     let endDate: Date;
@@ -216,10 +214,12 @@ export class StudentService {
       throw new Error('Access denied: Course requires a captured enrollment payment');
     }
 
+    const enrollmentId = enrollment.id!;
+
     // 2. Perform atomic upsert for specific batchContent progress (Query 1)
     const progressRecord = await this.studentRepository.upsertContentProgress(
       userId,
-      enrollment.id,
+      enrollmentId,
       input.batchContentId,
       input.timeSpent,
       input.progress,
@@ -232,7 +232,7 @@ export class StudentService {
     // 4. Atomic aggregate update to enrollment records (Query 2)
     if (totalContentCount > 0) {
       await this.studentRepository.updateEnrollmentAggregates(
-        enrollment.id,
+        enrollmentId,
         input.timeSpent,
         totalContentCount
       );
@@ -257,10 +257,12 @@ export class StudentService {
       throw new Error('Access denied: Course requires a captured enrollment payment');
     }
 
+    const enrollmentId = enrollment.id!;
+
     // 2. Perform atomic assignment submission (Query 1)
     const progressRecord = await this.studentRepository.upsertAssignmentSubmission(
       userId,
-      enrollment.id,
+      enrollmentId,
       batchContentId,
       input
     );
@@ -271,7 +273,7 @@ export class StudentService {
     // 4. Update aggregates (Query 2) - Note: assignment submission adds 0 delta to timeSpent, but updates completion progress
     if (totalContentCount > 0) {
       await this.studentRepository.updateEnrollmentAggregates(
-        enrollment.id,
+        enrollmentId,
         0,
         totalContentCount
       );
