@@ -23,6 +23,8 @@ import docsRouter from './modules/docs/docs.route.js';
 import changelogRouter from './modules/changelog/changelog.route.js';
 import playgroundRouter from './modules/playground/playground.route.js';
 import courseProgressRouter from './modules/course-progress/course-progress.route.js';
+import studentRouter from './modules/student/student.route.js';
+import studentDocsRouter from './modules/student-docs/student-docs.route.js';
 import { activityMiddleware } from './middleware/activity.middleware.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
@@ -83,12 +85,14 @@ v1.route('/admin/analytics', adminAnalyticsRouter);
 v1.route('/admin/batch-contents', adminBatchContentRouter);
 v1.route('/admin/logs', adminLogsRouter);
 v1.route('/course-progress', courseProgressRouter);
+v1.route('/student', studentRouter);
 
 // Register Routes
 app.route('/v1', v1);
 app.route('/docs', docsRouter);
 app.route('/changelog', changelogRouter);
 app.route('/playground', playgroundRouter);
+app.route('/student-docs', studentDocsRouter);
 app.get('/admin/logs', (c) => c.html(renderLogsView()));
 
 // Global 404 Handler
