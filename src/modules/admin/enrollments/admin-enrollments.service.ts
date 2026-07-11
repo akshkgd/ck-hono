@@ -119,7 +119,7 @@ export class AdminEnrollmentsService {
     const now = new Date();
     const diffTime = now.getTime() - startDate.getTime();
     const calculatedDaysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const daysPassed = enrollment.overrideAccessDays !== null && enrollment.overrideAccessDays !== undefined
+    const daysPassed = enrollment.overrideAccessDays !== null && enrollment.overrideAccessDays !== undefined && enrollment.overrideAccessDays > 0
       ? Math.max(calculatedDaysPassed, enrollment.overrideAccessDays)
       : calculatedDaysPassed;
 
