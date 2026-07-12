@@ -135,6 +135,7 @@ export class StudentRepository {
         accessOnDate: batchContent.accessOnDate,
         accessTillDate: batchContent.accessTillDate,
         canSubmitAssignment: batchContent.canSubmitAssignment,
+        videoDuration: contentLibrary.videoDuration,
         enrollment: {
           id: batchEnrollments.id,
           paymentStatus: batchEnrollments.paymentStatus,
@@ -148,6 +149,7 @@ export class StudentRepository {
       })
       .from(batchContent)
       .innerJoin(batches, eq(batchContent.batchId, batches.id))
+      .leftJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
       .leftJoin(
         batchEnrollments,
         and(
@@ -166,8 +168,12 @@ export class StudentRepository {
     batchContentId: number,
     timeSpentDelta: number,
     progress: number,
-    status: 'not_started' | 'learning' | 'completed'
+    status: 'not_started' | 'learning' | 'completed',
+    videoDuration?: number | null
   ) {
+    const isCompletedOnInsert = progress >= 100 || status === 'completed' || (videoDuration && timeSpentDelta >= videoDuration * 0.9);
+    const progressOnInsert = isCompletedOnInsert ? 100 : progress;
+
     const results = await db
       .insert(courseProgress)
       .values({
@@ -175,18 +181,28 @@ export class StudentRepository {
         enrollmentId,
         batchContentId,
         timeSpent: timeSpentDelta,
-        progress,
-        status: (progress >= 100 || status === 'completed') ? 'completed' : 'learning',
+        progress: progressOnInsert,
+        status: isCompletedOnInsert ? 'completed' : 'learning',
       })
       .onConflictDoUpdate({
         target: [courseProgress.enrollmentId, courseProgress.batchContentId],
         set: {
           timeSpent: sql`${courseProgress.timeSpent} + ${timeSpentDelta}`,
-          progress: sql`GREATEST(${courseProgress.progress}, ${progress})`,
-          status: sql`CASE 
-            WHEN GREATEST(${courseProgress.progress}, ${progress}) >= 100 OR ${status} = 'completed' THEN 'completed'::user_status 
-            ELSE 'learning'::user_status 
-          END`,
+          progress: videoDuration
+            ? sql`CASE 
+                WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${videoDuration} * 0.9 THEN 100 
+                ELSE GREATEST(${courseProgress.progress}, ${progress}) 
+              END`
+            : sql`GREATEST(${courseProgress.progress}, ${progress})`,
+          status: videoDuration
+            ? sql`CASE 
+                WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${videoDuration} * 0.9 OR GREATEST(${courseProgress.progress}, ${progress}) >= 100 OR ${status} = 'completed' THEN 'completed'::user_status 
+                ELSE 'learning'::user_status 
+              END`
+            : sql`CASE 
+                WHEN GREATEST(${courseProgress.progress}, ${progress}) >= 100 OR ${status} = 'completed' THEN 'completed'::user_status 
+                ELSE 'learning'::user_status 
+              END`,
           updatedAt: new Date(),
         }
       })

@@ -223,7 +223,8 @@ export class StudentService {
       input.batchContentId,
       input.timeSpent,
       input.progress,
-      input.status
+      input.status,
+      details.videoDuration
     );
 
     // 3. Count all contents in the batch
