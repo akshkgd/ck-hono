@@ -1733,6 +1733,24 @@ export interface BatchContent {
   }
 });</code></pre>
             </div>
+
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "title": "Introduction to CSS Grid",
+    "type": "video",
+    "contentType": "primary",
+    "desc": "Overview of grid columns and templates",
+    "videoLink": "https://player.vimeo.com/video/987654321",
+    "videoDuration": 850,
+    "createdAt": "2026-07-11T10:00:00.000Z",
+    "updatedAt": "2026-07-11T12:00:00.000Z"
+  }
+}</code></pre>
+            </div>
           </div>
         </div>
 
@@ -1762,6 +1780,20 @@ export interface BatchContent {
                 </tbody>
               </table>
             </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Request JSON Body</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900 font-mono">Field</th><th class="p-2 border-r border-zinc-900 font-mono">Type</th><th class="p-2 border-r border-zinc-900 font-mono">Required</th><th class="p-2 font-mono">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">title</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Title of the content item.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">type</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'video' | 'coding lab' | 'assignment' | 'article'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">videoDuration</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Duration of the video in seconds (nullable).</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div class="xl:col-span-2 space-y-6">
@@ -1775,9 +1807,23 @@ export interface BatchContent {
   },
   body: JSON.stringify({
     title: 'Introduction to CSS Grid',
-    videoLink: 'https://player.vimeo.com/video/987654321'
+    videoLink: 'https://player.vimeo.com/video/987654321',
+    videoDuration: 850
   })
 });</code></pre>
+            </div>
+
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "title": "Introduction to CSS Grid",
+    "type": "video",
+    "videoDuration": 850
+  }
+}</code></pre>
             </div>
           </div>
         </div>
