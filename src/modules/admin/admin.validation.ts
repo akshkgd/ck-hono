@@ -1,12 +1,22 @@
 import { z } from 'zod';
 
+const roleSchema = z.preprocess(
+  (val) => typeof val === 'string' ? val.toLowerCase() : val,
+  z.enum(['student', 'admin', 'user', 'moderator'])
+);
+
+const statusSchema = z.preprocess(
+  (val) => typeof val === 'string' ? val.toLowerCase() : val,
+  z.enum(['active', 'inactive', 'suspended'])
+);
+
 export const adminAddUserSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters long'),
   name: z.string().min(2, 'Name must be at least 2 characters long').optional(),
   mobile: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number').optional(),
-  role: z.enum(['student', 'admin', 'user', 'moderator']).optional(),
-  status: z.enum(['active', 'inactive', 'suspended']).optional(),
+  role: roleSchema.optional(),
+  status: statusSchema.optional(),
 });
 
 export const adminUpdateUserSchema = z.object({
@@ -27,16 +37,16 @@ export const adminUpdateUserSchema = z.object({
   currentStreak: z.number().int().min(0).optional(),
   longestStreak: z.number().int().min(0).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
-  role: z.enum(['student', 'admin', 'user', 'moderator']).optional(),
-  status: z.enum(['active', 'inactive', 'suspended']).optional(),
+  role: roleSchema.optional(),
+  status: statusSchema.optional(),
 });
 
 export const adminUpdateRoleSchema = z.object({
-  role: z.enum(['student', 'admin', 'user', 'moderator']),
+  role: roleSchema,
 });
 
 export const adminUpdateStatusSchema = z.object({
-  status: z.enum(['active', 'inactive', 'suspended']),
+  status: statusSchema,
 });
 
 export const adminSearchQuerySchema = z.object({
