@@ -158,6 +158,7 @@ export const contentLibrary = pgTable('content_library', {
   videoLink: varchar('video_link', { length: 255 }),
   videoDuration: integer('video_duration'),
   assignment: text('assignment'),
+  xp: integer('xp'),
   solutionCode: text('solution_code'),
   hints: jsonb('hints'),
   metadata: jsonb('metadata').default({}),

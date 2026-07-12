@@ -17,6 +17,7 @@ export class AdminContentLibraryService {
       videoLink: input.videoLink,
       videoDuration: input.videoDuration,
       assignment: input.assignment,
+      xp: input.xp,
       solutionCode: input.solutionCode,
       hints: input.hints,
       metadata: input.metadata,

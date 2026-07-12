@@ -584,6 +584,9 @@ export interface ContentLibraryItem {
   type: 'video' | 'coding lab' | 'assignment' | 'article';
   contentType: 'primary' | 'secondary'; // Default: 'primary'
   videoLink: string | null;
+  videoDuration?: number | null;
+  assignment?: string | null;
+  xp?: number | null;
   solutionCode: string | null;
   hints: any | null;
   metadata: Record&lt;string, any&gt;; // Default: {}
@@ -1671,6 +1674,7 @@ export interface BatchContent {
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">videoLink</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">URL path to video hosting service.</td></tr>
                    <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">videoDuration</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Duration of the video in seconds (nullable).</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">assignment</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Large markdown text block detailing assignment requirements (nullable).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">xp</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Experience points awarded on completion (nullable).</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">solutionCode</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Reference solution code for labs or tests.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">hints</td><td class="p-2 border-r border-zinc-900 text-zinc-400">any</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">JSON array containing helpful hints.</td></tr>
                 </tbody>
@@ -1751,6 +1755,7 @@ export interface BatchContent {
     "videoLink": "https://player.vimeo.com/video/987654321",
     "videoDuration": 850,
     "assignment": "Build a responsive grid layout consisting of a header, sidebar, main content and footer.",
+    "xp": 50,
     "createdAt": "2026-07-11T10:00:00.000Z",
     "updatedAt": "2026-07-11T12:00:00.000Z"
   }
@@ -1797,6 +1802,7 @@ export interface BatchContent {
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">type</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'video' | 'coding lab' | 'assignment' | 'article'</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">videoDuration</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Duration of the video in seconds (nullable).</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">assignment</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Large markdown text block detailing assignment requirements (nullable).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">xp</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Experience points awarded on completion (nullable).</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1815,7 +1821,8 @@ export interface BatchContent {
     title: 'Introduction to CSS Grid',
     videoLink: 'https://player.vimeo.com/video/987654321',
     videoDuration: 850,
-    assignment: 'Build a responsive grid layout consisting of a header, sidebar, main content and footer.'
+    assignment: 'Build a responsive grid layout consisting of a header, sidebar, main content and footer.',
+    xp: 50
   })
 });</code></pre>
             </div>
@@ -1829,7 +1836,8 @@ export interface BatchContent {
     "title": "Introduction to CSS Grid",
     "type": "video",
     "videoDuration": 850,
-    "assignment": "Build a responsive grid layout consisting of a header, sidebar, main content and footer."
+    "assignment": "Build a responsive grid layout consisting of a header, sidebar, main content and footer.",
+    "xp": 50
   }
 }</code></pre>
             </div>
