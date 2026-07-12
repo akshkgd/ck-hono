@@ -83,6 +83,8 @@ export class StudentService {
         accessTill: item.accessTill,
         accessOnDate: item.accessOnDate,
         accessTillDate: item.accessTillDate,
+        canSubmitAssignment: item.canSubmitAssignment,
+        canSubmitAssignments: item.canSubmitAssignment,
         content: item.content,
         progress: {
           status: progressStatus,
