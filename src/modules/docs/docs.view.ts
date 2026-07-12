@@ -1040,7 +1040,9 @@ export interface BatchContent {
   body: JSON.stringify({
     name: 'Jane Smith Updated',
     bio: 'Professional Software Engineer',
-    experienceYears: 4
+    experienceYears: 4,
+    role: 'admin',
+    status: 'active'
   })
 });</code></pre>
             </div>

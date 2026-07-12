@@ -82,6 +82,11 @@ export class AdminService {
       throw new Error('Failed to update user');
     }
 
+    // Force re-login if critical access attributes (role/status) are modified via editUser
+    if (input.role !== undefined || input.status !== undefined) {
+      await this.clearUserSessions(id);
+    }
+
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }
@@ -96,6 +101,8 @@ export class AdminService {
     if (!updatedUser) {
       throw new Error('Failed to update user role');
     }
+
+    await this.clearUserSessions(id);
 
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
@@ -112,6 +119,8 @@ export class AdminService {
       throw new Error('Failed to update user status');
     }
 
+    await this.clearUserSessions(id);
+
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }
@@ -122,6 +131,7 @@ export class AdminService {
       throw new Error('User not found');
     }
 
+    await this.clearUserSessions(id);
     return this.userRepository.delete(id);
   }
 
@@ -167,5 +177,18 @@ export class AdminService {
       enrollments,
       activeSessions,
     };
+  }
+
+  private async clearUserSessions(userId: string) {
+    if (redis && isRedisReady()) {
+      try {
+        const sessionKeys = await redis.keys(`session:${userId}:*`);
+        if (sessionKeys.length > 0) {
+          await redis.del(...sessionKeys);
+        }
+      } catch (err) {
+        console.error('[Redis] Failed to clear user sessions:', err);
+      }
+    }
   }
 }

@@ -27,6 +27,8 @@ export const adminUpdateUserSchema = z.object({
   currentStreak: z.number().int().min(0).optional(),
   longestStreak: z.number().int().min(0).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
+  role: z.enum(['student', 'admin', 'user', 'moderator']).optional(),
+  status: z.enum(['active', 'inactive', 'suspended']).optional(),
 });
 
 export const adminUpdateRoleSchema = z.object({
