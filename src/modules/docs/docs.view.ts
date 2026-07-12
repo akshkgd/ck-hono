@@ -218,6 +218,10 @@ export function getDocsHtml(): string {
               <a href="#batch-content-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Associate content</a>
             </li>
             <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#batch-content-bulk-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Bulk Associate content</a>
+            </li>
+            <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
               <a href="#batch-content-get" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get linkage</a>
             </li>
@@ -1899,6 +1903,76 @@ export interface BatchContent {
     accessTill: 30
   })
 });</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /v1/admin/batch-contents/bulk -->
+        <div id="batch-content-bulk-create" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Content</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Bulk Associate Content</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Links multiple content library items to a curriculum section under a specific batch sequentially in a single transaction, preserving their ordering. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/batch-contents/bulk</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Target batch ID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">sectionId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Target section ID.</td></tr>
+                  <tr class="border-b border-zinc-900">
+                    <td class="p-2 border-r border-zinc-900 text-zinc-300">items</td>
+                    <td class="p-2 border-r border-zinc-900 text-zinc-400">array</td>
+                    <td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td>
+                    <td class="p-2 text-zinc-400">Array of objects with: <code>contentId</code>, <code>accessOn</code> (default: 0), <code>accessTill</code> (default: 0), <code>accessOnDate</code> (optional), <code>accessTillDate</code> (optional).</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-contents/bulk', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    batchId: 2,
+    sectionId: 12,
+    items: [
+      { contentId: 4, accessOn: 0, accessTill: 365 },
+      { contentId: 7, accessOn: 0, accessTill: 365 },
+      { contentId: 9, accessOn: 0, accessTill: 365 }
+    ]
+  })
+});</code></pre>
+            </div>
+
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": [
+    { "id": 101, "batchId": 2, "sectionId": 12, "contentId": 4, "order": 1, "accessOn": 0, "accessTill": 365 },
+    { "id": 102, "batchId": 2, "sectionId": 12, "contentId": 7, "order": 2, "accessOn": 0, "accessTill": 365 },
+    { "id": 103, "batchId": 2, "sectionId": 12, "contentId": 9, "order": 3, "accessOn": 0, "accessTill": 365 }
+  ]
+}</code></pre>
             </div>
           </div>
         </div>
