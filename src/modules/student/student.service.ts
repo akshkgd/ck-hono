@@ -248,6 +248,10 @@ export class StudentService {
       throw new Error('Batch content not found');
     }
 
+    if (details.canSubmitAssignment === false) {
+      throw new Error('Access denied: Assignment submission is disabled for this content item');
+    }
+
     const enrollment = details.enrollment;
     if (!enrollment) {
       throw new Error('Access denied: You are not enrolled in the course associated with this content');

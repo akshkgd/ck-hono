@@ -601,6 +601,7 @@ export interface BatchContent {
   accessTill: number; // Default: 0
   accessOnDate: string | null;
   accessTillDate: string | null;
+  canSubmitAssignment: boolean | null;
   metadata: Record&lt;string, any&gt;; // Default: {}
   createdAt: string; // Default: CURRENT_TIMESTAMP
   updatedAt: string; // Default: CURRENT_TIMESTAMP
@@ -1953,7 +1954,8 @@ export interface BatchContent {
     sectionId: 12,
     contentId: 4,
     accessOn: 0,
-    accessTill: 30
+    accessTill: 30,
+    canSubmitAssignment: true
   })
 });</code></pre>
             </div>
@@ -2122,7 +2124,8 @@ export interface BatchContent {
   },
   body: JSON.stringify({
     accessOn: 1,
-    accessTillDate: "2026-12-31"
+    accessTillDate: "2026-12-31",
+    canSubmitAssignment: false
   })
 });</code></pre>
             </div>

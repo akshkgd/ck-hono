@@ -84,6 +84,7 @@ export class StudentRepository {
         accessTill: batchContent.accessTill,
         accessOnDate: batchContent.accessOnDate,
         accessTillDate: batchContent.accessTillDate,
+        canSubmitAssignment: batchContent.canSubmitAssignment,
         content: {
           id: contentLibrary.id,
           title: contentLibrary.title,
@@ -132,6 +133,7 @@ export class StudentRepository {
         accessTill: batchContent.accessTill,
         accessOnDate: batchContent.accessOnDate,
         accessTillDate: batchContent.accessTillDate,
+        canSubmitAssignment: batchContent.canSubmitAssignment,
         enrollment: {
           id: batchEnrollments.id,
           paymentStatus: batchEnrollments.paymentStatus,

@@ -9,6 +9,7 @@ export const createBatchContentSchema = z.object({
   accessTill: z.number().int().nonnegative().default(0),
   accessOnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
   accessTillDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
+  canSubmitAssignment: z.boolean().optional().nullable(),
   metadata: z.record(z.string(), z.any()).default({}),
 });
 
@@ -43,6 +44,7 @@ export const createBulkBatchContentSchema = z.object({
       contentId: z.number().int().positive(),
       accessOn: z.number().int().nonnegative().default(0),
       accessTill: z.number().int().nonnegative().default(0),
+      canSubmitAssignment: z.boolean().optional().nullable(),
     })
   ).min(1, 'At least one item is required'),
 });

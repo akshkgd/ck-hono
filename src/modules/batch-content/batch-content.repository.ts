@@ -18,6 +18,7 @@ export class BatchContentRepository {
         accessTill: batchContent.accessTill,
         accessOnDate: batchContent.accessOnDate,
         accessTillDate: batchContent.accessTillDate,
+        canSubmitAssignment: batchContent.canSubmitAssignment,
         metadata: batchContent.metadata,
         createdAt: batchContent.createdAt,
         updatedAt: batchContent.updatedAt,
@@ -101,6 +102,7 @@ export class BatchContentRepository {
         accessTill: batchContent.accessTill,
         accessOnDate: batchContent.accessOnDate,
         accessTillDate: batchContent.accessTillDate,
+        canSubmitAssignment: batchContent.canSubmitAssignment,
         metadata: batchContent.metadata,
         createdAt: batchContent.createdAt,
         updatedAt: batchContent.updatedAt,
@@ -172,7 +174,7 @@ export class BatchContentRepository {
   public async createBulk(
     batchId: number,
     sectionId: number,
-    items: { contentId: number; accessOn: number; accessTill: number }[]
+    items: { contentId: number; accessOn: number; accessTill: number; canSubmitAssignment?: boolean | null }[]
   ): Promise<BatchContent[]> {
     return db.transaction(async (tx) => {
       // 1. Find current max order for this section
@@ -195,6 +197,7 @@ export class BatchContentRepository {
             contentId: item.contentId,
             accessOn: item.accessOn,
             accessTill: item.accessTill,
+            canSubmitAssignment: item.canSubmitAssignment ?? null,
             order: currentMax,
           })
           .returning();

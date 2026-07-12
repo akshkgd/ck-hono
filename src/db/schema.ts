@@ -179,6 +179,7 @@ export const batchContent = pgTable('batch_content', {
   accessTill: integer('access_till').default(0).notNull(),
   accessOnDate: date('access_on_date'),
   accessTillDate: date('access_till_date'),
+  canSubmitAssignment: boolean('can_submit_assignment'),
   metadata: jsonb('metadata').default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
