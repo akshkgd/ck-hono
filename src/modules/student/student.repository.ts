@@ -93,6 +93,8 @@ export class StudentRepository {
           contentType: contentLibrary.contentType,
           videoLink: contentLibrary.videoLink,
           xp: contentLibrary.xp,
+          assignment: contentLibrary.assignment,
+          assignments: contentLibrary.assignment,
           solutionCode: contentLibrary.solutionCode,
           hints: contentLibrary.hints,
         },
