@@ -231,7 +231,8 @@ export class StudentService {
       input.timeSpent,
       input.progress,
       input.status,
-      details.videoDuration
+      details.videoDuration,
+      details.canSubmitAssignment
     );
 
     // 3. Count all contents in the batch

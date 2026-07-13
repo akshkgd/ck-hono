@@ -170,10 +170,12 @@ export class StudentRepository {
     timeSpentDelta: number,
     progress: number,
     status: 'not_started' | 'learning' | 'completed',
-    videoDuration?: number | null
+    videoDuration?: number | null,
+    canSubmitAssignment?: boolean | null
   ) {
     const isCompletedOnInsert = progress >= 100 || status === 'completed' || (videoDuration && timeSpentDelta >= videoDuration * 0.9);
     const progressOnInsert = isCompletedOnInsert ? 100 : progress;
+    const assignmentStatusOnInsert = (canSubmitAssignment && timeSpentDelta >= 600) ? 'pending' : null;
 
     const results = await db
       .insert(courseProgress)
@@ -184,6 +186,7 @@ export class StudentRepository {
         timeSpent: timeSpentDelta,
         progress: progressOnInsert,
         status: isCompletedOnInsert ? 'completed' : 'learning',
+        assignmentStatus: assignmentStatusOnInsert,
       })
       .onConflictDoUpdate({
         target: [courseProgress.enrollmentId, courseProgress.batchContentId],
@@ -204,6 +207,12 @@ export class StudentRepository {
                 WHEN GREATEST(${courseProgress.progress}, ${progress}) >= 100 OR ${status} = 'completed' THEN 'completed'::user_status 
                 ELSE 'learning'::user_status 
               END`,
+          assignmentStatus: canSubmitAssignment
+            ? sql`CASE 
+                WHEN ${courseProgress.assignmentStatus} IS NULL AND ${courseProgress.timeSpent} + ${timeSpentDelta} >= 600 THEN 'pending'::assignment_status 
+                ELSE ${courseProgress.assignmentStatus} 
+              END`
+            : courseProgress.assignmentStatus,
           updatedAt: new Date(),
         }
       })
