@@ -712,7 +712,7 @@ export function getStudentDocsHtml(): string {
             <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Dashboard</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Submit Assignment</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Submits assignment project URLs, text remarks, and solution source code for a specific course content item. Sets the assignment status to <code class="font-mono text-zinc-200">'submitted'</code> and marks the item's completion status to <code class="font-mono text-zinc-200">100% completed</code>.
+              Submits assignment project URLs, text remarks, and solution source code for a specific course content item. **Note:** Students can only submit if their current assignment status is <code class="font-mono text-zinc-200">'pending'</code> (unlocked after watching 10 minutes of the video). Submitting when status is null or not 'pending' returns a 403 Forbidden error. On success, sets the status to <code class="font-mono text-zinc-200">'submitted'</code> and marks progress as <code class="font-mono text-zinc-200">100% completed</code>.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
