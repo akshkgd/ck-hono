@@ -90,6 +90,12 @@ export class StudentService {
           status: progressStatus,
           timeSpent: item.progress?.timeSpent || 0,
           progress: item.progress?.progress || 0,
+          githubLink: item.progress?.githubLink || null,
+          deployedLink: item.progress?.deployedLink || null,
+          DeployedLink: item.progress?.deployedLink || null,
+          assignmentStatus: item.progress?.assignmentStatus || null,
+          teacherRemark: item.progress?.teacherRemark || null,
+          videoFeedback: item.progress?.videoFeedback || null,
         }
       };
 
