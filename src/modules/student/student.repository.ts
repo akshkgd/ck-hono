@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
-import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress } from '../../db/schema.js';
-import { eq, and, asc, sql } from 'drizzle-orm';
+import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress, batchEnrollmentPayments } from '../../db/schema.js';
+import { eq, and, asc, sql, desc } from 'drizzle-orm';
 
 export class StudentRepository {
   public async findEnrolledCourses(userId: string) {
@@ -284,5 +284,31 @@ export class StudentRepository {
       })
       .returning();
     return results[0];
+  }
+
+  public async getStudentPayments(userId: string) {
+    return db
+      .select({
+        id: batchEnrollmentPayments.id,
+        amount: batchEnrollmentPayments.amount,
+        paidAt: batchEnrollmentPayments.paidAt,
+        paymentMethod: batchEnrollmentPayments.paymentMethod,
+        transactionId: batchEnrollmentPayments.transactionId,
+        invoiceId: batchEnrollmentPayments.invoiceId,
+        purpose: batchEnrollmentPayments.purpose,
+        isGstApplicable: batchEnrollmentPayments.isGstApplicable,
+        remarks: batchEnrollmentPayments.remarks,
+        courseName: batches.name,
+      })
+      .from(batchEnrollmentPayments)
+      .innerJoin(batchEnrollments, eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollments.id))
+      .innerJoin(batches, eq(batchEnrollments.batchId, batches.id))
+      .where(
+        and(
+          eq(batchEnrollments.userId, userId),
+          eq(batchEnrollments.paymentStatus, 'captured')
+        )
+      )
+      .orderBy(desc(batchEnrollmentPayments.paidAt));
   }
 }

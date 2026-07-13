@@ -891,6 +891,59 @@ export function getStudentDocsHtml(): string {
         </div>
       </section>
 
+      <hr class="border-zinc-900" />
+
+      <!-- Group: Student Payments -->
+      <section class="space-y-16">
+        <div class="border-b border-zinc-900 pb-2">
+          <h2 class="text-2xl font-normal text-zinc-50 font-mono">Student: Payments</h2>
+        </div>
+
+        <!-- Endpoint: GET /payments -->
+        <div id="student-payments" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get Payment History</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Fetches all captured payment records associated with the authenticated student's course enrollments.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/student/payments</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/student/payments', {
+  method: 'GET'
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": [
+    {
+      "id": 1,
+      "amount": 4999,
+      "paidAt": "2026-07-01T12:00:00.000Z",
+      "paymentMethod": "UPI",
+      "transactionId": "pay_XYZ123",
+      "invoiceId": "INV-2026-001",
+      "purpose": "enrollment",
+      "isGstApplicable": true,
+      "remarks": "Initial batch fee payment",
+      "courseName": "Full Stack Web Development"
+    }
+  ]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 </body>

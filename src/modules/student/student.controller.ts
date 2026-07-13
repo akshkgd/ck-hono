@@ -157,4 +157,28 @@ export class StudentController {
       }, status);
     }
   };
+
+  public getPayments = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      if (!user || !user.id) {
+        return c.json({
+          status: 'error',
+          message: 'Unauthorized: Missing user context',
+        }, 401);
+      }
+
+      const payments = await this.studentService.getPaymentsHistory(user.id);
+
+      return c.json({
+        status: 'success',
+        data: payments,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to fetch payments history',
+      }, 400);
+    }
+  };
 }

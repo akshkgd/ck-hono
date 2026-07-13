@@ -11,6 +11,7 @@ const controller = new StudentController();
 studentRouter.get('/courses', authMiddleware(), controller.getCourses);
 studentRouter.get('/courses/:batchId', authMiddleware(), controller.getCourseDetails);
 studentRouter.get('/courses/content/:batchContentId/access', authMiddleware(), controller.checkAccess);
+studentRouter.get('/payments', authMiddleware(), controller.getPayments);
 studentRouter.post('/courses/content/progress', authMiddleware(), zValidator('json', studentProgressSchema), controller.updateProgress);
 studentRouter.post('/courses/content/:batchContentId/assignment', authMiddleware(), zValidator('json', studentAssignmentSchema), controller.submitAssignment);
 

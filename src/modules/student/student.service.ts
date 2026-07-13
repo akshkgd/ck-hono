@@ -294,4 +294,8 @@ export class StudentService {
 
     return progressRecord;
   }
+
+  public async getPaymentsHistory(userId: string) {
+    return this.studentRepository.getStudentPayments(userId);
+  }
 }

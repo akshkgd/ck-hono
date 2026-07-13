@@ -133,4 +133,25 @@ describe('Student Dashboard Module', () => {
     const body = await res.json();
     expect(body.status).toBe('error');
   });
+
+  it('should reject unauthenticated request with 401 on GET /v1/student/payments', async () => {
+    const res = await app.request('/v1/student/payments', {
+      method: 'GET',
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it('should return successfully with payment history list for an authenticated student', async () => {
+    const res = await app.request('/v1/student/payments', {
+      method: 'GET',
+      headers: {
+        'Cookie': studentCookie,
+      },
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe('success');
+    expect(Array.isArray(body.data)).toBe(true);
+  });
 });
