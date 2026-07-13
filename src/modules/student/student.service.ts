@@ -84,7 +84,6 @@ export class StudentService {
         accessOnDate: item.accessOnDate,
         accessTillDate: item.accessTillDate,
         canSubmitAssignment: item.canSubmitAssignment,
-        canSubmitAssignments: item.canSubmitAssignment,
         content: item.content,
         progress: {
           status: progressStatus,
