@@ -9,7 +9,8 @@ export class AdminCourseProgressRepository {
     batchId?: number,
     email?: string,
     limit: number = 50,
-    offset: number = 0
+    offset: number = 0,
+    name?: string
   ) {
     const whereConditions = [
       sql`${courseProgress.updatedAt} >= ${start}`,
@@ -21,6 +22,9 @@ export class AdminCourseProgressRepository {
     }
     if (email) {
       whereConditions.push(ilike(users.email, `%${email}%`));
+    }
+    if (name) {
+      whereConditions.push(ilike(users.name, `%${name}%`));
     }
 
     return db
@@ -68,7 +72,8 @@ export class AdminCourseProgressRepository {
     start: Date,
     end: Date,
     batchId?: number,
-    email?: string
+    email?: string,
+    name?: string
   ): Promise<number> {
     const whereConditions = [
       sql`${courseProgress.updatedAt} >= ${start}`,
@@ -80,6 +85,9 @@ export class AdminCourseProgressRepository {
     }
     if (email) {
       whereConditions.push(ilike(users.email, `%${email}%`));
+    }
+    if (name) {
+      whereConditions.push(ilike(users.name, `%${name}%`));
     }
 
     const results = await db
@@ -96,7 +104,8 @@ export class AdminCourseProgressRepository {
     start: Date,
     end: Date,
     batchId?: number,
-    email?: string
+    email?: string,
+    name?: string
   ) {
     const whereConditions = [
       sql`${courseProgress.updatedAt} >= ${start}`,
@@ -108,6 +117,9 @@ export class AdminCourseProgressRepository {
     }
     if (email) {
       whereConditions.push(ilike(users.email, `%${email}%`));
+    }
+    if (name) {
+      whereConditions.push(ilike(users.name, `%${name}%`));
     }
 
     const results = await db
@@ -128,7 +140,8 @@ export class AdminCourseProgressRepository {
     start: Date,
     end: Date,
     batchId?: number,
-    email?: string
+    email?: string,
+    name?: string
   ) {
     const whereConditions = [
       sql`${courseProgress.updatedAt} >= ${start}`,
@@ -140,6 +153,9 @@ export class AdminCourseProgressRepository {
     }
     if (email) {
       whereConditions.push(ilike(users.email, `%${email}%`));
+    }
+    if (name) {
+      whereConditions.push(ilike(users.name, `%${name}%`));
     }
 
     return db

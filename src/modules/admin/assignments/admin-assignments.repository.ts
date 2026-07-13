@@ -10,7 +10,8 @@ export class AdminAssignmentsRepository {
     batchId?: number,
     email?: string,
     limit: number = 50,
-    offset: number = 0
+    offset: number = 0,
+    name?: string
   ) {
     const whereConditions = [
       sql`${courseProgress.updatedAt} >= ${start}`,
@@ -26,6 +27,9 @@ export class AdminAssignmentsRepository {
     }
     if (email) {
       whereConditions.push(ilike(users.email, `%${email}%`));
+    }
+    if (name) {
+      whereConditions.push(ilike(users.name, `%${name}%`));
     }
 
     return db
@@ -74,7 +78,8 @@ export class AdminAssignmentsRepository {
     end: Date,
     status?: 'Submitted' | 'under review' | 'approved' | 'rejected',
     batchId?: number,
-    email?: string
+    email?: string,
+    name?: string
   ): Promise<number> {
     const whereConditions = [
       sql`${courseProgress.updatedAt} >= ${start}`,
@@ -90,6 +95,9 @@ export class AdminAssignmentsRepository {
     }
     if (email) {
       whereConditions.push(ilike(users.email, `%${email}%`));
+    }
+    if (name) {
+      whereConditions.push(ilike(users.name, `%${name}%`));
     }
 
     const results = await db

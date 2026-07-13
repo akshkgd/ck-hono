@@ -17,6 +17,7 @@ export const progressQuerySchema = z.object({
     .transform((val) => (val ? parseInt(val, 10) : undefined))
     .refine((val) => val === undefined || !isNaN(val), 'batchId must be a valid number'),
   email: z.string().optional().nullable(),
+  name: z.string().optional().nullable(),
   page: z.string()
     .default('1')
     .transform((val) => parseInt(val, 10))

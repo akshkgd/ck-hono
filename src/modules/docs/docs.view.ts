@@ -2774,6 +2774,7 @@ export interface BatchContent {
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">endDate</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">YYYY-MM-DD (Required when timeRange is 'custom')</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Filter by specific batch ID.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">email</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Filter by student email substring.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">name</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Filter by student name substring.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -2832,6 +2833,11 @@ export interface BatchContent {
                 <tbody>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">status</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'Submitted' | 'under review' | 'approved' | 'rejected'</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">timeRange</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'today' | 'yesterday' | 'this_week' | 'last_week' | 'this_month' | 'last_month' | 'custom' (Default: 'this_week')</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">startDate</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">YYYY-MM-DD (Required when timeRange is 'custom')</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">endDate</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">YYYY-MM-DD (Required when timeRange is 'custom')</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Filter by specific batch ID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">email</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Filter by student email substring.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">name</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Filter by student name substring.</td></tr>
                 </tbody>
               </table>
             </div>

@@ -26,14 +26,16 @@ export class AdminAssignmentsService {
         input.batchId,
         input.email || undefined,
         limit,
-        offset
+        offset,
+        input.name || undefined
       ),
       this.repository.countAssignmentsTotal(
         start,
         end,
         input.status || undefined,
         input.batchId,
-        input.email || undefined
+        input.email || undefined,
+        input.name || undefined
       ),
     ]);
 

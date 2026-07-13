@@ -20,10 +20,10 @@ export class AdminCourseProgressService {
 
     // Fetch progress list, totals, summary analytics, and daily breakdown in parallel
     const [logs, totalCount, analytics, chartData] = await Promise.all([
-      this.repository.getProgressList(start, end, input.batchId, input.email || undefined, limit, offset),
-      this.repository.countProgressTotal(start, end, input.batchId, input.email || undefined),
-      this.repository.getProgressAnalytics(start, end, input.batchId, input.email || undefined),
-      this.repository.getDailyProgressAnalytics(start, end, input.batchId, input.email || undefined),
+      this.repository.getProgressList(start, end, input.batchId, input.email || undefined, limit, offset, input.name || undefined),
+      this.repository.countProgressTotal(start, end, input.batchId, input.email || undefined, input.name || undefined),
+      this.repository.getProgressAnalytics(start, end, input.batchId, input.email || undefined, input.name || undefined),
+      this.repository.getDailyProgressAnalytics(start, end, input.batchId, input.email || undefined, input.name || undefined),
     ]);
 
     // Calculate number of calendar days in the selected range to get a true daily average
