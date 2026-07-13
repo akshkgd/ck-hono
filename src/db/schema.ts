@@ -193,7 +193,7 @@ export const batchContent = pgTable('batch_content', {
 ]);
 
 export const userStatusEnum = pgEnum('user_status', ['not_started', 'learning', 'completed']);
-export const assignmentStatusEnum = pgEnum('assignment_status', ['Submitted', 'under review', 'approved', 'rejected']);
+export const assignmentStatusEnum = pgEnum('assignment_status', ['pending', 'Submitted', 'under review', 'approved', 'rejected']);
 export const codeSubmittedStatusEnum = pgEnum('code_submitted_status', ['Accepted', 'rejected', 'attempted']);
 
 export const courseProgress = pgTable('course_progress', {
