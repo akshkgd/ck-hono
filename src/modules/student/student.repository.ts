@@ -137,6 +137,7 @@ export class StudentRepository {
         accessTillDate: batchContent.accessTillDate,
         canSubmitAssignment: batchContent.canSubmitAssignment,
         videoDuration: contentLibrary.videoDuration,
+        assignmentStatus: courseProgress.assignmentStatus,
         enrollment: {
           id: batchEnrollments.id,
           paymentStatus: batchEnrollments.paymentStatus,
@@ -156,6 +157,13 @@ export class StudentRepository {
         and(
           eq(batchEnrollments.batchId, batchContent.batchId),
           eq(batchEnrollments.userId, userId)
+        )
+      )
+      .leftJoin(
+        courseProgress,
+        and(
+          eq(courseProgress.batchContentId, batchContent.id),
+          eq(courseProgress.userId, userId)
         )
       )
       .where(eq(batchContent.id, batchContentId))
