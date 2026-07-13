@@ -12,7 +12,7 @@ export const assignmentsQuerySchema = z.object({
   ]).default('this_week'),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
-  status: z.enum(['pending', 'Submitted', 'under review', 'approved', 'rejected']).optional().nullable(),
+  status: z.enum(['pending', 'submitted', 'under review', 'approved', 'rejected']).optional().nullable(),
   batchId: z.string()
     .optional()
     .transform((val) => (val ? parseInt(val, 10) : undefined))
@@ -38,7 +38,7 @@ export const assignmentsQuerySchema = z.object({
 });
 
 export const gradeAssignmentSchema = z.object({
-  assignmentStatus: z.enum(['pending', 'Submitted', 'under review', 'approved', 'rejected']),
+  assignmentStatus: z.enum(['pending', 'submitted', 'under review', 'approved', 'rejected']),
   teacherRemark: z.string().nullable().optional(),
   videoFeedback: z.string().url('Must be a valid URL').or(z.string().length(0)).nullable().optional(),
   codeSubmittedStatus: z.enum(['Accepted', 'rejected', 'attempted']).nullable().optional(),

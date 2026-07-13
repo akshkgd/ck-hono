@@ -258,7 +258,7 @@ export class StudentRepository {
         deployedLink: data.deployedLink,
         userRemark: data.userRemark,
         codeSubmitted: data.codeSubmitted,
-        assignmentStatus: 'Submitted',
+        assignmentStatus: 'submitted',
       })
       .onConflictDoUpdate({
         target: [courseProgress.enrollmentId, courseProgress.batchContentId],
@@ -269,7 +269,7 @@ export class StudentRepository {
           deployedLink: data.deployedLink,
           userRemark: data.userRemark,
           codeSubmitted: data.codeSubmitted,
-          assignmentStatus: 'Submitted',
+          assignmentStatus: 'submitted',
           updatedAt: new Date(),
         }
       })

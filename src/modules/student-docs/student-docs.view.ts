@@ -712,7 +712,7 @@ export function getStudentDocsHtml(): string {
             <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Dashboard</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Submit Assignment</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Submits assignment project URLs, text remarks, and solution source code for a specific course content item. Sets the assignment status to <code class="font-mono text-zinc-200">'Submitted'</code> and marks the item's completion status to <code class="font-mono text-zinc-200">100% completed</code>.
+              Submits assignment project URLs, text remarks, and solution source code for a specific course content item. Sets the assignment status to <code class="font-mono text-zinc-200">'submitted'</code> and marks the item's completion status to <code class="font-mono text-zinc-200">100% completed</code>.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
@@ -764,7 +764,7 @@ export function getStudentDocsHtml(): string {
     "status": "completed",
     "githubLink": "https://github.com/student/repo",
     "deployedLink": "https://demo.vercel.app",
-    "assignmentStatus": "Submitted",
+    "assignmentStatus": "submitted",
     "userRemark": "Please check the layout responsive checks.",
     "createdAt": "2026-07-01T12:00:00.000Z",
     "updatedAt": "2026-07-11T12:40:00.000Z"

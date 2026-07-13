@@ -6,7 +6,7 @@ export class AdminAssignmentsRepository {
   public async getAssignmentsList(
     start: Date,
     end: Date,
-    status?: 'pending' | 'Submitted' | 'under review' | 'approved' | 'rejected',
+    status?: 'pending' | 'submitted' | 'under review' | 'approved' | 'rejected',
     batchId?: number,
     email?: string,
     limit: number = 50,
@@ -76,7 +76,7 @@ export class AdminAssignmentsRepository {
   public async countAssignmentsTotal(
     start: Date,
     end: Date,
-    status?: 'pending' | 'Submitted' | 'under review' | 'approved' | 'rejected',
+    status?: 'pending' | 'submitted' | 'under review' | 'approved' | 'rejected',
     batchId?: number,
     email?: string,
     name?: string
@@ -113,7 +113,7 @@ export class AdminAssignmentsRepository {
   public async gradeAssignment(
     progressId: number,
     data: {
-      assignmentStatus: 'pending' | 'Submitted' | 'under review' | 'approved' | 'rejected';
+      assignmentStatus: 'pending' | 'submitted' | 'under review' | 'approved' | 'rejected';
       teacherRemark?: string | null;
       videoFeedback?: string | null;
       codeSubmittedStatus?: 'Accepted' | 'rejected' | 'attempted' | null;
