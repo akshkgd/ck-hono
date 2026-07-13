@@ -35,7 +35,9 @@ export const users = pgTable('users', {
 }, (table) => [
   index('users_name_idx').on(table.name),
   index('users_mobile_idx').on(table.mobile),
-  index('users_created_at_idx').on(table.createdAt)
+  index('users_created_at_idx').on(table.createdAt),
+  index('users_name_trgm_idx').using('gin', table.name.op('gin_trgm_ops')),
+  index('users_email_trgm_idx').using('gin', table.email.op('gin_trgm_ops')),
 ]);
 
 export const batches = pgTable('batches', {
