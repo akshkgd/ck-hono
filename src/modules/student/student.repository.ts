@@ -1,5 +1,5 @@
 import { db } from '../../db/index.js';
-import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress, batchEnrollmentPayments } from '../../db/schema.js';
+import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress, batchEnrollmentPayments, users } from '../../db/schema.js';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
 
 export class StudentRepository {
@@ -318,5 +318,17 @@ export class StudentRepository {
         )
       )
       .orderBy(desc(batchEnrollmentPayments.paidAt));
+  }
+
+  public async updateUserProfile(userId: string, data: any) {
+    const results = await db
+      .update(users)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return results[0];
   }
 }

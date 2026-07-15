@@ -1,5 +1,5 @@
 import { StudentRepository } from './student.repository.js';
-import type { StudentProgressInput, StudentAssignmentInput } from './student.validation.js';
+import type { StudentProgressInput, StudentAssignmentInput, UpdateProfileInput } from './student.validation.js';
 
 export class StudentService {
   private studentRepository: StudentRepository;
@@ -301,5 +301,14 @@ export class StudentService {
 
   public async getPaymentsHistory(userId: string) {
     return this.studentRepository.getStudentPayments(userId);
+  }
+
+  public async updateProfile(userId: string, input: UpdateProfileInput) {
+    const updatedUser = await this.studentRepository.updateUserProfile(userId, input);
+    if (!updatedUser) {
+      throw new Error('User not found');
+    }
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
   }
 }

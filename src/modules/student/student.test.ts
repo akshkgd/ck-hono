@@ -154,4 +154,47 @@ describe('Student Dashboard Module', () => {
     expect(body.status).toBe('success');
     expect(Array.isArray(body.data)).toBe(true);
   });
+
+  it('should reject unauthenticated request with 401 on PUT /v1/student/profile', async () => {
+    const res = await app.request('/v1/student/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Aarav' })
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it('should return successfully with updated user details on PUT /v1/student/profile', async () => {
+    const res = await app.request('/v1/student/profile', {
+      method: 'PUT',
+      headers: {
+        'Cookie': studentCookie,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: 'Updated Aarav',
+        mobile: '+918888888888',
+        bio: 'Coding enthusiast',
+        linkedinUrl: 'https://linkedin.com/in/updated-aarav',
+        githubUrl: 'https://github.com/updated-aarav',
+        occupationType: 'professional',
+        occupationTitle: 'Lead Architect',
+        organization: 'Enterprise Inc',
+        experienceYears: 5
+      }),
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe('success');
+    expect(body.data.name).toBe('Updated Aarav');
+    expect(body.data.mobile).toBe('+918888888888');
+    expect(body.data.bio).toBe('Coding enthusiast');
+    expect(body.data.linkedinUrl).toBe('https://linkedin.com/in/updated-aarav');
+    expect(body.data.githubUrl).toBe('https://github.com/updated-aarav');
+    expect(body.data.occupationType).toBe('professional');
+    expect(body.data.occupationTitle).toBe('Lead Architect');
+    expect(body.data.organization).toBe('Enterprise Inc');
+    expect(body.data.experienceYears).toBe(5);
+  });
 });

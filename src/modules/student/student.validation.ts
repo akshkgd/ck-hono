@@ -19,3 +19,17 @@ export const studentAssignmentSchema = z.object({
 });
 
 export type StudentAssignmentInput = z.infer<typeof studentAssignmentSchema>;
+
+export const updateProfileSchema = z.object({
+  name: z.string().max(255).optional().nullable(),
+  mobile: z.string().max(20).optional().nullable(),
+  bio: z.string().optional().nullable(),
+  linkedinUrl: z.string().url('Must be a valid URL').or(z.string().length(0)).optional().nullable(),
+  githubUrl: z.string().url('Must be a valid URL').or(z.string().length(0)).optional().nullable(),
+  occupationType: z.enum(['student', 'professional', 'academic', 'other']).optional(),
+  occupationTitle: z.string().max(100).optional().nullable(),
+  organization: z.string().max(150).optional().nullable(),
+  experienceYears: z.number().int().min(0).optional().nullable(),
+});
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

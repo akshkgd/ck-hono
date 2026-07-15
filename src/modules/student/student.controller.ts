@@ -181,4 +181,29 @@ export class StudentController {
       }, 400);
     }
   };
+
+  public updateProfile = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      if (!user || !user.id) {
+        return c.json({
+          status: 'error',
+          message: 'Unauthorized: Missing user context',
+        }, 401);
+      }
+
+      const input = (c.req as any).valid('json');
+      const updatedUser = await this.studentService.updateProfile(user.id, input);
+
+      return c.json({
+        status: 'success',
+        data: updatedUser,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to update profile details',
+      }, 400);
+    }
+  };
 }

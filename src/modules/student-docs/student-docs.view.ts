@@ -136,6 +136,16 @@ export function getStudentDocsHtml(): string {
             </li>
           </ul>
         </div>
+
+        <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Student: Profile</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">PUT</span>
+              <a href="#student-update-profile" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update Profile</a>
+            </li>
+          </ul>
+        </div>
       </nav>
     </div>
   </aside>
@@ -948,6 +958,96 @@ export function getStudentDocsHtml(): string {
       "batchName": "Full Stack Web Development - Batch 4"
     }
   ]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="border-zinc-900" />
+
+      <!-- Group: Student Profile -->
+      <section class="space-y-16">
+        <div class="border-b border-zinc-900 pb-2">
+          <h2 class="text-2xl font-normal text-zinc-50 font-mono">Student: Profile</h2>
+        </div>
+
+        <!-- Endpoint: PUT /profile -->
+        <div id="student-update-profile" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Profile</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Update Profile Details</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates the profile information for the authenticated student. All body fields are optional.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">PUT</span>
+              <span class="text-zinc-200">/v1/student/profile</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">name</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Student full name.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">mobile</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Mobile contact number.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">bio</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Biography / personal summary.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">linkedinUrl</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">LinkedIn profile URL.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">githubUrl</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">GitHub profile URL.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">occupationType</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'student' | 'professional' | 'academic' | 'other'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">occupationTitle</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Designation or job title.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">organization</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Company, school, or university.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">experienceYears</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Years of work experience.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/student/profile', {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: 'Aarav Sharma',
+    mobile: '+919999999999',
+    bio: 'Software engineer building web apps.',
+    linkedinUrl: 'https://linkedin.com/in/aarav',
+    githubUrl: 'https://github.com/aarav',
+    occupationType: 'professional',
+    occupationTitle: 'Software Engineer',
+    organization: 'Acme Corp',
+    experienceYears: 3
+  })
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": "8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1",
+    "email": "student@example.com",
+    "name": "Aarav Sharma",
+    "mobile": "+919999999999",
+    "bio": "Software engineer building web apps.",
+    "linkedinUrl": "https://linkedin.com/in/aarav",
+    "githubUrl": "https://github.com/aarav",
+    "occupationType": "professional",
+    "occupationTitle": "Software Engineer",
+    "organization": "Acme Corp",
+    "experienceYears": 3,
+    "role": "student",
+    "status": "active",
+    "createdAt": "2026-07-01T12:00:00.000Z",
+    "updatedAt": "2026-07-15T12:45:00.000Z"
+  }
 }</code></pre>
             </div>
           </div>
