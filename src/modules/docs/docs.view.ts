@@ -2957,17 +2957,17 @@ export interface BatchContent {
 
         <hr class="border-zinc-900" />
 
-        <!-- Endpoint: GET /v1/admin/assignments/users/:userId/batches/:batchId -->
+        <!-- Endpoint: GET /v1/admin/assignments/enrollments/:enrollmentId -->
         <div id="user-batch-assignments" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
             <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Assignments</div>
-            <h3 class="text-2xl font-semibold text-zinc-100">User Batch Assignments</h3>
+            <h3 class="text-2xl font-semibold text-zinc-100">Enrollment Assignments List</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Retrieves the assignment submissions list and history for a specific student in a specific batch, including course enrollment details (payment and starting time). Requires Admin Role.
+              Retrieves the assignment submissions list and history for a specific enrollment, including course enrollment details (payment and starting time). Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
-              <span class="text-zinc-200">/v1/admin/assignments/users/:userId/batches/:batchId</span>
+              <span class="text-zinc-200">/v1/admin/assignments/enrollments/:enrollmentId</span>
             </div>
 
             <div class="space-y-2 pt-4">
@@ -2977,8 +2977,7 @@ export interface BatchContent {
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
                 <tbody>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">userId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">UUID</td><td class="p-2 border-r border-zinc-900 text-zinc-500">Yes</td><td class="p-2 text-zinc-400">The UUID of the student.</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">Yes</td><td class="p-2 text-zinc-400">The ID of the batch.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">enrollmentId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">Yes</td><td class="p-2 text-zinc-400">The ID of the batch enrollment.</td></tr>
                 </tbody>
               </table>
             </div>

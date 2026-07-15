@@ -129,10 +129,10 @@ export class AdminAssignmentsService {
     return { start, end };
   }
 
-  public async getUserAssignmentsReport(userId: string, batchId: number) {
-    const report = await this.repository.getUserAssignments(batchId, userId);
+  public async getEnrollmentAssignmentsReport(enrollmentId: number) {
+    const report = await this.repository.getEnrollmentAssignments(enrollmentId);
     if (!report) {
-      throw new Error('Enrollment not found for this user in this batch');
+      throw new Error('Enrollment not found');
     }
     return report;
   }

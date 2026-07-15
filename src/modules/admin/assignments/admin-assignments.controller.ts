@@ -50,10 +50,10 @@ export class AdminAssignmentsController {
     }
   };
 
-  public getUserAssignments = async (c: Context) => {
+  public getEnrollmentAssignments = async (c: Context) => {
     try {
-      const { userId, batchId } = (c.req as any).valid('param');
-      const assignmentsDetails = await this.service.getUserAssignmentsReport(userId, batchId);
+      const { enrollmentId } = (c.req as any).valid('param');
+      const assignmentsDetails = await this.service.getEnrollmentAssignmentsReport(enrollmentId);
 
       return c.json({
         status: 'success',
@@ -62,7 +62,7 @@ export class AdminAssignmentsController {
     } catch (err: any) {
       return c.json({
         status: 'error',
-        message: err.message || 'Failed to fetch user assignments',
+        message: err.message || 'Failed to fetch enrollment assignments',
       }, 400);
     }
   };

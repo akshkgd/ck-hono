@@ -142,31 +142,15 @@ export class AdminAssignmentsRepository {
     return results[0] || null;
   }
 
-  public async getUserAssignments(batchId: number, userId: string) {
-    const enrollmentResult = await db
+  public async getEnrollmentAssignments(enrollmentId: number) {
+    const results = await db
       .select({
-        batchName: batches.name,
+        enrollmentId: batchEnrollments.id,
         paidAt: batchEnrollments.paidAt,
         startedAt: batchEnrollments.startedAt,
         createdAt: batchEnrollments.createdAt,
-        id: batchEnrollments.id,
-      })
-      .from(batchEnrollments)
-      .innerJoin(batches, eq(batchEnrollments.batchId, batches.id))
-      .where(and(
-        eq(batchEnrollments.userId, userId),
-        eq(batchEnrollments.batchId, batchId)
-      ))
-      .limit(1);
-
-    const enrollment = enrollmentResult[0];
-    if (!enrollment) {
-      return null;
-    }
-
-    const assignments = await db
-      .select({
-        id: courseProgress.id,
+        batchName: batches.name,
+        progressId: courseProgress.id,
         timeSpent: courseProgress.timeSpent,
         progress: courseProgress.progress,
         status: courseProgress.status,
@@ -185,22 +169,50 @@ export class AdminAssignmentsRepository {
           type: contentLibrary.type,
         }
       })
-      .from(courseProgress)
-      .innerJoin(batchContent, eq(courseProgress.batchContentId, batchContent.id))
-      .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
-      .where(and(
-        eq(courseProgress.userId, userId),
-        eq(courseProgress.enrollmentId, enrollment.id),
-        isNotNull(courseProgress.assignmentStatus)
-      ))
+      .from(batchEnrollments)
+      .innerJoin(batches, eq(batchEnrollments.batchId, batches.id))
+      .leftJoin(
+        courseProgress,
+        and(
+          eq(courseProgress.enrollmentId, batchEnrollments.id),
+          isNotNull(courseProgress.assignmentStatus)
+        )
+      )
+      .leftJoin(batchContent, eq(courseProgress.batchContentId, batchContent.id))
+      .leftJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
+      .where(eq(batchEnrollments.id, enrollmentId))
       .orderBy(desc(courseProgress.updatedAt));
 
+    if (results.length === 0) {
+      return null;
+    }
+
+    const first = results[0];
+    const assignments = results
+      .filter(row => row.progressId !== null)
+      .map(row => ({
+        id: row.progressId,
+        timeSpent: row.timeSpent,
+        progress: row.progress,
+        status: row.status,
+        githubLink: row.githubLink,
+        deployedLink: row.deployedLink,
+        assignmentStatus: row.assignmentStatus,
+        userRemark: row.userRemark,
+        teacherRemark: row.teacherRemark,
+        videoFeedback: row.videoFeedback,
+        codeSubmitted: row.codeSubmitted,
+        codeSubmittedStatus: row.codeSubmittedStatus,
+        updatedAt: row.updatedAt,
+        content: row.content,
+      }));
+
     return {
-      batchName: enrollment.batchName,
+      batchName: first.batchName,
       enrollment: {
-        id: enrollment.id,
-        paidAt: enrollment.paidAt,
-        startedAt: enrollment.startedAt || enrollment.paidAt || enrollment.createdAt,
+        id: first.enrollmentId,
+        paidAt: first.paidAt,
+        startedAt: first.startedAt || first.paidAt || first.createdAt,
       },
       assignments,
     };

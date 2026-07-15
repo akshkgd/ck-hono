@@ -47,11 +47,10 @@ export const gradeAssignmentSchema = z.object({
 export type AssignmentsQueryInput = z.infer<typeof assignmentsQuerySchema>;
 export type GradeAssignmentInput = z.infer<typeof gradeAssignmentSchema>;
 
-export const userAssignmentsParamsSchema = z.object({
-  userId: z.string().uuid('Must be a valid UUID'),
-  batchId: z.string()
+export const enrollmentAssignmentsParamsSchema = z.object({
+  enrollmentId: z.string()
     .transform((val) => parseInt(val, 10))
-    .refine((val) => !isNaN(val) && val > 0, 'batchId must be a positive number'),
+    .refine((val) => !isNaN(val) && val > 0, 'enrollmentId must be a positive number'),
 });
 
-export type UserAssignmentsParamsInput = z.infer<typeof userAssignmentsParamsSchema>;
+export type EnrollmentAssignmentsParamsInput = z.infer<typeof enrollmentAssignmentsParamsSchema>;
