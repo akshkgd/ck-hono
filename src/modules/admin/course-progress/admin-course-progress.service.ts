@@ -108,13 +108,13 @@ export class AdminCourseProgressService {
     return { start, end };
   }
 
-  public async getUserBatchProgress(userId: string, batchId: number) {
-    const enrollment = await this.repository.getUserEnrollmentDetails(batchId, userId);
+  public async getEnrollmentBatchProgress(enrollmentId: number) {
+    const enrollment = await this.repository.getEnrollmentDetails(enrollmentId);
     if (!enrollment) {
-      throw new Error('Enrollment not found for this user in this batch');
+      throw new Error('Enrollment not found');
     }
 
-    const { courseStartDate, batch, ...enrollmentDetails } = enrollment;
+    const { courseStartDate, batch, userId, ...enrollmentDetails } = enrollment;
     const now = new Date();
     const startDate = new Date(courseStartDate);
     const endDate = batch.endDate ? new Date(batch.endDate) : new Date();
@@ -131,8 +131,8 @@ export class AdminCourseProgressService {
 
     // Fetch sections and content in parallel
     const [sections, contents] = await Promise.all([
-      this.repository.getBatchSections(batchId),
-      this.repository.getBatchContentWithProgress(batchId, userId, enrollment.id),
+      this.repository.getBatchSections(batch.id),
+      this.repository.getBatchContentWithProgress(batch.id, userId, enrollment.id),
     ]);
 
     // Map content items to their corresponding sections

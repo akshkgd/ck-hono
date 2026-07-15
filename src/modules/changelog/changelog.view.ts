@@ -122,7 +122,7 @@ export function getChangelogHtml(): string {
             <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-3">
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">GET</span>
-                <span class="text-zinc-200 font-semibold">/v1/admin/course-progress/users/:userId/batches/:batchId</span>
+                <span class="text-zinc-200 font-semibold">/v1/admin/course-progress/enrollments/:enrollmentId</span>
               </div>
               <a href="/docs#user-batch-progress" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium transition">View Docs →</a>
             </div>

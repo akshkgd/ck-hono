@@ -26,10 +26,10 @@ export class AdminCourseProgressController {
     }
   };
 
-  public getUserBatchProgress = async (c: Context) => {
+  public getEnrollmentBatchProgress = async (c: Context) => {
     try {
-      const { userId, batchId } = (c.req as any).valid('param');
-      const progressDetails = await this.progressService.getUserBatchProgress(userId, batchId);
+      const { enrollmentId } = (c.req as any).valid('param');
+      const progressDetails = await this.progressService.getEnrollmentBatchProgress(enrollmentId);
 
       return c.json({
         status: 'success',
@@ -38,7 +38,7 @@ export class AdminCourseProgressController {
     } catch (err: any) {
       return c.json({
         status: 'error',
-        message: err.message || 'Failed to fetch user batch progress',
+        message: err.message || 'Failed to fetch enrollment batch progress',
       }, 400);
     }
   };

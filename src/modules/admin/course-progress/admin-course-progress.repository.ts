@@ -173,7 +173,7 @@ export class AdminCourseProgressRepository {
       .orderBy(sql`date_trunc('day', ${courseProgress.updatedAt})`);
   }
 
-  public async getUserEnrollmentDetails(batchId: number, userId: string) {
+  public async getEnrollmentDetails(enrollmentId: number) {
     const results = await db
       .select({
         id: batchEnrollments.id,
@@ -189,6 +189,7 @@ export class AdminCourseProgressRepository {
         amountPayable: batchEnrollments.amountPayable,
         amountPaid: batchEnrollments.amountPaid,
         courseStartDate: batches.startDate,
+        userId: batchEnrollments.userId,
         batch: {
           id: batches.id,
           name: batches.name,
@@ -202,10 +203,7 @@ export class AdminCourseProgressRepository {
       })
       .from(batchEnrollments)
       .innerJoin(batches, eq(batchEnrollments.batchId, batches.id))
-      .where(and(
-        eq(batchEnrollments.userId, userId),
-        eq(batchEnrollments.batchId, batchId)
-      ))
+      .where(eq(batchEnrollments.id, enrollmentId))
       .limit(1);
     return results[0];
   }

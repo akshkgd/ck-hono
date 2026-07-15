@@ -38,11 +38,10 @@ export const progressQuerySchema = z.object({
 
 export type ProgressQueryInput = z.infer<typeof progressQuerySchema>;
 
-export const userProgressParamsSchema = z.object({
-  userId: z.string().uuid('Must be a valid UUID'),
-  batchId: z.string()
+export const enrollmentProgressParamsSchema = z.object({
+  enrollmentId: z.string()
     .transform((val) => parseInt(val, 10))
-    .refine((val) => !isNaN(val) && val > 0, 'batchId must be a positive number'),
+    .refine((val) => !isNaN(val) && val > 0, 'enrollmentId must be a positive number'),
 });
 
-export type UserProgressParamsInput = z.infer<typeof userProgressParamsSchema>;
+export type EnrollmentProgressParamsInput = z.infer<typeof enrollmentProgressParamsSchema>;
