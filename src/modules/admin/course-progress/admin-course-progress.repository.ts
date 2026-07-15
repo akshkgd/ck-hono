@@ -1,6 +1,6 @@
 import { db } from '../../../db/index.js';
-import { courseProgress, users, batchContent, batches, contentLibrary } from '../../../db/schema.js';
-import { eq, and, desc, sql, ilike } from 'drizzle-orm';
+import { courseProgress, users, batchContent, batches, contentLibrary, batchEnrollments, batchSections } from '../../../db/schema.js';
+import { eq, and, desc, asc, sql, ilike } from 'drizzle-orm';
 
 export class AdminCourseProgressRepository {
   public async getProgressList(
@@ -171,5 +171,107 @@ export class AdminCourseProgressRepository {
       .where(and(...whereConditions))
       .groupBy(sql`date_trunc('day', ${courseProgress.updatedAt})`)
       .orderBy(sql`date_trunc('day', ${courseProgress.updatedAt})`);
+  }
+
+  public async getUserEnrollmentDetails(batchId: number, userId: string) {
+    const results = await db
+      .select({
+        id: batchEnrollments.id,
+        status: batchEnrollments.status,
+        progress: batchEnrollments.progress,
+        timeSpentSeconds: batchEnrollments.timeSpentSeconds,
+        paymentStatus: batchEnrollments.paymentStatus,
+        startedAt: batchEnrollments.startedAt,
+        paidAt: batchEnrollments.paidAt,
+        accessTill: batchEnrollments.accessTill,
+        overrideAccessDays: batchEnrollments.overrideAccessDays,
+        createdAt: batchEnrollments.createdAt,
+        amountPayable: batchEnrollments.amountPayable,
+        amountPaid: batchEnrollments.amountPaid,
+        courseStartDate: batches.startDate,
+        batch: {
+          id: batches.id,
+          name: batches.name,
+          topic: batches.topic,
+          description: batches.description,
+          slug: batches.slug,
+          startDate: batches.startDate,
+          endDate: batches.endDate,
+          img: batches.img,
+        }
+      })
+      .from(batchEnrollments)
+      .innerJoin(batches, eq(batchEnrollments.batchId, batches.id))
+      .where(and(
+        eq(batchEnrollments.userId, userId),
+        eq(batchEnrollments.batchId, batchId)
+      ))
+      .limit(1);
+    return results[0];
+  }
+
+  public async getBatchSections(batchId: number) {
+    return db
+      .select({
+        id: batchSections.id,
+        title: batchSections.title,
+        order: batchSections.order,
+      })
+      .from(batchSections)
+      .where(eq(batchSections.batchId, batchId))
+      .orderBy(asc(batchSections.order));
+  }
+
+  public async getBatchContentWithProgress(batchId: number, userId: string, enrollmentId: number) {
+    return db
+      .select({
+        id: batchContent.id,
+        contentId: batchContent.contentId,
+        sectionId: batchContent.sectionId,
+        order: batchContent.order,
+        accessOn: batchContent.accessOn,
+        accessTill: batchContent.accessTill,
+        accessOnDate: batchContent.accessOnDate,
+        accessTillDate: batchContent.accessTillDate,
+        canSubmitAssignment: batchContent.canSubmitAssignment,
+        content: {
+          id: contentLibrary.id,
+          title: contentLibrary.title,
+          desc: contentLibrary.desc,
+          type: contentLibrary.type,
+          contentType: contentLibrary.contentType,
+          videoLink: contentLibrary.videoLink,
+          xp: contentLibrary.xp,
+          assignment: contentLibrary.assignment,
+          solutionCode: contentLibrary.solutionCode,
+          hints: contentLibrary.hints,
+        },
+        progress: {
+          status: courseProgress.status,
+          timeSpent: courseProgress.timeSpent,
+          progress: courseProgress.progress,
+          githubLink: courseProgress.githubLink,
+          deployedLink: courseProgress.deployedLink,
+          assignmentStatus: courseProgress.assignmentStatus,
+          userRemark: courseProgress.userRemark,
+          teacherRemark: courseProgress.teacherRemark,
+          videoFeedback: courseProgress.videoFeedback,
+          codeSubmitted: courseProgress.codeSubmitted,
+          codeSubmittedStatus: courseProgress.codeSubmittedStatus,
+          updatedAt: courseProgress.updatedAt,
+        }
+      })
+      .from(batchContent)
+      .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
+      .leftJoin(
+        courseProgress,
+        and(
+          eq(courseProgress.batchContentId, batchContent.id),
+          eq(courseProgress.userId, userId),
+          eq(courseProgress.enrollmentId, enrollmentId)
+        )
+      )
+      .where(eq(batchContent.batchId, batchId))
+      .orderBy(asc(batchContent.order));
   }
 }

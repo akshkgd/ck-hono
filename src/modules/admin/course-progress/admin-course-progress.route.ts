@@ -3,7 +3,7 @@ import { AdminCourseProgressController } from './admin-course-progress.controlle
 import { adminMiddleware } from '../../../middleware/admin.middleware.js';
 import { authMiddleware } from '../../../middleware/auth.middleware.js';
 import { zValidator } from '@hono/zod-validator';
-import { progressQuerySchema } from './admin-course-progress.validation.js';
+import { progressQuerySchema, userProgressParamsSchema } from './admin-course-progress.validation.js';
 
 const adminProgressRouter = new Hono();
 const controller = new AdminCourseProgressController();
@@ -16,6 +16,12 @@ adminProgressRouter.get(
   '/',
   zValidator('query', progressQuerySchema),
   controller.getProgressLog
+);
+
+adminProgressRouter.get(
+  '/users/:userId/batches/:batchId',
+  zValidator('param', userProgressParamsSchema),
+  controller.getUserBatchProgress
 );
 
 export default adminProgressRouter;
