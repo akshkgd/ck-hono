@@ -945,8 +945,7 @@ export function getStudentDocsHtml(): string {
       "purpose": "enrollment",
       "isGstApplicable": true,
       "remarks": "Initial batch fee payment",
-      "batchName": "Full Stack Web Development - Batch 4",
-      "courseName": "Full Stack Web Development"
+      "batchName": "Full Stack Web Development - Batch 4"
     }
   ]
 }</code></pre>
