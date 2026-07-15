@@ -126,6 +126,16 @@ export function getStudentDocsHtml(): string {
             </li>
           </ul>
         </div>
+
+        <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Student: Payments</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#student-payments" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Payment History</a>
+            </li>
+          </ul>
+        </div>
       </nav>
     </div>
   </aside>
