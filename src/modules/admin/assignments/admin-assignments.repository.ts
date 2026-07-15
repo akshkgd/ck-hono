@@ -1,5 +1,5 @@
 import { db } from '../../../db/index.js';
-import { courseProgress, users, batchContent, batches, contentLibrary } from '../../../db/schema.js';
+import { courseProgress, users, batchContent, batches, contentLibrary, batchEnrollments } from '../../../db/schema.js';
 import { eq, and, desc, sql, ilike, isNotNull } from 'drizzle-orm';
 
 export class AdminAssignmentsRepository {
@@ -140,5 +140,69 @@ export class AdminAssignmentsRepository {
       .where(eq(courseProgress.id, progressId))
       .limit(1);
     return results[0] || null;
+  }
+
+  public async getUserAssignments(batchId: number, userId: string) {
+    const enrollmentResult = await db
+      .select({
+        batchName: batches.name,
+        paidAt: batchEnrollments.paidAt,
+        startedAt: batchEnrollments.startedAt,
+        createdAt: batchEnrollments.createdAt,
+        id: batchEnrollments.id,
+      })
+      .from(batchEnrollments)
+      .innerJoin(batches, eq(batchEnrollments.batchId, batches.id))
+      .where(and(
+        eq(batchEnrollments.userId, userId),
+        eq(batchEnrollments.batchId, batchId)
+      ))
+      .limit(1);
+
+    const enrollment = enrollmentResult[0];
+    if (!enrollment) {
+      return null;
+    }
+
+    const assignments = await db
+      .select({
+        id: courseProgress.id,
+        timeSpent: courseProgress.timeSpent,
+        progress: courseProgress.progress,
+        status: courseProgress.status,
+        githubLink: courseProgress.githubLink,
+        deployedLink: courseProgress.deployedLink,
+        assignmentStatus: courseProgress.assignmentStatus,
+        userRemark: courseProgress.userRemark,
+        teacherRemark: courseProgress.teacherRemark,
+        videoFeedback: courseProgress.videoFeedback,
+        codeSubmitted: courseProgress.codeSubmitted,
+        codeSubmittedStatus: courseProgress.codeSubmittedStatus,
+        updatedAt: courseProgress.updatedAt,
+        content: {
+          id: contentLibrary.id,
+          title: contentLibrary.title,
+          type: contentLibrary.type,
+        }
+      })
+      .from(courseProgress)
+      .innerJoin(batchContent, eq(courseProgress.batchContentId, batchContent.id))
+      .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
+      .where(and(
+        eq(courseProgress.userId, userId),
+        eq(courseProgress.enrollmentId, enrollment.id),
+        isNotNull(courseProgress.assignmentStatus)
+      ))
+      .orderBy(desc(courseProgress.updatedAt));
+
+    return {
+      batchName: enrollment.batchName,
+      enrollment: {
+        id: enrollment.id,
+        paidAt: enrollment.paidAt,
+        startedAt: enrollment.startedAt || enrollment.paidAt || enrollment.createdAt,
+      },
+      assignments,
+    };
   }
 }

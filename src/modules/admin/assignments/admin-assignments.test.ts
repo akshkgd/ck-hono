@@ -80,4 +80,37 @@ describe('Admin Assignments Manager Module', () => {
     });
     expect(res.status).toBe(400);
   });
+
+  it('should reject unauthenticated request with 401 on GET /v1/admin/assignments/users/:userId/batches/:batchId', async () => {
+    const fakeUuid = '00000000-0000-0000-0000-000000000000';
+    const res = await app.request(`/v1/admin/assignments/users/${fakeUuid}/batches/1`, {
+      method: 'GET'
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it('should reject non-admin request with 403 on GET /v1/admin/assignments/users/:userId/batches/:batchId', async () => {
+    const fakeUuid = '00000000-0000-0000-0000-000000000000';
+    const res = await app.request(`/v1/admin/assignments/users/${fakeUuid}/batches/1`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${userToken}`
+      }
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it('should return 400 with descriptive error if enrollment does not exist', async () => {
+    const fakeUuid = '00000000-0000-0000-0000-000000000000';
+    const res = await app.request(`/v1/admin/assignments/users/${fakeUuid}/batches/99999`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`
+      }
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe('error');
+    expect(body.message).toContain('Enrollment not found');
+  });
 });

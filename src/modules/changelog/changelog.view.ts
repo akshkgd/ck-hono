@@ -107,7 +107,7 @@ export function getChangelogHtml(): string {
             <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
           </h2>
           <p class="text-xs text-zinc-400 mb-6 leading-relaxed">
-            Released student profile management endpoint allowing students to update their contact details, bio, and social links. Built a dedicated administrator endpoint that compiles a detailed student syllabus structure along with their corresponding study progress, section-wise chapter lock status, assignment details, and active grading logs for any given batch.
+            Released student profile management endpoint allowing students to update their contact details, bio, and social links. Built dedicated administrator endpoints that compile detailed student syllabus structures, study progress metrics, and assignment submission histories for any given cohort batch.
           </p>
 
           <!-- API Endpoint details -->
@@ -125,6 +125,13 @@ export function getChangelogHtml(): string {
                 <span class="text-zinc-200 font-semibold">/v1/admin/course-progress/users/:userId/batches/:batchId</span>
               </div>
               <a href="/docs#user-batch-progress" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium transition">View Docs →</a>
+            </div>
+            <div class="bg-zinc-950/60 border border-zinc-900 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">GET</span>
+                <span class="text-zinc-200 font-semibold">/v1/admin/assignments/users/:userId/batches/:batchId</span>
+              </div>
+              <a href="/docs#user-batch-assignments" class="text-[10px] text-indigo-400 hover:text-indigo-300 font-medium transition">View Docs →</a>
             </div>
           </div>
         </div>

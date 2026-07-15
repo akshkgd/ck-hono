@@ -335,6 +335,10 @@ export function getDocsHtml(): string {
               <a href="#assignments-list" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List Submissions</a>
             </li>
             <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#user-batch-assignments" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">User Batch Assignments</a>
+            </li>
+            <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
               <a href="#assignments-grade" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Grade Submission</a>
             </li>
@@ -2945,6 +2949,75 @@ export interface BatchContent {
       }
     ],
     "pagination": { "page": 1, "limit": 50, "total": 1 }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /v1/admin/assignments/users/:userId/batches/:batchId -->
+        <div id="user-batch-assignments" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Assignments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">User Batch Assignments</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Retrieves the assignment submissions list and history for a specific student in a specific batch, including course enrollment details (payment and starting time). Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/assignments/users/:userId/batches/:batchId</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">userId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">UUID</td><td class="p-2 border-r border-zinc-900 text-zinc-500">Yes</td><td class="p-2 text-zinc-400">The UUID of the student.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">integer</td><td class="p-2 border-r border-zinc-900 text-zinc-500">Yes</td><td class="p-2 text-zinc-400">The ID of the batch.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "batchName": "Full Stack Web Development - Batch 4",
+    "enrollment": {
+      "id": 102,
+      "paidAt": "2026-07-01T12:00:00.000Z",
+      "startedAt": "2026-07-01T12:00:00.000Z"
+    },
+    "assignments": [
+      {
+        "id": 8,
+        "timeSpent": 2400,
+        "progress": 75,
+        "status": "learning",
+        "githubLink": "https://github.com/student/repo",
+        "deployedLink": "https://demo.vercel.app",
+        "assignmentStatus": "submitted",
+        "userRemark": "Completed all CSS core components.",
+        "teacherRemark": null,
+        "videoFeedback": null,
+        "codeSubmitted": "CSS code payload...",
+        "codeSubmittedStatus": "attempted",
+        "updatedAt": "2026-07-11T12:00:00.000Z",
+        "content": {
+          "id": 45,
+          "title": "Intro to Flexbox",
+          "type": "video"
+        }
+      }
+    ]
   }
 }</code></pre>
             </div>
