@@ -306,7 +306,8 @@ export class StudentRepository {
         purpose: batchEnrollmentPayments.purpose,
         isGstApplicable: batchEnrollmentPayments.isGstApplicable,
         remarks: batchEnrollmentPayments.remarks,
-        courseName: batches.name,
+        batchName: batches.name,
+        courseName: batches.topic,
       })
       .from(batchEnrollmentPayments)
       .innerJoin(batchEnrollments, eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollments.id))
