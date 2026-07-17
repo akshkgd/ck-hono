@@ -309,6 +309,22 @@ export class StudentService {
       );
     }
 
+    if (!progressRecord) {
+      return {
+        id: 0,
+        userId,
+        enrollmentId,
+        batchContentId: input.batchContentId,
+        timeSpent: 0,
+        progress: 0,
+        status: 'not_started' as const,
+        assignmentStatus: null,
+        lastWatchedPosition: input.lastWatchedPosition || 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    }
+
     return progressRecord;
   }
 

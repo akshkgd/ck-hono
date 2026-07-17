@@ -188,6 +188,21 @@ export class StudentRepository {
     canSubmitAssignment?: boolean | null,
     lastWatchedPosition?: number
   ) {
+    const existing = await db
+      .select({ id: courseProgress.id })
+      .from(courseProgress)
+      .where(and(
+        eq(courseProgress.enrollmentId, enrollmentId),
+        eq(courseProgress.batchContentId, batchContentId)
+      ))
+      .limit(1);
+
+    const hasRecord = existing.length > 0;
+
+    if (!hasRecord && timeSpentDelta < 60 && status !== 'completed' && progress < 100) {
+      return null;
+    }
+
     const durationInSeconds = videoDuration && videoDuration < 100 ? videoDuration * 60 : videoDuration;
 
     const isCompletedOnInsert = progress >= 100 || status === 'completed' || (durationInSeconds && timeSpentDelta >= durationInSeconds * 0.9);
