@@ -512,6 +512,8 @@ export function getStudentDocsHtml(): string {
                 <li><code class="font-mono text-zinc-200">accessTill</code>: defaults to <code class="font-mono text-zinc-200">accessTill || (startedAt + 1 year)</code>.</li>
                 <li><code class="font-mono text-zinc-200">daysPassed</code>: number of days passed since the start date.</li>
                 <li><code class="font-mono text-zinc-200">isAccessActive</code>: <code class="font-mono text-zinc-200">true</code> if today's date is less than or equal to the access end date.</li>
+                <li><code class="font-mono text-zinc-200">sequentialLearning</code>: <code class="font-mono text-zinc-200">true</code> if student must complete chapters sequentially.</li>
+                <li><code class="font-mono text-zinc-200">sequentialLearningWithAssignments</code>: <code class="font-mono text-zinc-200">true</code> if student must submit assignments before unlocking the next chapter.</li>
               </ul>
             </div>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
@@ -556,7 +558,9 @@ export function getStudentDocsHtml(): string {
       "isAccessActive": true,
       "amountPayable": 25000,
       "amountPaid": 25000,
-      "amountRemaining": 0
+      "amountRemaining": 0,
+      "sequentialLearning": false,
+      "sequentialLearningWithAssignments": true
     },
     "sections": [
       {
@@ -571,6 +575,8 @@ export function getStudentDocsHtml(): string {
             "order": 1,
             "accessOn": null,
             "accessTill": null,
+            "canSubmitAssignment": true,
+            "isSequentiallyLocked": false,
             "content": {
               "id": 5,
               "title": "Welcome Onboard Video",
@@ -582,7 +588,8 @@ export function getStudentDocsHtml(): string {
             "progress": {
               "status": "completed",
               "timeSpent": 180,
-              "progress": 100
+              "progress": 100,
+              "assignmentStatus": "submitted"
             }
           }
         ]
