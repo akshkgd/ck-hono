@@ -118,6 +118,7 @@ export class StudentRepository {
       })
       .from(batchContent)
       .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
+      .leftJoin(batchSections, eq(batchContent.sectionId, batchSections.id))
       .leftJoin(
         courseProgress,
         and(
@@ -127,7 +128,7 @@ export class StudentRepository {
         )
       )
       .where(eq(batchContent.batchId, batchId))
-      .orderBy(asc(batchContent.order));
+      .orderBy(asc(batchSections.order), asc(batchContent.order));
   }
 
   public async getBatchContentAccessDetails(batchContentId: number, userId: string) {

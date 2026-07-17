@@ -264,6 +264,7 @@ export class AdminCourseProgressRepository {
       })
       .from(batchContent)
       .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
+      .leftJoin(batchSections, eq(batchContent.sectionId, batchSections.id))
       .leftJoin(
         courseProgress,
         and(
@@ -273,6 +274,6 @@ export class AdminCourseProgressRepository {
         )
       )
       .where(eq(batchContent.batchId, batchId))
-      .orderBy(asc(batchContent.order));
+      .orderBy(asc(batchSections.order), asc(batchContent.order));
   }
 }
