@@ -213,12 +213,12 @@ export class StudentRepository {
           progress: durationInSeconds
             ? sql`CASE 
                 WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${durationInSeconds} * 0.9 THEN 100 
-                ELSE GREATEST(${courseProgress.progress}, ${progress}, CAST(LEAST(100, ROUND((${courseProgress.timeSpent} + ${timeSpentDelta}) * 100.0 / ${durationInSeconds})) AS integer)) 
+                ELSE GREATEST(${courseProgress.progress}, CAST(LEAST(100, ROUND((${courseProgress.timeSpent} + ${timeSpentDelta}) * 100.0 / ${durationInSeconds})) AS integer)) 
               END`
             : sql`GREATEST(${courseProgress.progress}, ${progress})`,
           status: durationInSeconds
             ? sql`CASE 
-                WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${durationInSeconds} * 0.9 OR GREATEST(${courseProgress.progress}, ${progress}, CAST(LEAST(100, ROUND((${courseProgress.timeSpent} + ${timeSpentDelta}) * 100.0 / ${durationInSeconds})) AS integer)) >= 100 OR ${status} = 'completed' THEN 'completed'::user_status 
+                WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${durationInSeconds} * 0.9 OR GREATEST(${courseProgress.progress}, CAST(LEAST(100, ROUND((${courseProgress.timeSpent} + ${timeSpentDelta}) * 100.0 / ${durationInSeconds})) AS integer)) >= 100 OR ${status} = 'completed' THEN 'completed'::user_status 
                 ELSE 'learning'::user_status 
               END`
             : sql`CASE 
