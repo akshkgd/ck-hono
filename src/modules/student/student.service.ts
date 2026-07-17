@@ -71,28 +71,28 @@ export class StudentService {
     }
 
     const unassignedContents: any[] = [];
-    let isPreviousStepUnsatisfied = false;
+    let lastVideoItem: any = null;
 
     for (const item of contents) {
       const progressStatus = item.progress?.status || 'not_started';
 
       let isSequentiallyLocked = false;
       if (enrollment.sequentialLearning || enrollment.sequentialLearningWithAssignments) {
-        if (isPreviousStepUnsatisfied) {
-          isSequentiallyLocked = true;
+        if (lastVideoItem) {
+          const isPrevVideoCompleted = lastVideoItem.progress?.status === 'completed';
+          let isPrevVideoAssignmentSatisfied = true;
+          if (enrollment.sequentialLearningWithAssignments && lastVideoItem.canSubmitAssignment) {
+            const assignmentStatus = lastVideoItem.progress?.assignmentStatus;
+            isPrevVideoAssignmentSatisfied = assignmentStatus !== null && assignmentStatus !== undefined && assignmentStatus !== 'pending';
+          }
+          if (!isPrevVideoCompleted || !isPrevVideoAssignmentSatisfied) {
+            isSequentiallyLocked = true;
+          }
         }
       }
 
-      // Determine if current item satisfies sequential learning step requirements for next content
-      const isCompleted = progressStatus === 'completed';
-      let isAssignmentSatisfied = true;
-      if (enrollment.sequentialLearningWithAssignments && item.canSubmitAssignment) {
-        const assignmentStatus = item.progress?.assignmentStatus;
-        isAssignmentSatisfied = assignmentStatus !== null && assignmentStatus !== undefined && assignmentStatus !== 'pending';
-      }
-
-      if (!isCompleted || !isAssignmentSatisfied) {
-        isPreviousStepUnsatisfied = true;
+      if (item.content.type === 'video') {
+        lastVideoItem = item;
       }
 
       const itemMapped = {
@@ -231,29 +231,30 @@ export class StudentService {
     if (enrollment.sequentialLearning || enrollment.sequentialLearningWithAssignments) {
       const contents = await this.studentRepository.getBatchContentWithProgress(details.batchId, userId, enrollment.id!);
       
-      let isPreviousStepUnsatisfied = false;
+      let lastVideoItem: any = null;
       for (const item of contents) {
         if (item.id === batchContentId) {
-          if (isPreviousStepUnsatisfied) {
-            return {
-              allowed: false,
-              reason: enrollment.sequentialLearningWithAssignments
-                ? 'Access denied: Complete the previous content and submit its assignment to unlock this content'
-                : 'Access denied: Complete the previous content to unlock this content'
-            };
+          if (lastVideoItem) {
+            const isPrevVideoCompleted = lastVideoItem.progress?.status === 'completed';
+            let isPrevVideoAssignmentSatisfied = true;
+            if (enrollment.sequentialLearningWithAssignments && lastVideoItem.canSubmitAssignment) {
+              const assignmentStatus = lastVideoItem.progress?.assignmentStatus;
+              isPrevVideoAssignmentSatisfied = assignmentStatus !== null && assignmentStatus !== undefined && assignmentStatus !== 'pending';
+            }
+            if (!isPrevVideoCompleted || !isPrevVideoAssignmentSatisfied) {
+              return {
+                allowed: false,
+                reason: enrollment.sequentialLearningWithAssignments
+                  ? 'Access denied: Complete the previous video and submit its assignment to unlock this content'
+                  : 'Access denied: Complete the previous video to unlock this content'
+              };
+            }
           }
           break;
         }
 
-        const isCompleted = item.progress?.status === 'completed';
-        let isAssignmentSatisfied = true;
-        if (enrollment.sequentialLearningWithAssignments && item.canSubmitAssignment) {
-          const assignmentStatus = item.progress?.assignmentStatus;
-          isAssignmentSatisfied = assignmentStatus !== null && assignmentStatus !== undefined && assignmentStatus !== 'pending';
-        }
-
-        if (!isCompleted || !isAssignmentSatisfied) {
-          isPreviousStepUnsatisfied = true;
+        if (item.content.type === 'video') {
+          lastVideoItem = item;
         }
       }
     }
