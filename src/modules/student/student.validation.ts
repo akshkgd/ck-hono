@@ -7,6 +7,7 @@ export const studentProgressSchema = z.object({
   timeSpent: z.number().int().nonnegative().default(0), // Delta time spent (seconds) since last ping
   progress: z.number().int().min(0).max(100).default(0), // Completion progress percentage (0-100)
   status: z.enum(['not_started', 'learning', 'completed']).default('learning'),
+  lastWatchedPosition: z.number().int().nonnegative().default(0), // Latest playback timestamp in seconds
 });
 
 export type StudentProgressInput = z.infer<typeof studentProgressSchema>;

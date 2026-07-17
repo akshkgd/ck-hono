@@ -111,6 +111,7 @@ export class StudentService {
           status: progressStatus,
           timeSpent: item.progress?.timeSpent || 0,
           progress: item.progress?.progress || 0,
+          lastWatchedPosition: item.progress?.lastWatchedPosition || 0,
           githubLink: item.progress?.githubLink || null,
           deployedLink: item.progress?.deployedLink || null,
           DeployedLink: item.progress?.deployedLink || null,
@@ -292,7 +293,8 @@ export class StudentService {
       input.progress,
       input.status,
       details.videoDuration,
-      details.canSubmitAssignment
+      details.canSubmitAssignment,
+      input.lastWatchedPosition
     );
 
     // 3. Count all contents in the batch

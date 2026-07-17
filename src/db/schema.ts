@@ -214,6 +214,7 @@ export const courseProgress = pgTable('course_progress', {
   videoFeedback: text('video_feedback'),
   codeSubmitted: text('code_submitted'),
   codeSubmittedStatus: codeSubmittedStatusEnum('code_submitted_status'),
+  lastWatchedPosition: integer('last_watched_position').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [

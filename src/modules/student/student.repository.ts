@@ -99,10 +99,11 @@ export class StudentRepository {
           solutionCode: contentLibrary.solutionCode,
           hints: contentLibrary.hints,
         },
-        progress: {
+         progress: {
           status: courseProgress.status,
           timeSpent: courseProgress.timeSpent,
           progress: courseProgress.progress,
+          lastWatchedPosition: courseProgress.lastWatchedPosition,
           githubLink: courseProgress.githubLink,
           deployedLink: courseProgress.deployedLink,
           assignmentStatus: courseProgress.assignmentStatus,
@@ -183,7 +184,8 @@ export class StudentRepository {
     progress: number,
     status: 'not_started' | 'learning' | 'completed',
     videoDuration?: number | null,
-    canSubmitAssignment?: boolean | null
+    canSubmitAssignment?: boolean | null,
+    lastWatchedPosition?: number
   ) {
     const durationInSeconds = videoDuration && videoDuration < 100 ? videoDuration * 60 : videoDuration;
 
@@ -205,6 +207,7 @@ export class StudentRepository {
         progress: progressOnInsert,
         status: isCompletedOnInsert ? 'completed' : 'learning',
         assignmentStatus: assignmentStatusOnInsert,
+        lastWatchedPosition: lastWatchedPosition || 0,
       })
       .onConflictDoUpdate({
         target: [courseProgress.enrollmentId, courseProgress.batchContentId],
@@ -231,6 +234,7 @@ export class StudentRepository {
                 ELSE ${courseProgress.assignmentStatus} 
               END`
             : courseProgress.assignmentStatus,
+          lastWatchedPosition: lastWatchedPosition !== undefined ? lastWatchedPosition : courseProgress.lastWatchedPosition,
           updatedAt: new Date(),
         }
       })
