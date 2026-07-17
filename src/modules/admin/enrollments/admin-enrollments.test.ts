@@ -195,7 +195,9 @@ describe('Admin Enrollments CRUD Module', () => {
           status: 1, // Active
           progress: 50,
           paymentStatus: 'captured',
-          certificateId: 'cert-test-id-123'
+          certificateId: 'cert-test-id-123',
+          sequentialLearning: true,
+          sequentialLearningWithAssignments: true
         })
       });
 
@@ -206,6 +208,8 @@ describe('Admin Enrollments CRUD Module', () => {
       expect(body.data.progress).toBe(50);
       expect(body.data.paymentStatus).toBe('captured');
       expect(body.data.certificateId).toBe('cert-test-id-123');
+      expect(body.data.sequentialLearning).toBe(true);
+      expect(body.data.sequentialLearningWithAssignments).toBe(true);
     });
 
     it('should allow admin to delete an enrollment record', async () => {

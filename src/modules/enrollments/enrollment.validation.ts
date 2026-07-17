@@ -33,6 +33,8 @@ export const createEnrollmentSchema = z.object({
   utmMedium: z.string().max(100).optional().nullable(),
   utmCampaign: z.string().max(150).optional().nullable(),
   remark: z.string().optional().nullable(),
+  sequentialLearning: z.boolean().optional().nullable(),
+  sequentialLearningWithAssignments: z.boolean().optional().nullable(),
   metadata: z.record(z.string(), z.any()).default({}),
 });
 
