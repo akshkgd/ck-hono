@@ -108,6 +108,8 @@ export const batchEnrollments = pgTable('batch_enrollments', {
   utmMedium: varchar('utm_medium', { length: 100 }),
   utmCampaign: varchar('utm_campaign', { length: 150 }),
   remark: text('remark'),
+  sequentialLearning: boolean('sequential_learning'),
+  sequentialLearningWithAssignments: boolean('sequential_learning_with_assignments'),
   metadata: jsonb('metadata').default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
