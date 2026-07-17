@@ -185,8 +185,14 @@ export class StudentRepository {
     videoDuration?: number | null,
     canSubmitAssignment?: boolean | null
   ) {
-    const isCompletedOnInsert = progress >= 100 || status === 'completed' || (videoDuration && timeSpentDelta >= videoDuration * 0.9);
-    const progressOnInsert = isCompletedOnInsert ? 100 : progress;
+    const durationInSeconds = videoDuration && videoDuration < 100 ? videoDuration * 60 : videoDuration;
+
+    const isCompletedOnInsert = progress >= 100 || status === 'completed' || (durationInSeconds && timeSpentDelta >= durationInSeconds * 0.9);
+    const progressOnInsert = isCompletedOnInsert 
+      ? 100 
+      : (durationInSeconds 
+          ? Math.min(100, Math.round((timeSpentDelta * 100) / durationInSeconds)) 
+          : progress);
     const assignmentStatusOnInsert = (canSubmitAssignment && timeSpentDelta >= 600) ? 'pending' : null;
 
     const results = await db
@@ -204,15 +210,15 @@ export class StudentRepository {
         target: [courseProgress.enrollmentId, courseProgress.batchContentId],
         set: {
           timeSpent: sql`${courseProgress.timeSpent} + ${timeSpentDelta}`,
-          progress: videoDuration
+          progress: durationInSeconds
             ? sql`CASE 
-                WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${videoDuration} * 0.9 THEN 100 
-                ELSE GREATEST(${courseProgress.progress}, ${progress}) 
+                WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${durationInSeconds} * 0.9 THEN 100 
+                ELSE GREATEST(${courseProgress.progress}, ${progress}, CAST(LEAST(100, ROUND((${courseProgress.timeSpent} + ${timeSpentDelta}) * 100.0 / ${durationInSeconds})) AS integer)) 
               END`
             : sql`GREATEST(${courseProgress.progress}, ${progress})`,
-          status: videoDuration
+          status: durationInSeconds
             ? sql`CASE 
-                WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${videoDuration} * 0.9 OR GREATEST(${courseProgress.progress}, ${progress}) >= 100 OR ${status} = 'completed' THEN 'completed'::user_status 
+                WHEN ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${durationInSeconds} * 0.9 OR GREATEST(${courseProgress.progress}, ${progress}, CAST(LEAST(100, ROUND((${courseProgress.timeSpent} + ${timeSpentDelta}) * 100.0 / ${durationInSeconds})) AS integer)) >= 100 OR ${status} = 'completed' THEN 'completed'::user_status 
                 ELSE 'learning'::user_status 
               END`
             : sql`CASE 
