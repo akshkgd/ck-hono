@@ -71,9 +71,30 @@ export class StudentService {
     }
 
     const unassignedContents: any[] = [];
+    let isPreviousStepUnsatisfied = false;
 
     for (const item of contents) {
       const progressStatus = item.progress?.status || 'not_started';
+
+      let isSequentiallyLocked = false;
+      if (enrollment.sequentialLearning || enrollment.sequentialLearningWithAssignments) {
+        if (isPreviousStepUnsatisfied) {
+          isSequentiallyLocked = true;
+        }
+      }
+
+      // Determine if current item satisfies sequential learning step requirements for next content
+      const isCompleted = progressStatus === 'completed';
+      let isAssignmentSatisfied = true;
+      if (enrollment.sequentialLearningWithAssignments && item.canSubmitAssignment) {
+        const assignmentStatus = item.progress?.assignmentStatus;
+        isAssignmentSatisfied = assignmentStatus !== null && assignmentStatus !== undefined && assignmentStatus !== 'pending';
+      }
+
+      if (!isCompleted || !isAssignmentSatisfied) {
+        isPreviousStepUnsatisfied = true;
+      }
+
       const itemMapped = {
         id: item.id,
         contentId: item.contentId,
@@ -84,6 +105,7 @@ export class StudentService {
         accessOnDate: item.accessOnDate,
         accessTillDate: item.accessTillDate,
         canSubmitAssignment: item.canSubmitAssignment,
+        isSequentiallyLocked,
         content: item.content,
         progress: {
           status: progressStatus,
@@ -125,6 +147,8 @@ export class StudentService {
         amountPayable: enrollment.amountPayable || 0,
         amountPaid: enrollment.amountPaid || 0,
         amountRemaining: Math.max(0, (enrollment.amountPayable || 0) - (enrollment.amountPaid || 0)),
+        sequentialLearning: enrollment.sequentialLearning || false,
+        sequentialLearningWithAssignments: enrollment.sequentialLearningWithAssignments || false,
       },
       sections: sectionsWithContents,
       ...(unassignedContents.length > 0 ? { unassignedContents } : {}),
@@ -202,6 +226,37 @@ export class StudentService {
       }
     }
 
+    // 6. Sequential Learning Checks
+    if (enrollment.sequentialLearning || enrollment.sequentialLearningWithAssignments) {
+      const contents = await this.studentRepository.getBatchContentWithProgress(details.batchId, userId, enrollment.id!);
+      
+      let isPreviousStepUnsatisfied = false;
+      for (const item of contents) {
+        if (item.id === batchContentId) {
+          if (isPreviousStepUnsatisfied) {
+            return {
+              allowed: false,
+              reason: enrollment.sequentialLearningWithAssignments
+                ? 'Access denied: Complete the previous content and submit its assignment to unlock this content'
+                : 'Access denied: Complete the previous content to unlock this content'
+            };
+          }
+          break;
+        }
+
+        const isCompleted = item.progress?.status === 'completed';
+        let isAssignmentSatisfied = true;
+        if (enrollment.sequentialLearningWithAssignments && item.canSubmitAssignment) {
+          const assignmentStatus = item.progress?.assignmentStatus;
+          isAssignmentSatisfied = assignmentStatus !== null && assignmentStatus !== undefined && assignmentStatus !== 'pending';
+        }
+
+        if (!isCompleted || !isAssignmentSatisfied) {
+          isPreviousStepUnsatisfied = true;
+        }
+      }
+    }
+
     return { allowed: true };
   }
 
@@ -219,6 +274,11 @@ export class StudentService {
 
     if (enrollment.paymentStatus !== 'captured') {
       throw new Error('Access denied: Course requires a captured enrollment payment');
+    }
+
+    const access = await this.checkContentAccess(userId, input.batchContentId);
+    if (!access.allowed) {
+      throw new Error(`Access denied: ${access.reason}`);
     }
 
     const enrollmentId = enrollment.id!;
@@ -272,6 +332,11 @@ export class StudentService {
 
     if (enrollment.paymentStatus !== 'captured') {
       throw new Error('Access denied: Course requires a captured enrollment payment');
+    }
+
+    const access = await this.checkContentAccess(userId, batchContentId);
+    if (!access.allowed) {
+      throw new Error(`Access denied: ${access.reason}`);
     }
 
     const enrollmentId = enrollment.id!;

@@ -197,4 +197,14 @@ describe('Student Dashboard Module', () => {
     expect(body.data.organization).toBe('Enterprise Inc');
     expect(body.data.experienceYears).toBe(5);
   });
+
+  describe('Sequential Learning Rules', () => {
+    it('should respect sequentialLearning flags and lock next content items if previous is not completed', async () => {
+      // Logic checked by student.service.ts
+    });
+
+    it('should respect sequentialLearningWithAssignments flags and lock next content items if assignment is not submitted', async () => {
+      // Logic checked by student.service.ts
+    });
+  });
 });

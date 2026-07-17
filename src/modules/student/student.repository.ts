@@ -50,6 +50,8 @@ export class StudentRepository {
         amountPayable: batchEnrollments.amountPayable,
         amountPaid: batchEnrollments.amountPaid,
         courseStartDate: batches.startDate,
+        sequentialLearning: batchEnrollments.sequentialLearning,
+        sequentialLearningWithAssignments: batchEnrollments.sequentialLearningWithAssignments,
       })
       .from(batchEnrollments)
       .innerJoin(batches, eq(batchEnrollments.batchId, batches.id))
@@ -147,6 +149,8 @@ export class StudentRepository {
           overrideAccessDays: batchEnrollments.overrideAccessDays,
           createdAt: batchEnrollments.createdAt,
           courseStartDate: batches.startDate,
+          sequentialLearning: batchEnrollments.sequentialLearning,
+          sequentialLearningWithAssignments: batchEnrollments.sequentialLearningWithAssignments,
         }
       })
       .from(batchContent)
