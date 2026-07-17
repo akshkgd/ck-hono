@@ -256,7 +256,7 @@ export class StudentRepository {
       .set({
         timeSpentSeconds: sql`${batchEnrollments.timeSpentSeconds} + ${timeSpentDelta}`,
         progress: sql`(
-          SELECT COALESCE(ROUND(SUM(${courseProgress.progress}) / ${totalContentCount}), 0)
+          SELECT COALESCE(ROUND(SUM(CASE WHEN ${courseProgress.status} = 'completed' THEN 100 ELSE 0 END) / ${totalContentCount}), 0)
           FROM ${courseProgress}
           WHERE ${courseProgress.enrollmentId} = ${enrollmentId}
         )`,
