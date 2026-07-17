@@ -113,6 +113,8 @@ describe('Admin User Management Module', () => {
       expect(body.data).toHaveProperty('users');
       expect(body.data.users.length).toBeGreaterThan(0);
       expect(body.data.pagination.page).toBe(1);
+      expect(body.data.pagination).toHaveProperty('total');
+      expect(typeof body.data.pagination.total).toBe('number');
     });
 
     it('should allow admin to edit a user profile', async () => {

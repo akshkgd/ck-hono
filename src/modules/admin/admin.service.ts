@@ -33,11 +33,14 @@ export class AdminService {
     // Omit passwords from search list
     const usersWithoutPassword = usersList.map(({ password, ...user }) => user);
 
+    const total = await this.userRepository.count(input.q, input.role);
+
     return {
       users: usersWithoutPassword,
       pagination: {
         page: input.page,
         limit: input.limit,
+        total,
       }
     };
   }

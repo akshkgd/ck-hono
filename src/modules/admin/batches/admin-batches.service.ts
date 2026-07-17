@@ -44,7 +44,12 @@ export class AdminBatchesService {
     if (!batch) {
       throw new Error('Batch not found');
     }
-    return batch;
+    const stats = await this.batchRepository.getBatchStats(id);
+    return {
+      ...batch,
+      totalEnrollments: stats.totalEnrollments,
+      totalRevenue: stats.totalRevenue,
+    };
   }
 
   public async updateBatch(id: number, input: UpdateBatchInput) {

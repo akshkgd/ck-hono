@@ -126,13 +126,23 @@ export class UserRepository {
       .offset(offset);
   }
 
-  public async count(role?: 'student' | 'admin' | 'user' | 'moderator'): Promise<number> {
+  public async count(q?: string, role?: 'student' | 'admin' | 'user' | 'moderator'): Promise<number> {
     const query = db
       .select({ count: sql<number>`count(*)` })
       .from(users)
       .$dynamic();
 
     const conditions = [];
+    if (q) {
+      const searchPattern = `%${q}%`;
+      conditions.push(
+        or(
+          ilike(users.name, searchPattern),
+          ilike(users.email, searchPattern),
+          ilike(users.mobile, searchPattern)
+        )
+      );
+    }
     if (role) {
       conditions.push(eq(users.role, role));
     }

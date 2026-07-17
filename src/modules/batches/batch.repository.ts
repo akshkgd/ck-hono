@@ -1,5 +1,5 @@
 import { db } from '../../db/index.js';
-import { batches } from '../../db/schema.js';
+import { batches, batchEnrollments } from '../../db/schema.js';
 import { eq, or, ilike, sql, and } from 'drizzle-orm';
 
 export type Batch = typeof batches.$inferSelect;
@@ -14,6 +14,17 @@ export class BatchRepository {
       .limit(1);
     
     return results[0] || null;
+  }
+
+  public async getBatchStats(batchId: number) {
+    const stats = await db
+      .select({
+        totalEnrollments: sql<number>`cast(count(${batchEnrollments.id}) as integer)`,
+        totalRevenue: sql<number>`cast(coalesce(sum(case when ${batchEnrollments.paymentStatus} = 'captured' then ${batchEnrollments.amountPaid} else 0 end), 0) as integer)`
+      })
+      .from(batchEnrollments)
+      .where(eq(batchEnrollments.batchId, batchId));
+    return stats[0] || { totalEnrollments: 0, totalRevenue: 0 };
   }
 
   public async findBySlug(slug: string): Promise<Batch | null> {

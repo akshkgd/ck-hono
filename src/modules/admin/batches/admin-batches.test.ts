@@ -160,6 +160,10 @@ describe('Admin Batches CRUD Module', () => {
       expect(body.status).toBe('success');
       expect(body.data.id).toBe(createdBatchId);
       expect(body.data.name).toBe(testBatchData.name);
+      expect(body.data).toHaveProperty('totalEnrollments');
+      expect(body.data).toHaveProperty('totalRevenue');
+      expect(typeof body.data.totalEnrollments).toBe('number');
+      expect(typeof body.data.totalRevenue).toBe('number');
     });
 
     it('should allow admin to update a batch', async () => {
