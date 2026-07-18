@@ -130,6 +130,7 @@ describe('Admin Payments CRUD Module', () => {
       expect(body.data.batchEnrollmentId).toBe(testEnrollmentId);
       expect(body.data.amount).toBe(399);
       expect(body.data.paymentMethod).toBe('UPI');
+      expect(body.data.isGstApplicable).toBe(true);
 
       createdPaymentId = body.data.id;
       expect(createdPaymentId).toBeTypeOf('number');
@@ -195,6 +196,7 @@ describe('Admin Payments CRUD Module', () => {
         body: JSON.stringify({
           amount: 450,
           paymentMethod: 'Card',
+          isGstApplicable: false,
           remarks: 'Updated remark details'
         })
       });
@@ -204,6 +206,7 @@ describe('Admin Payments CRUD Module', () => {
       expect(body.status).toBe('success');
       expect(body.data.amount).toBe(450);
       expect(body.data.paymentMethod).toBe('Card');
+      expect(body.data.isGstApplicable).toBe(false);
       expect(body.data.remarks).toBe('Updated remark details');
     });
 
