@@ -26,8 +26,8 @@ export class RazorpayService {
    * Helper to perform authenticated HTTP requests to Razorpay API
    */
   private async callRazorpay(endpoint: string, method: 'GET' | 'POST' = 'GET', body?: any) {
-    const keyId = process.env.RAZORPAY_KEY_ID;
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const keyId = process.env.RAZORPAY_KEY_ID?.trim().replace(/^["']|["']$/g, '');
+    const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim().replace(/^["']|["']$/g, '');
 
     if (!keyId || !keySecret) {
       throw new Error('Razorpay API keys are not configured in environment variables');
@@ -192,7 +192,7 @@ export class RazorpayService {
     });
 
     return {
-      keyId: process.env.RAZORPAY_KEY_ID,
+      keyId: process.env.RAZORPAY_KEY_ID?.trim().replace(/^["']|["']$/g, ''),
       orderId: razorpayOrder.id,
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency,
@@ -204,7 +204,7 @@ export class RazorpayService {
    * Verify checkout signature
    */
   public async verifyPayment(input: VerifyRazorpayPaymentInput) {
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim().replace(/^["']|["']$/g, '');
     if (!keySecret) {
       throw new Error('Razorpay secret key not configured');
     }
@@ -329,7 +329,7 @@ export class RazorpayService {
    * Handle Webhook notifications from Razorpay
    */
   public async handleWebhook(rawBody: string, signature: string) {
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET?.trim().replace(/^["']|["']$/g, '');
     if (!webhookSecret) {
       throw new Error('Razorpay webhook secret not configured');
     }
