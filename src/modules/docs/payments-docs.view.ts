@@ -255,6 +255,9 @@ rzp.open();</code></pre>
     "enrollmentId": 248,
     "paymentId": "pay_O2GZ...",
     "orderId": "order_O2GY...",
+    "batchName": "Backend Engineering Cohort",
+    "batchTopic": "Node.js & Hono",
+    "paymentType": "enrollment", // "enrollment" | "pending_payment" | "renew"
     "token": "eyJhbGciOi...", // JWT Session token (Frontend should store this to auto-login guest user)
     "user": {
       "id": "uuid-string",

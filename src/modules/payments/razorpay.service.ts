@@ -270,6 +270,7 @@ export class RazorpayService {
         orderId: input.razorpay_order_id,
         batchName: batch?.name || null,
         batchTopic: batch?.topic || null,
+        paymentType: purpose,
         token,
         user: userProfile,
       },
