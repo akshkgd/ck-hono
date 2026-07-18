@@ -221,6 +221,68 @@ rzp.open();</code></pre>
         </div>
       </section>
 
+      <!-- Public Batch Details Endpoint -->
+      <section class="space-y-4">
+        <h2 class="text-xl font-bold text-white font-mono">Public Batch Details & Pricing</h2>
+        <p class="text-zinc-400 text-sm">
+          To display the correct course title, topic, and price immediately on the checkout page before the guest enters their details, you can query the public batch details endpoints. These do not require any Authorization header.
+        </p>
+
+        <div class="space-y-4">
+          <!-- Get by ID -->
+          <div class="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+            <div class="bg-zinc-950 border-b border-zinc-800 px-4 py-2 flex items-center justify-between text-xs font-mono">
+              <div class="flex items-center gap-2">
+                <span class="bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded font-bold">GET</span>
+                <span class="text-zinc-300">/v1/batches/:id/public</span>
+              </div>
+              <span class="text-zinc-500">Public Route</span>
+            </div>
+            <div class="p-4 space-y-2">
+              <div class="text-zinc-400 text-xs font-mono">Response Payload Example:</div>
+              <pre class="bg-zinc-950 text-zinc-300 p-3 rounded text-xs font-mono overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "name": "Backend Engineering Hono Cohort",
+    "price": 4999,
+    "topic": "Backend",
+    "description": "Stateless APIs with Hono",
+    "slug": "hono-cohort",
+    "img": "image_url"
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Get by Slug -->
+          <div class="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+            <div class="bg-zinc-950 border-b border-zinc-800 px-4 py-2 flex items-center justify-between text-xs font-mono">
+              <div class="flex items-center gap-2">
+                <span class="bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded font-bold">GET</span>
+                <span class="text-zinc-300">/v1/batches/slug/:slug/public</span>
+              </div>
+              <span class="text-zinc-500">Public Route</span>
+            </div>
+            <div class="p-4 space-y-2">
+              <div class="text-zinc-400 text-xs font-mono">Response Payload Example:</div>
+              <pre class="bg-zinc-950 text-zinc-300 p-3 rounded text-xs font-mono overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "name": "Backend Engineering Hono Cohort",
+    "price": 4999,
+    "topic": "Backend",
+    "description": "Stateless APIs with Hono",
+    "slug": "hono-cohort",
+    "img": "image_url"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Advanced Features -->
       <section class="space-y-6">
         <h2 class="text-xl font-bold text-white font-mono">Advanced Payment Actions</h2>
