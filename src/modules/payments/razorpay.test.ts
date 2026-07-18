@@ -126,16 +126,22 @@ describe('Razorpay Payments Module', () => {
       expect(body.data.amount).toBe(499900);
 
       // Verify guest user was created in DB
-      const guestUser = await db.query.users.findFirst({
-        where: eq(users.email, guestEmail),
-      });
+      const guestUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, guestEmail))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(guestUser).toBeDefined();
       expect(guestUser?.mobile).toBe('9999999999');
 
       // Verify enrollment was created in created status
-      const guestEnrollment = await db.query.batchEnrollments.findFirst({
-        where: eq(batchEnrollments.userId, guestUser!.id),
-      });
+      const guestEnrollment = await db
+        .select()
+        .from(batchEnrollments)
+        .where(eq(batchEnrollments.userId, guestUser!.id))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(guestEnrollment).toBeDefined();
       expect(guestEnrollment?.paymentStatus).toBe('created');
       expect(guestEnrollment?.metadata).toHaveProperty('razorpayOrderId', 'order_mock_guest123');
@@ -174,9 +180,12 @@ describe('Razorpay Payments Module', () => {
       expect(body.data.orderId).toBe('order_mock_auth123');
       expect(body.data.enrollmentId).toBeDefined();
 
-      const enrollment = await db.query.batchEnrollments.findFirst({
-        where: eq(batchEnrollments.userId, studentUserId),
-      });
+      const enrollment = await db
+        .select()
+        .from(batchEnrollments)
+        .where(eq(batchEnrollments.userId, studentUserId))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(enrollment).toBeDefined();
       expect(enrollment?.metadata).toHaveProperty('razorpayOrderId', 'order_mock_auth123');
     });
@@ -184,9 +193,12 @@ describe('Razorpay Payments Module', () => {
 
   describe('POST /v1/payments/razorpay/verify', () => {
     it('should fail with invalid signature', async () => {
-      const studentEnrollment = await db.query.batchEnrollments.findFirst({
-        where: eq(batchEnrollments.userId, studentUserId),
-      });
+      const studentEnrollment = await db
+        .select()
+        .from(batchEnrollments)
+        .where(eq(batchEnrollments.userId, studentUserId))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(studentEnrollment).toBeDefined();
 
       const res = await app.request('/v1/payments/razorpay/verify', {
@@ -206,9 +218,12 @@ describe('Razorpay Payments Module', () => {
     });
 
     it('should successfully verify payment, activate enrollment, and log payment details', async () => {
-      const studentEnrollment = await db.query.batchEnrollments.findFirst({
-        where: eq(batchEnrollments.userId, studentUserId),
-      });
+      const studentEnrollment = await db
+        .select()
+        .from(batchEnrollments)
+        .where(eq(batchEnrollments.userId, studentUserId))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(studentEnrollment).toBeDefined();
 
       const paymentId = 'pay_mock_auth123';
@@ -246,16 +261,22 @@ describe('Razorpay Payments Module', () => {
       expect(body.status).toBe('success');
 
       // Verify DB updates
-      const updatedEnrollment = await db.query.batchEnrollments.findFirst({
-        where: eq(batchEnrollments.id, studentEnrollment!.id),
-      });
+      const updatedEnrollment = await db
+        .select()
+        .from(batchEnrollments)
+        .where(eq(batchEnrollments.id, studentEnrollment!.id))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(updatedEnrollment?.paymentStatus).toBe('captured');
       expect(updatedEnrollment?.status).toBe(1); // Activated
       expect(updatedEnrollment?.startedAt).not.toBeNull();
 
-      const loggedPayment = await db.query.batchEnrollmentPayments.findFirst({
-        where: eq(batchEnrollmentPayments.batchEnrollmentId, studentEnrollment!.id),
-      });
+      const loggedPayment = await db
+        .select()
+        .from(batchEnrollmentPayments)
+        .where(eq(batchEnrollmentPayments.batchEnrollmentId, studentEnrollment!.id))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(loggedPayment).toBeDefined();
       expect(loggedPayment?.amount).toBe(4999);
       expect(loggedPayment?.transactionId).toBe(paymentId);
@@ -265,9 +286,12 @@ describe('Razorpay Payments Module', () => {
 
   describe('POST /v1/payments/razorpay/webhook', () => {
     it('should successfully handle webhook captured event, renew access and extend date by 1 year', async () => {
-      const studentEnrollment = await db.query.batchEnrollments.findFirst({
-        where: eq(batchEnrollments.userId, studentUserId),
-      });
+      const studentEnrollment = await db
+        .select()
+        .from(batchEnrollments)
+        .where(eq(batchEnrollments.userId, studentUserId))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(studentEnrollment).toBeDefined();
 
       const webhookPaymentId = 'pay_webhook_renew123';
@@ -307,14 +331,20 @@ describe('Razorpay Payments Module', () => {
       expect(body.status).toBe('success');
 
       // Verify DB updates for renewal
-      const renewedEnrollment = await db.query.batchEnrollments.findFirst({
-        where: eq(batchEnrollments.id, studentEnrollment!.id),
-      });
+      const renewedEnrollment = await db
+        .select()
+        .from(batchEnrollments)
+        .where(eq(batchEnrollments.id, studentEnrollment!.id))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(renewedEnrollment?.accessTill).not.toBeNull();
       
-      const renewPayment = await db.query.batchEnrollmentPayments.findFirst({
-        where: eq(batchEnrollmentPayments.transactionId, webhookPaymentId),
-      });
+      const renewPayment = await db
+        .select()
+        .from(batchEnrollmentPayments)
+        .where(eq(batchEnrollmentPayments.transactionId, webhookPaymentId))
+        .limit(1)
+        .then((res) => res[0] || null);
       expect(renewPayment).toBeDefined();
       expect(renewPayment?.purpose).toBe('renew');
       expect(renewPayment?.amount).toBe(4999);
