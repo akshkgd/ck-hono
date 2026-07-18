@@ -25,9 +25,12 @@ export class AdminPaymentsService {
   }
 
   public async createPayment(input: CreatePaymentInput) {
+    console.log("[DEBUG] createPayment invoked. input:", JSON.stringify(input, null, 2));
+
     // 1. Verify Batch Enrollment Exists
     const enrollment = await this.enrollmentRepository.findById(input.batchEnrollmentId);
     if (!enrollment) {
+      console.log("[DEBUG] Enrollment not found for ID:", input.batchEnrollmentId);
       throw new Error('Batch enrollment not found');
     }
 
@@ -37,10 +40,20 @@ export class AdminPaymentsService {
     const remarks = sanitizeString(input.remarks);
     const paidAtDate = (input.paidAt && input.paidAt.trim() !== '') ? new Date(input.paidAt) : new Date();
 
+    console.log("[DEBUG] Sanitized fields:", {
+      transactionId,
+      invoiceId,
+      paymentMethod,
+      remarks,
+      paidAtDate: paidAtDate.toISOString()
+    });
+
     // 2. Verify Transaction ID Uniqueness
     if (transactionId) {
       const existingTx = await this.paymentRepository.findByTransactionId(transactionId);
+      console.log("[DEBUG] existingTx query result for", transactionId, ":", JSON.stringify(existingTx, null, 2));
       if (existingTx) {
+        console.log("[DEBUG] Uniqueness violation: Transaction ID already exists. existingTx ID:", existingTx.id);
         throw new Error('Transaction ID already exists');
       }
     }
@@ -48,12 +61,15 @@ export class AdminPaymentsService {
     // 3. Verify Invoice ID Uniqueness
     if (invoiceId) {
       const existingInvoice = await this.paymentRepository.findByInvoiceId(invoiceId);
+      console.log("[DEBUG] existingInvoice query result for", invoiceId, ":", JSON.stringify(existingInvoice, null, 2));
       if (existingInvoice) {
+        console.log("[DEBUG] Uniqueness violation: Invoice ID already exists. existingInvoice ID:", existingInvoice.id);
         throw new Error('Invoice ID already exists');
       }
     }
 
     // 4. Create payment
+    console.log("[DEBUG] Inserting payment into database...");
     const newPayment = await this.paymentRepository.create({
       ...input,
       paidAt: paidAtDate,
