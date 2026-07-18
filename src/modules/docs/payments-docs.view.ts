@@ -213,7 +213,7 @@ const options = {
       // 5. Redirect to custom thank you page with batch details
       const batchName = encodeURIComponent(verifyData.data.batchName || '');
       const batchTopic = encodeURIComponent(verifyData.data.batchTopic || '');
-      window.location.href = `/thank-you?batchName=${batchName}&topic=${batchTopic}`;
+      window.location.href = "/thank-you?batchName=" + batchName + "&topic=" + batchTopic;
     } else {
       alert('Verification Failed: ' + verifyData.message);
     }
