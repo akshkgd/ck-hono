@@ -96,7 +96,7 @@ export function getPaymentsDocsHtml(): string {
       <section class="space-y-4">
         <h2 class="text-xl font-bold text-white font-mono">1. Create Payment Order</h2>
         <p class="text-zinc-400 text-sm">
-          Call the backend to initialize the transaction. Depending on the payment type, you must pass the appropriate payload. If the user is logged in, pass the Bearer JWT token; for guest users, pass `email` and `phone`.
+          Call the backend to initialize the transaction. Depending on the payment type, you must pass the appropriate payload. If the user is logged in, pass the Bearer JWT token; for guest users, pass <code>email</code> and <code>phone</code>.
         </p>
         
         <div class="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
@@ -122,7 +122,7 @@ export function getPaymentsDocsHtml(): string {
         <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 text-xs text-amber-300 space-y-1">
           <span class="font-bold">⚠️ Guest User Logic:</span>
           <p>
-            When a guest user triggers order creation, the backend automatically validates if their email is in the DB. If not, it registers a user account under their email and creates a pending enrollment. Keep the returned `enrollmentId` for the verification phase.
+            When a guest user triggers order creation, the backend automatically validates if their email is in the DB. If not, it registers a user account under their email and creates a pending enrollment. Keep the returned <code>enrollmentId</code> for the verification phase.
           </p>
         </div>
       </section>
