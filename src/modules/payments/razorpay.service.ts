@@ -250,13 +250,16 @@ export class RazorpayService {
     let token: string | undefined;
     let userProfile: any | undefined;
 
-    if (user) {
+    // Security: Only auto-login if the role is student (prevent admin/teacher account takeover)
+    if (user && user.role === 'student') {
       const authService = new AuthService();
       const jwtSecret = process.env.JWT_SECRET || 'super-secret-key-change-in-production';
       const result = await authService.createSessionAndToken(user, jwtSecret);
       token = result.token;
       userProfile = result.user;
     }
+
+    const batch = await this.batchRepository.findById(enrollment.batchId);
 
     return {
       status: 'success',
@@ -265,6 +268,8 @@ export class RazorpayService {
         enrollmentId: enrollment.id,
         paymentId: input.razorpay_payment_id,
         orderId: input.razorpay_order_id,
+        batchName: batch?.name || null,
+        batchTopic: batch?.topic || null,
         token,
         user: userProfile,
       },

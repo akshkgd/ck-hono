@@ -348,6 +348,8 @@ describe('Razorpay Payments Module', () => {
       expect(body.data.token).toBeDefined();
       expect(body.data.user).toBeDefined();
       expect(body.data.user.id).toBe(studentUserId);
+      expect(body.data.batchName).toBe(testBatchData.name);
+      expect(body.data.batchTopic).toBe(testBatchData.topic);
 
       // Verify DB updates
       const updatedEnrollment = await db
@@ -370,6 +372,60 @@ describe('Razorpay Payments Module', () => {
       expect(loggedPayment?.amount).toBe(4999);
       expect(loggedPayment?.transactionId).toBe(paymentId);
       expect(loggedPayment?.purpose).toBe('enrollment');
+    });
+
+    it('should NOT return session token if the user is an admin', async () => {
+      // Create a test enrollment for our admin user
+      const adminEnrollmentResults = await db
+        .insert(batchEnrollments)
+        .values({
+          userId: adminUserId,
+          batchId: testBatchId,
+          status: 0,
+          paymentStatus: 'created',
+          amountPaid: 0,
+          metadata: { razorpayOrderId: 'order_mock_admin123' },
+        })
+        .returning();
+      const adminEnrollment = adminEnrollmentResults[0];
+
+      const paymentId = 'pay_mock_admin123';
+      const orderId = 'order_mock_admin123';
+
+      const hmac = crypto.createHmac('sha256', keySecret);
+      hmac.update(`${orderId}|${paymentId}`);
+      const validSignature = hmac.digest('hex');
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          id: paymentId,
+          amount: 499900,
+          method: 'upi',
+          status: 'captured',
+        }),
+      });
+
+      const res = await app.request('/v1/payments/razorpay/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enrollmentId: adminEnrollment.id,
+          razorpay_payment_id: paymentId,
+          razorpay_order_id: orderId,
+          razorpay_signature: validSignature,
+        }),
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.token).toBeUndefined(); // Verify no session token is returned
+      expect(body.data.user).toBeUndefined(); // Verify no user profile is returned
+
+      // Clean up
+      await db.delete(batchEnrollmentPayments).where(eq(batchEnrollmentPayments.batchEnrollmentId, adminEnrollment.id));
+      await db.delete(batchEnrollments).where(eq(batchEnrollments.id, adminEnrollment.id));
     });
   });
 
