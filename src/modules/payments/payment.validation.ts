@@ -5,7 +5,7 @@ export const paymentPurposeSchema = z.enum(['enrollment', 'renewal', 'certificat
 export const createPaymentSchema = z.object({
   batchEnrollmentId: z.number().int().positive(),
   amount: z.number().int(),
-  paidAt: z.string().refine((val) => !val || !isNaN(Date.parse(val)), 'Must be valid date/time'),
+  paidAt: z.string().refine((val) => !val || !isNaN(Date.parse(val)), 'Must be valid date/time').optional().nullable(),
   paymentMethod: z.string().max(100).optional().nullable(),
   transactionId: z.string().max(255).optional().nullable(),
   invoiceId: z.string().max(255).optional().nullable(),

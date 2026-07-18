@@ -22,17 +22,23 @@ export class AdminPaymentsService {
       throw new Error('Batch enrollment not found');
     }
 
+    const transactionId = input.transactionId?.trim() || null;
+    const invoiceId = input.invoiceId?.trim() || null;
+    const paymentMethod = input.paymentMethod?.trim() || null;
+    const remarks = input.remarks?.trim() || null;
+    const paidAtDate = (input.paidAt && input.paidAt.trim() !== '') ? new Date(input.paidAt) : new Date();
+
     // 2. Verify Transaction ID Uniqueness
-    if (input.transactionId) {
-      const existingTx = await this.paymentRepository.findByTransactionId(input.transactionId);
+    if (transactionId) {
+      const existingTx = await this.paymentRepository.findByTransactionId(transactionId);
       if (existingTx) {
         throw new Error('Transaction ID already exists');
       }
     }
 
     // 3. Verify Invoice ID Uniqueness
-    if (input.invoiceId) {
-      const existingInvoice = await this.paymentRepository.findByInvoiceId(input.invoiceId);
+    if (invoiceId) {
+      const existingInvoice = await this.paymentRepository.findByInvoiceId(invoiceId);
       if (existingInvoice) {
         throw new Error('Invoice ID already exists');
       }
@@ -41,7 +47,11 @@ export class AdminPaymentsService {
     // 4. Create payment
     const newPayment = await this.paymentRepository.create({
       ...input,
-      paidAt: new Date(input.paidAt),
+      paidAt: paidAtDate,
+      transactionId,
+      invoiceId,
+      paymentMethod,
+      remarks,
     });
 
     // Recalculate total amount paid on batch enrollment
@@ -86,15 +96,21 @@ export class AdminPaymentsService {
       }
     }
 
-    if (input.transactionId && input.transactionId !== payment.transactionId) {
-      const existingTx = await this.paymentRepository.findByTransactionId(input.transactionId);
+    const transactionId = input.transactionId !== undefined ? (input.transactionId?.trim() || null) : undefined;
+    const invoiceId = input.invoiceId !== undefined ? (input.invoiceId?.trim() || null) : undefined;
+    const paymentMethod = input.paymentMethod !== undefined ? (input.paymentMethod?.trim() || null) : undefined;
+    const remarks = input.remarks !== undefined ? (input.remarks?.trim() || null) : undefined;
+    const paidAtDate = input.paidAt !== undefined ? ((input.paidAt && input.paidAt.trim() !== '') ? new Date(input.paidAt) : new Date()) : undefined;
+
+    if (transactionId && transactionId !== payment.transactionId) {
+      const existingTx = await this.paymentRepository.findByTransactionId(transactionId);
       if (existingTx) {
         throw new Error('Transaction ID already exists');
       }
     }
 
-    if (input.invoiceId && input.invoiceId !== payment.invoiceId) {
-      const existingInvoice = await this.paymentRepository.findByInvoiceId(input.invoiceId);
+    if (invoiceId && invoiceId !== payment.invoiceId) {
+      const existingInvoice = await this.paymentRepository.findByInvoiceId(invoiceId);
       if (existingInvoice) {
         throw new Error('Invoice ID already exists');
       }
@@ -102,7 +118,11 @@ export class AdminPaymentsService {
 
     const updated = await this.paymentRepository.update(id, {
       ...input,
-      paidAt: input.paidAt ? new Date(input.paidAt) : undefined,
+      paidAt: paidAtDate,
+      transactionId,
+      invoiceId,
+      paymentMethod,
+      remarks,
     });
 
     if (!updated) {
