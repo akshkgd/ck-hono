@@ -20,7 +20,6 @@ export const updatePaymentSchema = createPaymentSchema.partial();
 export const paymentSearchQuerySchema = z.object({
   q: z.string().default(''),
   batchEnrollmentId: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().positive().optional()),
-  batchId: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().positive().optional()),
   limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(50).default(10)),
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
 });

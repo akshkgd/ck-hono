@@ -98,7 +98,7 @@ export class PaymentRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number, batchEnrollmentId?: number, batchId?: number) {
+  public async search(queryText: string, limit: number, offset: number, batchEnrollmentId?: number) {
     let query = db
       .select({
         id: batchEnrollmentPayments.id,
@@ -126,9 +126,6 @@ export class PaymentRepository {
     if (batchEnrollmentId) {
       conditions.push(eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollmentId));
     }
-    if (batchId) {
-      conditions.push(eq(batchEnrollments.batchId, batchId));
-    }
     if (queryText) {
       const searchPattern = `%${queryText}%`;
       conditions.push(
@@ -150,7 +147,7 @@ export class PaymentRepository {
     return query.limit(limit).offset(offset);
   }
 
-  public async count(queryText: string, batchEnrollmentId?: number, batchId?: number): Promise<number> {
+  public async count(queryText: string, batchEnrollmentId?: number): Promise<number> {
     let query = db
       .select({ count: sql<number>`count(*)` })
       .from(batchEnrollmentPayments)
@@ -161,9 +158,6 @@ export class PaymentRepository {
     const conditions = [];
     if (batchEnrollmentId) {
       conditions.push(eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollmentId));
-    }
-    if (batchId) {
-      conditions.push(eq(batchEnrollments.batchId, batchId));
     }
     if (queryText) {
       const searchPattern = `%${queryText}%`;
