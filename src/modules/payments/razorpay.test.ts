@@ -345,6 +345,9 @@ describe('Razorpay Payments Module', () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.status).toBe('success');
+      expect(body.data.token).toBeDefined();
+      expect(body.data.user).toBeDefined();
+      expect(body.data.user.id).toBe(studentUserId);
 
       // Verify DB updates
       const updatedEnrollment = await db

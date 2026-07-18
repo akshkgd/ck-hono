@@ -8,6 +8,7 @@ import type { CreateRazorpayOrderInput, VerifyRazorpayPaymentInput } from './raz
 import argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
+import { AuthService } from '../auth/auth.service.js';
 
 export class RazorpayService {
   private userRepository: UserRepository;
@@ -245,7 +246,29 @@ export class RazorpayService {
       purpose
     );
 
-    return { status: 'success', message: 'Payment successfully verified' };
+    const user = await this.userRepository.findById(enrollment.userId);
+    let token: string | undefined;
+    let userProfile: any | undefined;
+
+    if (user) {
+      const authService = new AuthService();
+      const jwtSecret = process.env.JWT_SECRET || 'super-secret-key-change-in-production';
+      const result = await authService.createSessionAndToken(user, jwtSecret);
+      token = result.token;
+      userProfile = result.user;
+    }
+
+    return {
+      status: 'success',
+      message: 'Payment successfully verified',
+      data: {
+        enrollmentId: enrollment.id,
+        paymentId: input.razorpay_payment_id,
+        orderId: input.razorpay_order_id,
+        token,
+        user: userProfile,
+      },
+    };
   }
 
   /**

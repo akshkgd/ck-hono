@@ -246,6 +246,26 @@ rzp.open();</code></pre>
   "razorpay_signature": string
 }</code></pre>
           </div>
+          <div class="p-4 border-t border-zinc-800">
+            <div class="text-zinc-400 text-xs font-mono mb-2">Response Payload Example:</div>
+            <pre class="bg-zinc-950 text-zinc-300 p-3 rounded text-xs font-mono overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Payment successfully verified",
+  "data": {
+    "enrollmentId": 248,
+    "paymentId": "pay_O2GZ...",
+    "orderId": "order_O2GY...",
+    "token": "eyJhbGciOi...", // JWT Session token (Frontend should store this to auto-login guest user)
+    "user": {
+      "id": "uuid-string",
+      "email": "student@example.com",
+      "name": "John Doe",
+      "role": "student",
+      "status": "active"
+    }
+  }
+}</code></pre>
+          </div>
         </div>
       </section>
 
