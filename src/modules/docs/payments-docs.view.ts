@@ -121,9 +121,12 @@ export function getPaymentsDocsHtml(): string {
         </div>
 
         <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 text-xs text-amber-300 space-y-1">
-          <span class="font-bold">⚠️ Guest User Logic:</span>
+          <span class="font-bold">⚠️ Guest User & Parameter Options:</span>
           <p>
             When a guest user triggers order creation, the backend automatically validates if their email is in the DB. If not, it registers a user account under their email and creates a pending enrollment. Keep the returned <code>enrollmentId</code> for the verification phase.
+          </p>
+          <p class="mt-1">
+            💡 <strong class="text-white">Frontend Tip:</strong> You can pass the parameters (<code>batchId</code>, <code>email</code>, <code>phone</code>, <code>name</code>, etc.) either as a JSON request body OR directly as URL query parameters (e.g., <code>/v1/payments/razorpay/create-order?batchId=4&email=guest@example.com&phone=9999999999&name=John</code>).
           </p>
         </div>
       </section>

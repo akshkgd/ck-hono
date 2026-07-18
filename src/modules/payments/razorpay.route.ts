@@ -52,7 +52,7 @@ const optionalAuth = () => {
   };
 };
 
-razorpayRouter.post('/create-order', optionalAuth(), zValidator('json', createRazorpayOrderSchema), controller.createOrder);
+razorpayRouter.post('/create-order', optionalAuth(), controller.createOrder);
 razorpayRouter.post('/verify', zValidator('json', verifyRazorpayPaymentSchema), controller.verifyPayment);
 razorpayRouter.post('/webhook', controller.handleWebhook);
 

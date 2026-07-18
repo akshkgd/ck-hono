@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { RazorpayService } from './razorpay.service.js';
+import { createRazorpayOrderSchema } from './razorpay.validation.js';
 
 export class RazorpayController {
   private razorpayService: RazorpayService;
@@ -11,8 +12,29 @@ export class RazorpayController {
   public createOrder = async (c: Context) => {
     try {
       const user = c.get('user') || null;
-      const input = (c.req as any).valid('json');
+      
+      const query = c.req.query();
+      let body: any = {};
+      const contentType = c.req.header('content-type') || '';
+      if (contentType.includes('application/json')) {
+        try {
+          body = await c.req.json();
+        } catch (_) {
+          // ignore parsing error
+        }
+      }
 
+      const rawData = { ...query, ...body };
+
+      // Coerce numeric fields if they come from query parameters
+      if (rawData.batchId !== undefined && typeof rawData.batchId === 'string') {
+        rawData.batchId = parseInt(rawData.batchId, 10);
+      }
+      if (rawData.enrollmentId !== undefined && typeof rawData.enrollmentId === 'string') {
+        rawData.enrollmentId = parseInt(rawData.enrollmentId, 10);
+      }
+
+      const input = createRazorpayOrderSchema.parse(rawData);
       const data = await this.razorpayService.createOrder(input, user);
 
       return c.json({

@@ -152,6 +152,49 @@ describe('Razorpay Payments Module', () => {
       await db.delete(batchEnrollments).where(eq(batchEnrollments.id, guestEnrollment!.id));
     });
 
+    it('should successfully create order for a guest passing params via query string', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          id: 'order_mock_query123',
+          entity: 'order',
+          amount: 499900,
+          currency: 'INR',
+          status: 'created',
+        }),
+      });
+
+      const queryEmail = 'guest_query@example.com';
+      const res = await app.request(
+        `/v1/payments/razorpay/create-order?paymentType=enrollment&batchId=${testBatchId}&email=${encodeURIComponent(
+          queryEmail
+        )}&phone=9999999998&name=QueryGuest`,
+        {
+          method: 'POST',
+        }
+      );
+
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.orderId).toBe('order_mock_query123');
+
+      // Verify guest user was created in DB
+      const guestUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, queryEmail))
+        .limit(1)
+        .then((res) => res[0] || null);
+      expect(guestUser).toBeDefined();
+      expect(guestUser?.mobile).toBe('9999999998');
+      expect(guestUser?.name).toBe('QueryGuest');
+
+      // Clean up enrollment & user
+      await db.delete(batchEnrollments).where(eq(batchEnrollments.userId, guestUser!.id));
+      await db.delete(users).where(eq(users.id, guestUser!.id));
+    });
+
     it('should successfully create order and enrollment for an authenticated student', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
