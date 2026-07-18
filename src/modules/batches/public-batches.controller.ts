@@ -30,10 +30,6 @@ export class PublicBatchesController {
           id: batch.id,
           name: batch.name,
           price: batch.price,
-          topic: batch.topic,
-          description: batch.description,
-          slug: batch.slug,
-          img: batch.img,
         },
       }, 200);
     } catch (err: any) {
@@ -59,10 +55,6 @@ export class PublicBatchesController {
           id: batch.id,
           name: batch.name,
           price: batch.price,
-          topic: batch.topic,
-          description: batch.description,
-          slug: batch.slug,
-          img: batch.img,
         },
       }, 200);
     } catch (err: any) {
