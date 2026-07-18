@@ -6,6 +6,15 @@ import type {
   PaymentSearchQueryInput
 } from '../../payments/payment.validation.js';
 
+function sanitizeString(val: string | null | undefined): string | null {
+  if (!val) return null;
+  const trimmed = val.trim();
+  if (trimmed === '' || trimmed === 'null' || trimmed === 'undefined') {
+    return null;
+  }
+  return trimmed;
+}
+
 export class AdminPaymentsService {
   private paymentRepository: PaymentRepository;
   private enrollmentRepository: EnrollmentRepository;
@@ -22,10 +31,10 @@ export class AdminPaymentsService {
       throw new Error('Batch enrollment not found');
     }
 
-    const transactionId = input.transactionId?.trim() || null;
-    const invoiceId = input.invoiceId?.trim() || null;
-    const paymentMethod = input.paymentMethod?.trim() || null;
-    const remarks = input.remarks?.trim() || null;
+    const transactionId = sanitizeString(input.transactionId);
+    const invoiceId = sanitizeString(input.invoiceId);
+    const paymentMethod = sanitizeString(input.paymentMethod);
+    const remarks = sanitizeString(input.remarks);
     const paidAtDate = (input.paidAt && input.paidAt.trim() !== '') ? new Date(input.paidAt) : new Date();
 
     // 2. Verify Transaction ID Uniqueness
@@ -96,10 +105,10 @@ export class AdminPaymentsService {
       }
     }
 
-    const transactionId = input.transactionId !== undefined ? (input.transactionId?.trim() || null) : undefined;
-    const invoiceId = input.invoiceId !== undefined ? (input.invoiceId?.trim() || null) : undefined;
-    const paymentMethod = input.paymentMethod !== undefined ? (input.paymentMethod?.trim() || null) : undefined;
-    const remarks = input.remarks !== undefined ? (input.remarks?.trim() || null) : undefined;
+    const transactionId = input.transactionId !== undefined ? sanitizeString(input.transactionId) : undefined;
+    const invoiceId = input.invoiceId !== undefined ? sanitizeString(input.invoiceId) : undefined;
+    const paymentMethod = input.paymentMethod !== undefined ? sanitizeString(input.paymentMethod) : undefined;
+    const remarks = input.remarks !== undefined ? sanitizeString(input.remarks) : undefined;
     const paidAtDate = input.paidAt !== undefined ? ((input.paidAt && input.paidAt.trim() !== '') ? new Date(input.paidAt) : new Date()) : undefined;
 
     if (transactionId && transactionId !== payment.transactionId) {
