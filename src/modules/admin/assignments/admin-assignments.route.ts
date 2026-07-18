@@ -3,7 +3,7 @@ import { AdminAssignmentsController } from './admin-assignments.controller.js';
 import { adminMiddleware } from '../../../middleware/admin.middleware.js';
 import { authMiddleware } from '../../../middleware/auth.middleware.js';
 import { zValidator } from '@hono/zod-validator';
-import { assignmentsQuerySchema, gradeAssignmentSchema, enrollmentAssignmentsParamsSchema } from './admin-assignments.validation.js';
+import { assignmentsQuerySchema, gradeAssignmentSchema, enrollmentAssignmentsParamsSchema, singleAssignmentParamsSchema } from './admin-assignments.validation.js';
 
 const adminAssignmentsRouter = new Hono();
 const controller = new AdminAssignmentsController();
@@ -28,6 +28,12 @@ adminAssignmentsRouter.post(
   '/:progressId/grade',
   zValidator('json', gradeAssignmentSchema),
   controller.gradeSubmission
+);
+
+adminAssignmentsRouter.get(
+  '/:progressId',
+  zValidator('param', singleAssignmentParamsSchema),
+  controller.getAssignmentById
 );
 
 export default adminAssignmentsRouter;

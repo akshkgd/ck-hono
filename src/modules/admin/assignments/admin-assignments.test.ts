@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import app from '../../../app.js';
+import { db } from '../../../db/index.js';
+import { courseProgress } from '../../../db/schema.js';
+import { isNotNull } from 'drizzle-orm';
 
 describe('Admin Assignments Manager Module', () => {
   let adminToken = '';
@@ -109,5 +112,46 @@ describe('Admin Assignments Manager Module', () => {
     const body = await res.json();
     expect(body.status).toBe('error');
     expect(body.message).toContain('Enrollment not found');
+  });
+
+  it('should successfully fetch a single assignment by progressId', async () => {
+    // Find an assignment progress record in the database
+    const existingProgress = await db
+      .select()
+      .from(courseProgress)
+      .where(isNotNull(courseProgress.assignmentStatus))
+      .limit(1)
+      .then((res) => res[0] || null);
+
+    if (existingProgress) {
+      const res = await app.request(`/v1/admin/assignments/${existingProgress.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`
+        }
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.id).toBe(existingProgress.id);
+      expect(body.data.batch).toHaveProperty('name');
+      expect(body.data.content).toHaveProperty('title');
+      expect(body.data.content).toHaveProperty('type');
+      expect(body.data.content).toHaveProperty('assignment');
+    }
+  });
+
+  it('should return 400 for non-existent progressId', async () => {
+    const res = await app.request('/v1/admin/assignments/999999', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`
+      }
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe('error');
+    expect(body.message).toContain('Assignment submission not found');
   });
 });

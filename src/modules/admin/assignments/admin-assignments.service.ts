@@ -136,4 +136,12 @@ export class AdminAssignmentsService {
     }
     return report;
   }
+
+  public async getAssignmentSubmission(progressId: number) {
+    const details = await this.repository.getAssignmentDetailsById(progressId);
+    if (!details) {
+      throw new Error('Assignment submission not found');
+    }
+    return details;
+  }
 }

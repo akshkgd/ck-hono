@@ -54,3 +54,11 @@ export const enrollmentAssignmentsParamsSchema = z.object({
 });
 
 export type EnrollmentAssignmentsParamsInput = z.infer<typeof enrollmentAssignmentsParamsSchema>;
+
+export const singleAssignmentParamsSchema = z.object({
+  progressId: z.string()
+    .transform((val) => parseInt(val, 10))
+    .refine((val) => !isNaN(val) && val > 0, 'progressId must be a positive number'),
+});
+
+export type SingleAssignmentParamsInput = z.infer<typeof singleAssignmentParamsSchema>;

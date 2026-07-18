@@ -217,4 +217,48 @@ export class AdminAssignmentsRepository {
       assignments,
     };
   }
+
+  public async getAssignmentDetailsById(progressId: number) {
+    const results = await db
+      .select({
+        id: courseProgress.id,
+        timeSpent: courseProgress.timeSpent,
+        progress: courseProgress.progress,
+        status: courseProgress.status,
+        githubLink: courseProgress.githubLink,
+        deployedLink: courseProgress.deployedLink,
+        assignmentStatus: courseProgress.assignmentStatus,
+        userRemark: courseProgress.userRemark,
+        teacherRemark: courseProgress.teacherRemark,
+        videoFeedback: courseProgress.videoFeedback,
+        codeSubmitted: courseProgress.codeSubmitted,
+        codeSubmittedStatus: courseProgress.codeSubmittedStatus,
+        updatedAt: courseProgress.updatedAt,
+        createdAt: courseProgress.createdAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+        },
+        batch: {
+          id: batches.id,
+          name: batches.name,
+        },
+        content: {
+          id: contentLibrary.id,
+          title: contentLibrary.title,
+          type: contentLibrary.type,
+          assignment: contentLibrary.assignment,
+        }
+      })
+      .from(courseProgress)
+      .innerJoin(users, eq(courseProgress.userId, users.id))
+      .innerJoin(batchContent, eq(courseProgress.batchContentId, batchContent.id))
+      .innerJoin(batches, eq(batchContent.batchId, batches.id))
+      .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
+      .where(and(eq(courseProgress.id, progressId), isNotNull(courseProgress.assignmentStatus)))
+      .limit(1);
+
+    return results[0] || null;
+  }
 }

@@ -66,4 +66,21 @@ export class AdminAssignmentsController {
       }, 400);
     }
   };
+
+  public getAssignmentById = async (c: Context) => {
+    try {
+      const { progressId } = (c.req as any).valid('param');
+      const submission = await this.service.getAssignmentSubmission(progressId);
+
+      return c.json({
+        status: 'success',
+        data: submission,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to fetch assignment submission',
+      }, 400);
+    }
+  };
 }
