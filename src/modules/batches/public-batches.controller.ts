@@ -10,7 +10,11 @@ export class PublicBatchesController {
 
   public getBatchById = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id'), 10);
+      const idParam = c.req.param('id');
+      if (!idParam) {
+        return c.json({ status: 'error', message: 'Missing batch ID' }, 400);
+      }
+      const id = parseInt(idParam, 10);
       if (isNaN(id)) {
         return c.json({ status: 'error', message: 'Invalid batch ID' }, 400);
       }
