@@ -27,6 +27,7 @@ import studentRouter from './modules/student/student.route.js';
 import studentDocsRouter from './modules/student-docs/student-docs.route.js';
 import adminProgressRouter from './modules/admin/course-progress/admin-course-progress.route.js';
 import adminAssignmentsRouter from './modules/admin/assignments/admin-assignments.route.js';
+import razorpayRouter from './modules/payments/razorpay.route.js';
 import { activityMiddleware } from './middleware/activity.middleware.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
@@ -90,6 +91,7 @@ v1.route('/admin/course-progress', adminProgressRouter);
 v1.route('/admin/assignments', adminAssignmentsRouter);
 v1.route('/course-progress', courseProgressRouter);
 v1.route('/student', studentRouter);
+v1.route('/payments/razorpay', razorpayRouter);
 
 // Register Routes
 app.route('/v1', v1);
