@@ -282,35 +282,19 @@ export class EnrollmentRepository {
       return 0;
     }
 
-    // Sum non-refunds and subtract refunds
-    const sumResult = await tx
+    // Fetch payment statistics in a single query to reduce database round-trips
+    const statsResult = await tx
       .select({
-        sum: sql<number>`coalesce(sum(case when ${batchEnrollmentPayments.purpose} = 'refund' then -${batchEnrollmentPayments.amount} else ${batchEnrollmentPayments.amount} end), 0)`
+        sum: sql<number>`coalesce(sum(case when ${batchEnrollmentPayments.purpose} = 'refund' then -${batchEnrollmentPayments.amount} else ${batchEnrollmentPayments.amount} end), 0)`,
+        count: sql<number>`count(*)`,
+        refundCount: sql<number>`count(case when ${batchEnrollmentPayments.purpose} = 'refund' then 1 end)`
       })
       .from(batchEnrollmentPayments)
       .where(eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId));
 
-    const totalPaid = Number(sumResult[0]?.sum || 0);
-
-    // Count existing payments
-    const paymentsCountResult = await tx
-      .select({ count: sql<number>`count(*)` })
-      .from(batchEnrollmentPayments)
-      .where(eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId));
-    const hasPayments = Number(paymentsCountResult[0]?.count || 0) > 0;
-
-    // Check if there is any refund transaction
-    const hasRefund = await tx
-      .select({ id: batchEnrollmentPayments.id })
-      .from(batchEnrollmentPayments)
-      .where(
-        and(
-          eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId),
-          eq(batchEnrollmentPayments.purpose, 'refund')
-        )
-      )
-      .limit(1)
-      .then((res: any) => res.length > 0);
+    const totalPaid = Number(statsResult[0]?.sum || 0);
+    const hasPayments = Number(statsResult[0]?.count || 0) > 0;
+    const hasRefund = Number(statsResult[0]?.refundCount || 0) > 0;
 
     const payable = enrollment.amountPayable ?? 0;
     let newStatus = enrollment.paymentStatus;

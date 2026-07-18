@@ -32,14 +32,15 @@ export class AdminEnrollmentsService {
   }
 
   public async createEnrollment(input: CreateEnrollmentInput) {
-    // 1. Verify User Exists
-    const user = await this.userRepository.findById(input.userId);
+    // 1. Verify User and Batch Exist in parallel
+    const [user, batch] = await Promise.all([
+      this.userRepository.findById(input.userId),
+      this.batchRepository.findById(input.batchId),
+    ]);
+
     if (!user) {
       throw new Error('User not found');
     }
-
-    // 2. Verify Batch Exists
-    const batch = await this.batchRepository.findById(input.batchId);
     if (!batch) {
       throw new Error('Batch not found');
     }
