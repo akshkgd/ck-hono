@@ -339,6 +339,10 @@ export function getDocsHtml(): string {
               <a href="#user-batch-assignments" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">User Batch Assignments</a>
             </li>
             <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#assignment-get-single" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get Submission Details</a>
+            </li>
+            <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
               <a href="#assignments-grade" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Grade Submission</a>
             </li>
@@ -3075,6 +3079,70 @@ export interface BatchContent {
     "assignmentStatus": "approved",
     "teacherRemark": "Well structured project layout!",
     "videoFeedback": "https://loom.com/share/review"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /v1/admin/assignments/:progressId -->
+        <div id="assignment-get-single" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Assignments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get Submission Details</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Retrieves the specific details of a single assignment submission, including batch metadata, content title, type, and specific assignment prompt details. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/assignments/:progressId</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
+              <ul class="list-disc pl-5 text-xs text-zinc-400 font-mono space-y-1">
+                <li><code>progressId</code>: number (Required) - The unique course progress ID of the submission.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": 8,
+    "timeSpent": 2400,
+    "progress": 100,
+    "status": "completed",
+    "githubLink": "https://github.com/student/assignment-repo",
+    "deployedLink": "https://assignment-demo.vercel.app",
+    "assignmentStatus": "submitted",
+    "userRemark": "Finished all tasks and challenges.",
+    "teacherRemark": null,
+    "videoFeedback": null,
+    "codeSubmitted": "Code payload...",
+    "codeSubmittedStatus": "attempted",
+    "createdAt": "2026-07-18T10:00:00.000Z",
+    "updatedAt": "2026-07-18T12:30:00.000Z",
+    "user": {
+      "id": "student-uuid",
+      "name": "John Student",
+      "email": "john.student@example.com"
+    },
+    "batch": {
+      "id": 4,
+      "name": "Full Stack Cohort"
+    },
+    "content": {
+      "id": 45,
+      "title": "Intro to REST APIs",
+      "type": "assignment",
+      "assignment": "Write a complete REST API in Hono and deploy to Cloudflare Pages..."
+    }
   }
 }</code></pre>
             </div>
