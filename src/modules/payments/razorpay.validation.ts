@@ -6,6 +6,7 @@ export const createRazorpayOrderSchema = z.object({
   enrollmentId: z.number().int().positive().optional(),
   email: z.string().email().optional(),
   phone: z.string().min(10).max(15).optional(),
+  name: z.string().max(255).optional(),
 }).refine((data) => {
   if (data.paymentType === 'enrollment') {
     return data.batchId !== undefined;

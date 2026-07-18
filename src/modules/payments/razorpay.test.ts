@@ -116,6 +116,7 @@ describe('Razorpay Payments Module', () => {
           batchId: testBatchId,
           email: guestEmail,
           phone: '9999999999',
+          name: 'Guest Programmer',
         }),
       });
 
@@ -134,6 +135,7 @@ describe('Razorpay Payments Module', () => {
         .then((res) => res[0] || null);
       expect(guestUser).toBeDefined();
       expect(guestUser?.mobile).toBe('9999999999');
+      expect(guestUser?.name).toBe('Guest Programmer');
 
       // Verify enrollment was created in created status
       const guestEnrollment = await db

@@ -80,7 +80,7 @@ export class RazorpayService {
         user = await this.userRepository.create({
           email: cleanEmail,
           password: hashedPassword,
-          name: cleanEmail.split('@')[0],
+          name: input.name?.trim() || cleanEmail.split('@')[0],
           mobile: input.phone,
           role: 'student',
           status: 'active',

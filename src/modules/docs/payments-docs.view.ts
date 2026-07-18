@@ -114,7 +114,8 @@ export function getPaymentsDocsHtml(): string {
   "batchId": number,           // Required ONLY if paymentType is "enrollment"
   "enrollmentId": number,      // Required ONLY if paymentType is "pending_payment" or "renew"
   "email": string,             // Required for guest checkout (no auth header)
-  "phone": string              // Required for guest checkout (no auth header)
+  "phone": string,             // Required for guest checkout (no auth header)
+  "name": string               // Optional guest name
 }</code></pre>
           </div>
         </div>
