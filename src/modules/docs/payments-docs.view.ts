@@ -204,7 +204,16 @@ const options = {
     
     const verifyData = await verifyRes.json();
     if (verifyRes.ok) {
-      alert('Payment Verified & Activated!');
+      // 4. Auto-login student user if token is returned
+      if (verifyData.data.token) {
+        localStorage.setItem('jwt_token', verifyData.data.token);
+        localStorage.setItem('user_profile', JSON.stringify(verifyData.data.user));
+      }
+      
+      // 5. Redirect to custom thank you page with batch details
+      const batchName = encodeURIComponent(verifyData.data.batchName || '');
+      const batchTopic = encodeURIComponent(verifyData.data.batchTopic || '');
+      window.location.href = `/thank-you?batchName=${batchName}&topic=${batchTopic}`;
     } else {
       alert('Verification Failed: ' + verifyData.message);
     }
