@@ -6,8 +6,8 @@ export type Enrollment = typeof batchEnrollments.$inferSelect;
 export type NewEnrollment = typeof batchEnrollments.$inferInsert;
 
 export class EnrollmentRepository {
-  public async findById(id: number) {
-    const results = await db
+  public async findById(id: number, tx: any = db) {
+    const results = await tx
       .select({
         id: batchEnrollments.id,
         userId: batchEnrollments.userId,
@@ -74,8 +74,8 @@ export class EnrollmentRepository {
     return results[0] || null;
   }
 
-  public async create(data: NewEnrollment): Promise<Enrollment> {
-    const results = await db
+  public async create(data: NewEnrollment, tx: any = db): Promise<Enrollment> {
+    const results = await tx
       .insert(batchEnrollments)
       .values(data)
       .returning();
@@ -83,8 +83,8 @@ export class EnrollmentRepository {
     return results[0];
   }
 
-  public async update(id: number, data: Partial<NewEnrollment>): Promise<Enrollment | null> {
-    const results = await db
+  public async update(id: number, data: Partial<NewEnrollment>, tx: any = db): Promise<Enrollment | null> {
+    const results = await tx
       .update(batchEnrollments)
       .set({
         ...data,
@@ -267,8 +267,8 @@ export class EnrollmentRepository {
       .where(eq(batchEnrollments.userId, userId));
    }
 
-  public async recalculateAmountPaid(enrollmentId: number): Promise<number> {
-    const enrollment = await db
+  public async recalculateAmountPaid(enrollmentId: number, tx: any = db): Promise<number> {
+    const enrollment = await tx
       .select({
         amountPayable: batchEnrollments.amountPayable,
         paymentStatus: batchEnrollments.paymentStatus,
@@ -276,14 +276,14 @@ export class EnrollmentRepository {
       .from(batchEnrollments)
       .where(eq(batchEnrollments.id, enrollmentId))
       .limit(1)
-      .then((res) => res[0]);
+      .then((res: any) => res[0]);
 
     if (!enrollment) {
       return 0;
     }
 
     // Sum non-refunds and subtract refunds
-    const sumResult = await db
+    const sumResult = await tx
       .select({
         sum: sql<number>`coalesce(sum(case when ${batchEnrollmentPayments.purpose} = 'refund' then -${batchEnrollmentPayments.amount} else ${batchEnrollmentPayments.amount} end), 0)`
       })
@@ -293,14 +293,14 @@ export class EnrollmentRepository {
     const totalPaid = Number(sumResult[0]?.sum || 0);
 
     // Count existing payments
-    const paymentsCountResult = await db
+    const paymentsCountResult = await tx
       .select({ count: sql<number>`count(*)` })
       .from(batchEnrollmentPayments)
       .where(eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId));
     const hasPayments = Number(paymentsCountResult[0]?.count || 0) > 0;
 
     // Check if there is any refund transaction
-    const hasRefund = await db
+    const hasRefund = await tx
       .select({ id: batchEnrollmentPayments.id })
       .from(batchEnrollmentPayments)
       .where(
@@ -310,7 +310,7 @@ export class EnrollmentRepository {
         )
       )
       .limit(1)
-      .then((res) => res.length > 0);
+      .then((res: any) => res.length > 0);
 
     const payable = enrollment.amountPayable ?? 0;
     let newStatus = enrollment.paymentStatus;
@@ -326,7 +326,7 @@ export class EnrollmentRepository {
     }
 
     // Find the latest payment date to update paidAt if appropriate
-    const latestPaymentResult = await db
+    const latestPaymentResult = await tx
       .select({ paidAt: batchEnrollmentPayments.paidAt })
       .from(batchEnrollmentPayments)
       .where(eq(batchEnrollmentPayments.batchEnrollmentId, enrollmentId))
@@ -343,7 +343,7 @@ export class EnrollmentRepository {
       updateData.paidAt = latestPaidAt;
     }
 
-    await db
+    await tx
       .update(batchEnrollments)
       .set(updateData)
       .where(eq(batchEnrollments.id, enrollmentId));

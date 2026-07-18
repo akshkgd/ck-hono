@@ -1,3 +1,4 @@
+import { db } from '../../../db/index.js';
 import { EnrollmentRepository, type NewEnrollment } from '../../enrollments/enrollment.repository.js';
 import { UserRepository } from '../../users/user.repository.js';
 import { BatchRepository } from '../../batches/batch.repository.js';
@@ -34,47 +35,63 @@ export class AdminEnrollmentsService {
       throw new Error('Batch not found');
     }
 
+    const transactionId = input.transactionId?.trim() || null;
+    const invoiceId = input.invoiceId?.trim() || null;
+    const certificateId = input.certificateId?.trim() || null;
+    const paymentMethod = input.paymentMethod?.trim() || null;
+    const couponCode = input.couponCode?.trim() || null;
+    const remark = input.remark?.trim() || null;
+
     // 3. Verify Certificate ID Uniqueness
-    if (input.certificateId) {
-      const existingCert = await this.enrollmentRepository.findByCertificateId(input.certificateId);
+    if (certificateId) {
+      const existingCert = await this.enrollmentRepository.findByCertificateId(certificateId);
       if (existingCert) {
         throw new Error('Certificate ID already in use');
       }
     }
 
-    // 4. Create record (parsing date strings to Date objects)
-    const newEnrollment = await this.enrollmentRepository.create({
-      ...input,
-      amountPaid: input.amountPaid ?? 0,
-      paidAt: input.paidAt ? new Date(input.paidAt) : null,
-      certificateGeneratedAt: input.certificateGeneratedAt ? new Date(input.certificateGeneratedAt) : null,
-      startedAt: input.startedAt ? new Date(input.startedAt) : null,
-    });
+    // 4. Run all write operations inside a transaction to prevent partial database states
+    return await db.transaction(async (tx) => {
+      const newEnrollment = await this.enrollmentRepository.create({
+        ...input,
+        transactionId,
+        invoiceId,
+        certificateId,
+        paymentMethod,
+        couponCode,
+        remark,
+        amountPaid: input.amountPaid ?? 0,
+        paidAt: input.paidAt ? new Date(input.paidAt) : null,
+        certificateGeneratedAt: input.certificateGeneratedAt ? new Date(input.certificateGeneratedAt) : null,
+        startedAt: input.startedAt ? new Date(input.startedAt) : null,
+      }, tx);
 
-    // Automatically create a matching transaction in batch_enrollment_payments if amountPaid > 0
-    if (newEnrollment.amountPaid > 0) {
-      await this.paymentRepository.create({
-        batchEnrollmentId: newEnrollment.id,
-        amount: newEnrollment.amountPaid,
-        paidAt: newEnrollment.paidAt ?? new Date(),
-        paymentMethod: newEnrollment.paymentMethod || 'Manual',
-        transactionId: newEnrollment.transactionId || `tx-init-${newEnrollment.id}-${Date.now()}`,
-        invoiceId: newEnrollment.invoiceId || `inv-init-${newEnrollment.id}-${Date.now()}`,
-        purpose: 'enrollment',
-        isGstApplicable: true,
-        remarks: newEnrollment.remark || 'Logged automatically on enrollment creation',
-      });
-      // Recalculate to ensure everything, including status, is perfectly in sync
-      await this.enrollmentRepository.recalculateAmountPaid(newEnrollment.id);
-      
-      // Fetch the updated enrollment to return it with the updated state
-      const updatedEnrollment = await this.enrollmentRepository.findById(newEnrollment.id);
-      if (updatedEnrollment) {
-        return updatedEnrollment;
+      // Automatically create a matching transaction in batch_enrollment_payments if amountPaid > 0
+      if (newEnrollment.amountPaid > 0) {
+        await this.paymentRepository.create({
+          batchEnrollmentId: newEnrollment.id,
+          amount: newEnrollment.amountPaid,
+          paidAt: newEnrollment.paidAt ?? new Date(),
+          paymentMethod: newEnrollment.paymentMethod || 'Manual',
+          transactionId: newEnrollment.transactionId || `tx-init-${newEnrollment.id}-${Date.now()}`,
+          invoiceId: newEnrollment.invoiceId || `inv-init-${newEnrollment.id}-${Date.now()}`,
+          purpose: 'enrollment',
+          isGstApplicable: true,
+          remarks: newEnrollment.remark || 'Logged automatically on enrollment creation',
+        }, tx);
+
+        // Recalculate to ensure everything, including status, is perfectly in sync
+        await this.enrollmentRepository.recalculateAmountPaid(newEnrollment.id, tx);
+        
+        // Fetch the updated enrollment to return it with the updated state
+        const updatedEnrollment = await this.enrollmentRepository.findById(newEnrollment.id, tx);
+        if (updatedEnrollment) {
+          return updatedEnrollment;
+        }
       }
-    }
 
-    return newEnrollment;
+      return newEnrollment;
+    });
   }
 
   public async searchEnrollments(input: EnrollmentSearchQueryInput) {
@@ -149,53 +166,68 @@ export class AdminEnrollmentsService {
       }
     }
 
-    if (input.certificateId && input.certificateId !== enrollment.certificateId) {
-      const existingCert = await this.enrollmentRepository.findByCertificateId(input.certificateId);
+    const transactionId = input.transactionId !== undefined ? (input.transactionId?.trim() || null) : undefined;
+    const invoiceId = input.invoiceId !== undefined ? (input.invoiceId?.trim() || null) : undefined;
+    const certificateId = input.certificateId !== undefined ? (input.certificateId?.trim() || null) : undefined;
+    const paymentMethod = input.paymentMethod !== undefined ? (input.paymentMethod?.trim() || null) : undefined;
+    const couponCode = input.couponCode !== undefined ? (input.couponCode?.trim() || null) : undefined;
+    const remark = input.remark !== undefined ? (input.remark?.trim() || null) : undefined;
+
+    if (certificateId && certificateId !== enrollment.certificateId) {
+      const existingCert = await this.enrollmentRepository.findByCertificateId(certificateId);
       if (existingCert) {
         throw new Error('Certificate ID already in use');
       }
     }
 
-    const updated = await this.enrollmentRepository.update(id, {
-      ...input,
-      amountPaid: input.amountPaid ?? undefined,
-      paidAt: input.paidAt ? new Date(input.paidAt) : undefined,
-      certificateGeneratedAt: input.certificateGeneratedAt ? new Date(input.certificateGeneratedAt) : undefined,
-      startedAt: input.startedAt ? new Date(input.startedAt) : undefined,
-    });
+    return await db.transaction(async (tx) => {
+      const updated = await this.enrollmentRepository.update(id, {
+        ...input,
+        transactionId,
+        invoiceId,
+        certificateId,
+        paymentMethod,
+        couponCode,
+        remark,
+        amountPaid: input.amountPaid ?? undefined,
+        paidAt: input.paidAt ? new Date(input.paidAt) : undefined,
+        certificateGeneratedAt: input.certificateGeneratedAt ? new Date(input.certificateGeneratedAt) : undefined,
+        startedAt: input.startedAt ? new Date(input.startedAt) : undefined,
+      }, tx);
 
-    if (!updated) {
-      throw new Error('Failed to update enrollment');
-    }
+      if (!updated) {
+        throw new Error('Failed to update enrollment');
+      }
 
-    // Automatically synchronize transaction logs if amountPaid is modified directly
-    if (input.amountPaid !== undefined && input.amountPaid !== enrollment.amountPaid) {
-      const diff = input.amountPaid - enrollment.amountPaid;
-      if (diff !== 0) {
-        await this.paymentRepository.create({
-          batchEnrollmentId: id,
-          amount: Math.abs(diff),
-          paidAt: input.paidAt ? new Date(input.paidAt) : new Date(),
-          paymentMethod: input.paymentMethod || enrollment.paymentMethod || 'Manual',
-          transactionId: input.transactionId || `tx-update-${id}-${Date.now()}`,
-          invoiceId: input.invoiceId || `inv-update-${id}-${Date.now()}`,
-          purpose: diff > 0 ? 'enrollment' : 'refund',
-          isGstApplicable: true,
-          remarks: input.remark || `Logged automatically on enrollment update (amountPaid changed from ${enrollment.amountPaid} to ${input.amountPaid})`,
-        });
-        
-        // Recalculate enrollment total & status
-        await this.enrollmentRepository.recalculateAmountPaid(id);
-        
-        // Return refreshed enrollment
-        const refreshed = await this.enrollmentRepository.findById(id);
-        if (refreshed) {
-          return refreshed;
+      // Automatically synchronize transaction logs if amountPaid is modified directly
+      if (input.amountPaid !== undefined && input.amountPaid !== enrollment.amountPaid) {
+        const diff = input.amountPaid - enrollment.amountPaid;
+        if (diff !== 0) {
+          await this.paymentRepository.create({
+            batchEnrollmentId: id,
+            amount: Math.abs(diff),
+            paidAt: input.paidAt ? new Date(input.paidAt) : new Date(),
+            paymentMethod: paymentMethod || enrollment.paymentMethod || 'Manual',
+            transactionId: transactionId || `tx-update-${id}-${Date.now()}`,
+            invoiceId: invoiceId || `inv-update-${id}-${Date.now()}`,
+            purpose: diff > 0 ? 'enrollment' : 'refund',
+            isGstApplicable: true,
+            remarks: remark || `Logged automatically on enrollment update (amountPaid changed from ${enrollment.amountPaid} to ${input.amountPaid})`,
+          }, tx);
+          
+          // Recalculate enrollment total & status
+          await this.enrollmentRepository.recalculateAmountPaid(id, tx);
+          
+          // Return refreshed enrollment
+          const refreshed = await this.enrollmentRepository.findById(id, tx);
+          if (refreshed) {
+            return refreshed;
+          }
         }
       }
-    }
 
-    return updated;
+      return updated;
+    });
   }
 
   public async deleteEnrollment(id: number) {
