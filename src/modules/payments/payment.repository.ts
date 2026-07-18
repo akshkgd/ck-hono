@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batchEnrollmentPayments, batchEnrollments, users, batches } from '../../db/schema.js';
-import { eq, or, ilike, sql, and } from 'drizzle-orm';
+import { eq, or, ilike, sql, and, gte, lte, asc, desc } from 'drizzle-orm';
 
 export type Payment = typeof batchEnrollmentPayments.$inferSelect;
 export type NewPayment = typeof batchEnrollmentPayments.$inferInsert;
@@ -170,6 +170,112 @@ export class PaymentRepository {
           ilike(batchEnrollmentPayments.invoiceId, searchPattern)
         )
       );
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+
+    const results = await query;
+    return Number(results[0]?.count || 0);
+  }
+
+  public async searchTransactions(
+    queryText: string,
+    limit: number,
+    offset: number,
+    sortOrder: 'asc' | 'desc' = 'desc',
+    startDate?: Date,
+    endDate?: Date
+  ) {
+    let query = db
+      .select({
+        id: batchEnrollmentPayments.id,
+        batchEnrollmentId: batchEnrollmentPayments.batchEnrollmentId,
+        amount: batchEnrollmentPayments.amount,
+        paidAt: batchEnrollmentPayments.paidAt,
+        paymentMethod: batchEnrollmentPayments.paymentMethod,
+        transactionId: batchEnrollmentPayments.transactionId,
+        invoiceId: batchEnrollmentPayments.invoiceId,
+        purpose: batchEnrollmentPayments.purpose,
+        isGstApplicable: batchEnrollmentPayments.isGstApplicable,
+        remarks: batchEnrollmentPayments.remarks,
+        createdAt: batchEnrollmentPayments.createdAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+        },
+        batch: {
+          id: batches.id,
+          name: batches.name,
+        }
+      })
+      .from(batchEnrollmentPayments)
+      .leftJoin(batchEnrollments, eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollments.id))
+      .leftJoin(users, eq(batchEnrollments.userId, users.id))
+      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id));
+
+    const conditions = [];
+    if (queryText) {
+      const searchPattern = `%${queryText}%`;
+      conditions.push(
+        or(
+          ilike(users.name, searchPattern),
+          ilike(users.email, searchPattern),
+          ilike(batches.name, searchPattern),
+          ilike(batchEnrollmentPayments.transactionId, searchPattern),
+          ilike(batchEnrollmentPayments.invoiceId, searchPattern)
+        )
+      );
+    }
+    if (startDate) {
+      conditions.push(gte(batchEnrollmentPayments.createdAt, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(batchEnrollmentPayments.createdAt, endDate));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+
+    const sortFn = sortOrder === 'asc' ? asc : desc;
+    query = query.orderBy(sortFn(batchEnrollmentPayments.createdAt)) as any;
+
+    return query.limit(limit).offset(offset);
+  }
+
+  public async countTransactions(
+    queryText: string,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<number> {
+    let query = db
+      .select({ count: sql<number>`count(*)` })
+      .from(batchEnrollmentPayments)
+      .leftJoin(batchEnrollments, eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollments.id))
+      .leftJoin(users, eq(batchEnrollments.userId, users.id))
+      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id));
+
+    const conditions = [];
+    if (queryText) {
+      const searchPattern = `%${queryText}%`;
+      conditions.push(
+        or(
+          ilike(users.name, searchPattern),
+          ilike(users.email, searchPattern),
+          ilike(batches.name, searchPattern),
+          ilike(batchEnrollmentPayments.transactionId, searchPattern),
+          ilike(batchEnrollmentPayments.invoiceId, searchPattern)
+        )
+      );
+    }
+    if (startDate) {
+      conditions.push(gte(batchEnrollmentPayments.createdAt, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(batchEnrollmentPayments.createdAt, endDate));
     }
 
     if (conditions.length > 0) {

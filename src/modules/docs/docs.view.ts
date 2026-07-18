@@ -282,6 +282,10 @@ export function getDocsHtml(): string {
               <a href="#payments-get" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get payment</a>
             </li>
             <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#payments-transactions" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Transaction History</a>
+            </li>
+            <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
               <a href="#payments-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update payment</a>
             </li>
@@ -2582,6 +2586,77 @@ export interface BatchContent {
             </div>
           </div>
         </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /v1/admin/enrollment-payments/transactions -->
+        <div id="payments-transactions" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Transaction History</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Retrieves the comprehensive transaction history ledger across all batch enrollment payments, supporting queries, sort ordering, and modular date-range presets. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/enrollment-payments/transactions</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
+              <ul class="list-disc pl-5 text-xs text-zinc-400 font-mono space-y-1">
+                <li><code>q</code>: string (Optional) - Fuzzy search text matching user name, email, batch title, transaction ID, or invoice ID.</li>
+                <li><code>timeRange</code>: enum (Optional, defaults to <code>"this_month"</code>) - Choose from <code>"today" | "yesterday" | "this_week" | "last_week" | "this_month" | "last_month" | "custom"</code>.</li>
+                <li><code>startDate</code> &amp; <code>endDate</code>: string (Required only if timeRange is "custom") - Format: <code>YYYY-MM-DD</code>.</li>
+                <li><code>sortOrder</code>: enum (Optional, defaults to <code>"desc"</code>) - Choose from <code>"asc" | "desc"</code> to sort by transaction creation time.</li>
+                <li><code>limit</code>: number (Optional, defaults to 20) - Page size limit (max 100).</li>
+                <li><code>page</code>: number (Optional, defaults to 1) - Results pagination page index.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "transactions": [
+      {
+        "id": 142,
+        "batchEnrollmentId": 248,
+        "amount": 4999,
+        "paidAt": "2026-07-18T10:00:00.000Z",
+        "paymentMethod": "upi",
+        "transactionId": "pay_O2GZ_mock123",
+        "invoiceId": "inv_O2GZ_mock123",
+        "purpose": "enrollment",
+        "isGstApplicable": true,
+        "remarks": "Razorpay auto-activated",
+        "createdAt": "2026-07-18T10:00:00.000Z",
+        "user": {
+          "id": "student-uuid-xxxx",
+          "name": "John Doe",
+          "email": "student@example.com"
+        },
+        "batch": {
+          "id": 4,
+          "name": "Backend Cohort"
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 1
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
 
 
         <!-- -------------------- ADMIN: REPORTS GROUP -------------------- -->

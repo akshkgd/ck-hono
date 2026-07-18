@@ -12,6 +12,7 @@ const controller = new AdminPaymentsController();
 adminPaymentsRouter.use('*', authMiddleware(), adminMiddleware());
 
 adminPaymentsRouter.get('/', controller.search);
+adminPaymentsRouter.get('/transactions', controller.transactions);
 adminPaymentsRouter.get('/:id', controller.get);
 adminPaymentsRouter.post('/', zValidator('json', createPaymentSchema), controller.create);
 adminPaymentsRouter.put('/:id', zValidator('json', updatePaymentSchema), controller.edit);

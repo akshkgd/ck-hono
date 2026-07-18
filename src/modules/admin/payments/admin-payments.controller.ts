@@ -3,7 +3,8 @@ import { AdminPaymentsService } from './admin-payments.service.js';
 import {
   createPaymentSchema,
   updatePaymentSchema,
-  paymentSearchQuerySchema
+  paymentSearchQuerySchema,
+  transactionSearchQuerySchema
 } from '../../payments/payment.validation.js';
 
 export class AdminPaymentsController {
@@ -108,6 +109,24 @@ export class AdminPaymentsController {
       return c.json({
         status: 'error',
         message: err.message || 'Failed to delete payment',
+      }, 400);
+    }
+  };
+
+  public transactions = async (c: Context) => {
+    try {
+      const rawQuery = c.req.query();
+      const query = transactionSearchQuerySchema.parse(rawQuery);
+
+      const result = await this.adminPaymentsService.getTransactionHistory(query);
+      return c.json({
+        status: 'success',
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to fetch transaction history',
       }, 400);
     }
   };

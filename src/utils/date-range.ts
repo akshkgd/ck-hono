@@ -3,7 +3,18 @@ export interface DateRange {
   to: Date;
 }
 
-export type DateRangePreset = 'today' | 'yesterday' | 'thisMonth' | 'lastMonth' | 'last7Days' | 'thisYear' | 'custom';
+export type DateRangePreset =
+  | 'today'
+  | 'yesterday'
+  | 'this_week'
+  | 'last_week'
+  | 'thisMonth'
+  | 'this_month'
+  | 'lastMonth'
+  | 'last_month'
+  | 'last7Days'
+  | 'thisYear'
+  | 'custom';
 
 export function calculateDateRange(
   preset: DateRangePreset,
@@ -27,6 +38,26 @@ export function calculateDateRange(
       to.setHours(23, 59, 59, 999);
       break;
 
+    case 'this_week': {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      from = new Date(now.setDate(diff));
+      from.setHours(0, 0, 0, 0);
+      to.setHours(23, 59, 59, 999);
+      break;
+    }
+
+    case 'last_week': {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1) - 7;
+      from = new Date(now.setDate(diff));
+      from.setHours(0, 0, 0, 0);
+      to = new Date(from);
+      to.setDate(to.getDate() + 6);
+      to.setHours(23, 59, 59, 999);
+      break;
+    }
+
     case 'last7Days':
       from.setDate(now.getDate() - 7);
       from.setHours(0, 0, 0, 0);
@@ -34,11 +65,13 @@ export function calculateDateRange(
       break;
 
     case 'thisMonth':
+    case 'this_month':
       from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
       to.setHours(23, 59, 59, 999);
       break;
 
     case 'lastMonth':
+    case 'last_month':
       from = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
       to = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
       break;

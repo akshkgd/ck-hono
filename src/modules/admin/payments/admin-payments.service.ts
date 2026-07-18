@@ -3,8 +3,10 @@ import { EnrollmentRepository } from '../../enrollments/enrollment.repository.js
 import type {
   CreatePaymentInput,
   UpdatePaymentInput,
-  PaymentSearchQueryInput
+  PaymentSearchQueryInput,
+  TransactionSearchQueryInput
 } from '../../payments/payment.validation.js';
+import { calculateDateRange } from '../../../utils/date-range.js';
 
 function sanitizeString(val: string | null | undefined): string | null {
   if (!val) return null;
@@ -178,5 +180,40 @@ export class AdminPaymentsService {
     await this.enrollmentRepository.recalculateAmountPaid(payment.batchEnrollmentId);
 
     return true;
+  }
+
+  public async getTransactionHistory(input: TransactionSearchQueryInput) {
+    const { from: startDate, to: endDate } = calculateDateRange(
+      input.timeRange as any,
+      input.startDate || undefined,
+      input.endDate || undefined
+    );
+
+    const offset = (input.page - 1) * input.limit;
+
+    const [transactions, total] = await Promise.all([
+      this.paymentRepository.searchTransactions(
+        input.q,
+        input.limit,
+        offset,
+        input.sortOrder,
+        startDate,
+        endDate
+      ),
+      this.paymentRepository.countTransactions(
+        input.q,
+        startDate,
+        endDate
+      )
+    ]);
+
+    return {
+      transactions,
+      pagination: {
+        page: input.page,
+        limit: input.limit,
+        total
+      }
+    };
   }
 }

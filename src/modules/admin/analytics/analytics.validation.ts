@@ -4,8 +4,12 @@ import { type DateRangePreset } from '../../../utils/date-range.js';
 export const dateRangePresetSchema = z.enum([
   'today',
   'yesterday',
+  'this_week',
+  'last_week',
   'thisMonth',
+  'this_month',
   'lastMonth',
+  'last_month',
   'last7Days',
   'thisYear',
   'custom',

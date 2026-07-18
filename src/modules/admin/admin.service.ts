@@ -2,6 +2,7 @@ import argon2 from 'argon2';
 import { UserRepository, type NewUser } from '../users/user.repository.js';
 import { EnrollmentRepository } from '../enrollments/enrollment.repository.js';
 import { redis, isRedisReady } from '../../utils/redis.js';
+import { calculateDateRange } from '../../utils/date-range.js';
 import type {
   AdminAddUserInput,
   AdminUpdateUserInput,
@@ -21,19 +22,35 @@ export class AdminService {
 
   public async searchUsers(input: AdminSearchQueryInput) {
     const offset = (input.page - 1) * input.limit;
+
+    let startDate: Date | undefined;
+    let endDate: Date | undefined;
+
+    if (input.timeRange) {
+      const range = calculateDateRange(
+        input.timeRange as any,
+        input.startDate || undefined,
+        input.endDate || undefined
+      );
+      startDate = range.from;
+      endDate = range.to;
+    }
+
     const usersList = await this.userRepository.search(
       input.q,
       input.limit,
       offset,
       input.role,
       input.sortBy,
-      input.sortOrder
+      input.sortOrder,
+      startDate,
+      endDate
     );
     
     // Omit passwords from search list
     const usersWithoutPassword = usersList.map(({ password, ...user }) => user);
 
-    const total = await this.userRepository.count(input.q, input.role);
+    const total = await this.userRepository.count(input.q, input.role, startDate, endDate);
 
     return {
       users: usersWithoutPassword,

@@ -24,6 +24,33 @@ export const paymentSearchQuerySchema = z.object({
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
 });
 
+export const transactionSearchQuerySchema = z.object({
+  q: z.string().optional().default(''),
+  timeRange: z.enum([
+    'today',
+    'yesterday',
+    'this_week',
+    'last_week',
+    'this_month',
+    'last_month',
+    'custom'
+  ]).optional().default('this_month'),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
+  page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
+  limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(100).default(20)),
+}).refine((data) => {
+  if (data.timeRange === 'custom') {
+    return !!data.startDate && !!data.endDate;
+  }
+  return true;
+}, {
+  message: 'startDate and endDate are required when timeRange is set to custom',
+  path: ['startDate']
+});
+
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
 export type UpdatePaymentInput = z.infer<typeof updatePaymentSchema>;
 export type PaymentSearchQueryInput = z.infer<typeof paymentSearchQuerySchema>;
+export type TransactionSearchQueryInput = z.infer<typeof transactionSearchQuerySchema>;

@@ -56,6 +56,25 @@ export const adminSearchQuerySchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   limit: z.coerce.number().int().min(1).max(50).default(10),
   page: z.coerce.number().int().min(1).default(1),
+  timeRange: z.enum([
+    'today',
+    'yesterday',
+    'this_week',
+    'last_week',
+    'this_month',
+    'last_month',
+    'custom'
+  ]).optional().nullable(),
+  startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
+  endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
+}).refine((data) => {
+  if (data.timeRange === 'custom') {
+    return !!data.startDate && !!data.endDate;
+  }
+  return true;
+}, {
+  message: 'startDate and endDate are required when timeRange is set to custom',
+  path: ['startDate']
 });
 
 export type AdminAddUserInput = z.infer<typeof adminAddUserSchema>;

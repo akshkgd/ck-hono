@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { users } from '../../db/schema.js';
-import { eq, or, ilike, and, asc, desc, sql } from 'drizzle-orm';
+import { eq, or, ilike, and, asc, desc, sql, gte, lte } from 'drizzle-orm';
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -70,7 +70,9 @@ export class UserRepository {
     offset: number,
     role?: 'student' | 'admin' | 'user' | 'moderator',
     sortBy: 'createdAt' | 'name' | 'email' | 'xp' | 'lastActiveAt' = 'createdAt',
-    sortOrder: 'asc' | 'desc' = 'desc'
+    sortOrder: 'asc' | 'desc' = 'desc',
+    startDate?: Date,
+    endDate?: Date
   ): Promise<User[]> {
     const conditions = [];
 
@@ -87,6 +89,13 @@ export class UserRepository {
 
     if (role) {
       conditions.push(eq(users.role, role));
+    }
+
+    if (startDate) {
+      conditions.push(gte(users.createdAt, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(users.createdAt, endDate));
     }
 
     let orderColumn;
@@ -126,7 +135,12 @@ export class UserRepository {
       .offset(offset);
   }
 
-  public async count(q?: string, role?: 'student' | 'admin' | 'user' | 'moderator'): Promise<number> {
+  public async count(
+    q?: string,
+    role?: 'student' | 'admin' | 'user' | 'moderator',
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<number> {
     const query = db
       .select({ count: sql<number>`count(*)` })
       .from(users)
@@ -145,6 +159,13 @@ export class UserRepository {
     }
     if (role) {
       conditions.push(eq(users.role, role));
+    }
+
+    if (startDate) {
+      conditions.push(gte(users.createdAt, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(users.createdAt, endDate));
     }
 
     if (conditions.length > 0) {

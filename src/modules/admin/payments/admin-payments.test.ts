@@ -405,5 +405,50 @@ describe('Admin Payments CRUD Module', () => {
       await app.request(`/v1/admin/enrollment-payments/${refundId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${adminToken}` } });
     });
   });
+
+  describe('Transactions List API', () => {
+    it('should reject unauthenticated requests with 401', async () => {
+      const res = await app.request('/v1/admin/enrollment-payments/transactions', {
+        method: 'GET'
+      });
+      expect(res.status).toBe(401);
+    });
+
+    it('should allow admin to retrieve sorted/filtered transactions', async () => {
+      const res = await app.request('/v1/admin/enrollment-payments/transactions?timeRange=this_month&sortOrder=desc&limit=10&page=1', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.transactions).toBeInstanceOf(Array);
+      expect(body.data.pagination.total).toBeTypeOf('number');
+
+      if (body.data.transactions.length > 1) {
+        const firstTime = new Date(body.data.transactions[0].createdAt).getTime();
+        const secondTime = new Date(body.data.transactions[1].createdAt).getTime();
+        expect(firstTime).toBeGreaterThanOrEqual(secondTime); // desc order
+      }
+    });
+
+    it('should support ascending sort order', async () => {
+      const res = await app.request('/v1/admin/enrollment-payments/transactions?timeRange=this_month&sortOrder=asc&limit=10&page=1', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+
+      if (body.data.transactions.length > 1) {
+        const firstTime = new Date(body.data.transactions[0].createdAt).getTime();
+        const secondTime = new Date(body.data.transactions[1].createdAt).getTime();
+        expect(firstTime).toBeLessThanOrEqual(secondTime); // asc order
+      }
+    });
+  });
 });
 
