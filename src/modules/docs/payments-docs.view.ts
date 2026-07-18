@@ -120,6 +120,30 @@ export function getPaymentsDocsHtml(): string {
           </div>
         </div>
 
+        <!-- Query Parameters Option -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden mt-4">
+          <div class="bg-zinc-950 border-b border-zinc-800 px-4 py-2 flex items-center justify-between text-xs font-mono">
+            <div class="flex items-center gap-2">
+              <span class="bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded font-bold">POST</span>
+              <span class="text-zinc-300">/v1/payments/razorpay/create-order</span>
+            </div>
+            <span class="text-zinc-500">Query Parameters</span>
+          </div>
+          <div class="p-4">
+            <div class="text-zinc-400 text-xs font-mono mb-2">Request Query Parameters Schema:</div>
+            <ul class="list-disc pl-5 text-xs text-zinc-400 font-mono space-y-1 mb-4">
+              <li><code>paymentType</code>: "enrollment" | "pending_payment" | "renew" (Required)</li>
+              <li><code>batchId</code>: number (Required if paymentType is "enrollment")</li>
+              <li><code>enrollmentId</code>: number (Required if paymentType is "pending_payment" or "renew")</li>
+              <li><code>email</code>: string (Required for guest checkout)</li>
+              <li><code>phone</code>: string (Required for guest checkout)</li>
+              <li><code>name</code>: string (Optional guest name)</li>
+            </ul>
+            <div class="text-zinc-400 text-xs font-mono mb-1">Example Request URL:</div>
+            <pre class="bg-zinc-950 text-zinc-300 p-3 rounded text-xs font-mono overflow-x-auto"><code>/v1/payments/razorpay/create-order?paymentType=enrollment&batchId=4&email=guest@example.com&phone=9999999999&name=John</code></pre>
+          </div>
+        </div>
+
         <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 text-xs text-amber-300 space-y-1">
           <span class="font-bold">⚠️ Guest User & Parameter Options:</span>
           <p>
