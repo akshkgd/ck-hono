@@ -195,6 +195,47 @@ describe('Razorpay Payments Module', () => {
       await db.delete(users).where(eq(users.id, guestUser!.id));
     });
 
+    it('should default paymentType to enrollment when not provided', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          id: 'order_mock_default123',
+          entity: 'order',
+          amount: 499900,
+          currency: 'INR',
+          status: 'created',
+        }),
+      });
+
+      const defaultEmail = 'guest_default_type@example.com';
+      const res = await app.request(
+        `/v1/payments/razorpay/create-order?batchId=${testBatchId}&email=${encodeURIComponent(
+          defaultEmail
+        )}&phone=9999999997&name=DefaultTypeGuest`,
+        {
+          method: 'POST',
+        }
+      );
+
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.orderId).toBe('order_mock_default123');
+
+      // Verify guest user was created in DB
+      const guestUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, defaultEmail))
+        .limit(1)
+        .then((res) => res[0] || null);
+      expect(guestUser).toBeDefined();
+
+      // Clean up enrollment & user
+      await db.delete(batchEnrollments).where(eq(batchEnrollments.userId, guestUser!.id));
+      await db.delete(users).where(eq(users.id, guestUser!.id));
+    });
+
     it('should successfully create order and enrollment for an authenticated student', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,

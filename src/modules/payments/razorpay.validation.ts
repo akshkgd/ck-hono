@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createRazorpayOrderSchema = z.object({
-  paymentType: z.enum(['enrollment', 'pending_payment', 'renew']),
+  paymentType: z.enum(['enrollment', 'pending_payment', 'renew']).default('enrollment'),
   batchId: z.number().int().positive().optional(),
   enrollmentId: z.number().int().positive().optional(),
   email: z.string().email().optional(),
