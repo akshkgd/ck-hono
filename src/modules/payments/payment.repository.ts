@@ -47,8 +47,8 @@ export class PaymentRepository {
     return results[0] || null;
   }
 
-  public async findByTransactionId(transactionId: string): Promise<Payment | null> {
-    const results = await db
+  public async findByTransactionId(transactionId: string, tx: any = db): Promise<Payment | null> {
+    const results = await tx
       .select()
       .from(batchEnrollmentPayments)
       .where(eq(batchEnrollmentPayments.transactionId, transactionId))
@@ -57,8 +57,8 @@ export class PaymentRepository {
     return results[0] || null;
   }
 
-  public async findByInvoiceId(invoiceId: string): Promise<Payment | null> {
-    const results = await db
+  public async findByInvoiceId(invoiceId: string, tx: any = db): Promise<Payment | null> {
+    const results = await tx
       .select()
       .from(batchEnrollmentPayments)
       .where(eq(batchEnrollmentPayments.invoiceId, invoiceId))

@@ -53,6 +53,10 @@ export class AdminPaymentsService {
       const existingTx = await this.paymentRepository.findByTransactionId(transactionId);
       console.log("[DEBUG] existingTx query result for", transactionId, ":", JSON.stringify(existingTx, null, 2));
       if (existingTx) {
+        if (existingTx.batchEnrollmentId === input.batchEnrollmentId && existingTx.amount === input.amount) {
+          console.log("[DEBUG] Redundant/idempotent createPayment request. Returning existing transaction.");
+          return existingTx;
+        }
         console.log("[DEBUG] Uniqueness violation: Transaction ID already exists. existingTx ID:", existingTx.id);
         throw new Error('Transaction ID already exists');
       }

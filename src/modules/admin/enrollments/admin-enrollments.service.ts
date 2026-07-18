@@ -77,17 +77,27 @@ export class AdminEnrollmentsService {
 
       // Automatically create a matching transaction in batch_enrollment_payments if amountPaid > 0
       if (newEnrollment.amountPaid > 0) {
-        await this.paymentRepository.create({
-          batchEnrollmentId: newEnrollment.id,
-          amount: newEnrollment.amountPaid,
-          paidAt: newEnrollment.paidAt ?? new Date(),
-          paymentMethod: newEnrollment.paymentMethod || 'Manual',
-          transactionId: newEnrollment.transactionId || `tx-init-${newEnrollment.id}-${Date.now()}`,
-          invoiceId: newEnrollment.invoiceId || `inv-init-${newEnrollment.id}-${Date.now()}`,
-          purpose: 'enrollment',
-          isGstApplicable: true,
-          remarks: newEnrollment.remark || 'Logged automatically on enrollment creation',
-        }, tx);
+        let paymentExists = false;
+        if (transactionId) {
+          const existingPayment = await this.paymentRepository.findByTransactionId(transactionId, tx);
+          if (existingPayment) {
+            paymentExists = true;
+          }
+        }
+
+        if (!paymentExists) {
+          await this.paymentRepository.create({
+            batchEnrollmentId: newEnrollment.id,
+            amount: newEnrollment.amountPaid,
+            paidAt: newEnrollment.paidAt ?? new Date(),
+            paymentMethod: newEnrollment.paymentMethod || 'Manual',
+            transactionId: newEnrollment.transactionId || `tx-init-${newEnrollment.id}-${Date.now()}`,
+            invoiceId: newEnrollment.invoiceId || `inv-init-${newEnrollment.id}-${Date.now()}`,
+            purpose: 'enrollment',
+            isGstApplicable: true,
+            remarks: newEnrollment.remark || 'Logged automatically on enrollment creation',
+          }, tx);
+        }
 
         // Recalculate to ensure everything, including status, is perfectly in sync
         await this.enrollmentRepository.recalculateAmountPaid(newEnrollment.id, tx);
