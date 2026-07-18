@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batchEnrollmentPayments, batchEnrollments, users, batches } from '../../db/schema.js';
-import { eq, or, ilike, sql, and } from 'drizzle-orm';
+import { eq, or, ilike, sql, and, desc, asc } from 'drizzle-orm';
 
 export type Payment = typeof batchEnrollmentPayments.$inferSelect;
 export type NewPayment = typeof batchEnrollmentPayments.$inferInsert;
@@ -144,7 +144,10 @@ export class PaymentRepository {
       query = query.where(and(...conditions)) as any;
     }
 
-    return query.limit(limit).offset(offset);
+    return query
+      .orderBy(desc(batchEnrollmentPayments.createdAt))
+      .limit(limit)
+      .offset(offset);
   }
 
   public async count(queryText: string, batchEnrollmentId?: number): Promise<number> {
