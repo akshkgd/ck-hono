@@ -245,11 +245,7 @@ rzp.open();</code></pre>
   "data": {
     "id": 1,
     "name": "Backend Engineering Hono Cohort",
-    "price": 4999,
-    "topic": "Backend",
-    "description": "Stateless APIs with Hono",
-    "slug": "hono-cohort",
-    "img": "image_url"
+    "price": 4999
   }
 }</code></pre>
             </div>
@@ -271,11 +267,7 @@ rzp.open();</code></pre>
   "data": {
     "id": 1,
     "name": "Backend Engineering Hono Cohort",
-    "price": 4999,
-    "topic": "Backend",
-    "description": "Stateless APIs with Hono",
-    "slug": "hono-cohort",
-    "img": "image_url"
+    "price": 4999
   }
 }</code></pre>
             </div>
