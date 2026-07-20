@@ -6,7 +6,7 @@ import { desc, eq } from 'drizzle-orm';
 export class AdminQueuesService {
   static async enqueueEmail(data: EmailJobData) {
     const job = await addEmailJob('send-email', data);
-    return { jobId: job.id, queue: 'email-queue', status: 'queued' };
+    return { jobId: job?.id ?? null, queue: 'email-queue', status: job ? 'queued' : 'skipped' };
   }
 
   static async enqueueCrawler(data: CrawlerJobData) {

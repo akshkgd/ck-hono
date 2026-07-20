@@ -62,7 +62,7 @@ export class AdminEnrollmentsService {
     }
 
     // 4. Run all write operations inside a transaction to prevent partial database states
-    return await db.transaction(async (tx) => {
+    const createdEnrollmentResult = await db.transaction(async (tx) => {
       const newEnrollment = await this.enrollmentRepository.create({
         ...input,
         transactionId,
@@ -116,7 +116,7 @@ export class AdminEnrollmentsService {
 
     // Queue background notification emails for the student (unless explicitly disabled)
     try {
-      if (input.notifyUser !== false && user && user.email) {
+      if (input.notifyUser !== false && user && batch && user.email) {
         const studentName = user.name || user.email.split('@')[0];
         const courseName = batch.name || 'Cohort Batch';
 
@@ -132,14 +132,14 @@ export class AdminEnrollmentsService {
         });
 
         // 2. Optional Payment Receipt Email if amount paid > 0
-        if (enrollmentResult.amountPaid && enrollmentResult.amountPaid > 0) {
+        if (createdEnrollmentResult.amountPaid && createdEnrollmentResult.amountPaid > 0) {
           await queuePaymentSuccessEmail(user.email, {
             studentName,
             itemName: courseName,
-            amountPaid: enrollmentResult.amountPaid,
+            amountPaid: createdEnrollmentResult.amountPaid,
             currency: 'INR',
-            transactionId: enrollmentResult.transactionId || `tx-${enrollmentResult.id}`,
-            invoiceId: enrollmentResult.invoiceId || `inv-${enrollmentResult.id}`,
+            transactionId: createdEnrollmentResult.transactionId || `tx-${createdEnrollmentResult.id}`,
+            invoiceId: createdEnrollmentResult.invoiceId || `inv-${createdEnrollmentResult.id}`,
             dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
           });
         }
@@ -148,7 +148,7 @@ export class AdminEnrollmentsService {
       console.error('[Admin Enrollment] Failed to queue email notifications:', emailErr);
     }
 
-    return enrollmentResult;
+    return createdEnrollmentResult;
   }
 
   public async searchEnrollments(input: EnrollmentSearchQueryInput) {

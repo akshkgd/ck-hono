@@ -30,8 +30,8 @@ export class EmailService {
     });
 
     return {
-      queued: true,
-      jobId: job.id,
+      queued: !!job,
+      jobId: job?.id ?? null,
       recipient: to,
       category: 'ENROLLMENT',
     };
@@ -54,8 +54,8 @@ export class EmailService {
     });
 
     return {
-      queued: true,
-      jobId: job.id,
+      queued: !!job,
+      jobId: job?.id ?? null,
       recipient: to,
       category: 'PAYMENT_SUCCESS',
     };
@@ -75,8 +75,8 @@ export class EmailService {
     });
 
     return {
-      queued: true,
-      jobId: job.id,
+      queued: !!job,
+      jobId: job?.id ?? null,
       recipient: to,
       category: 'ACCESS_GRANTED',
     };
@@ -95,8 +95,8 @@ export class EmailService {
     });
 
     return {
-      queued: true,
-      jobId: job.id,
+      queued: !!job,
+      jobId: job?.id ?? null,
       recipient: to,
       category: 'GENERIC',
     };
