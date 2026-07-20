@@ -26,6 +26,7 @@ class SystemSettingsRepository {
 
   /**
    * Get email notification toggles with O(1) in-memory fast caching
+   * Automatically populates system_settings table with default row if missing.
    */
   async getEmailSettings(): Promise<EmailSettingsConfig> {
     const now = Date.now();
@@ -48,7 +49,16 @@ class SystemSettingsRepository {
           accessGranted: val.accessGranted ?? DEFAULT_EMAIL_SETTINGS.accessGranted,
         };
       } else {
+        // Auto-seed default settings row into system_settings table
         this.cachedEmailSettings = DEFAULT_EMAIL_SETTINGS;
+        await db.insert(systemSettings)
+          .values({
+            key: SETTINGS_KEY,
+            value: DEFAULT_EMAIL_SETTINGS,
+            description: 'Dynamic Email Notification Event Toggles',
+            updatedAt: new Date(),
+          })
+          .onConflictDoNothing();
       }
     } catch (err: any) {
       logger.error(`[SystemSettings] Failed to fetch settings from DB, using fallback: ${err.message}`);
