@@ -252,34 +252,6 @@ export const systemSettings = pgTable('system_settings', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const magicLinkTokens = pgTable('magic_link_tokens', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  email: varchar('email', { length: 255 }).notNull(),
-  tokenHash: varchar('token_hash', { length: 255 }).notNull().unique(),
-  expiresAt: timestamp('expires_at').notNull(),
-  used: boolean('used').default(false).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => [
-  index('magic_link_tokens_email_idx').on(table.email),
-  index('magic_link_tokens_token_hash_idx').on(table.tokenHash),
-]);
-
-export const userSessions = pgTable('user_sessions', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  sessionTokenHash: varchar('session_token_hash', { length: 255 }).notNull().unique(),
-  ipAddress: varchar('ip_address', { length: 45 }),
-  userAgent: text('user_agent'),
-  expiresAt: timestamp('expires_at').notNull(),
-  revoked: boolean('revoked').default(false).notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  lastActiveAt: timestamp('last_active_at').defaultNow().notNull(),
-}, (table) => [
-  index('user_sessions_user_id_idx').on(table.userId),
-  index('user_sessions_token_hash_idx').on(table.sessionTokenHash),
-  index('user_sessions_expires_at_idx').on(table.expiresAt),
-]);
-
 // --- BETTER AUTH SCHEMA TABLES ---
 
 export const user = users;
