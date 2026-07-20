@@ -9,10 +9,11 @@ export class AuthService {
   }
 
   /**
-   * Request Magic Link via Better Auth
+   * Request Magic Link via Better Auth API
    */
   public async requestMagicLink(email: string) {
-    return auth.api.signInMagicLink({
+    const api = auth.api as any;
+    return api.signInMagicLink({
       body: {
         email: email.toLowerCase().trim(),
       },

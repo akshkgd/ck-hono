@@ -21,7 +21,7 @@ export const auth = betterAuth({
   },
   advanced: {
     ipAddress: {
-      headerName: 'x-forwarded-for',
+      ipAddressHeaders: ['x-forwarded-for'],
     },
   },
   session: {
