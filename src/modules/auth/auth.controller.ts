@@ -1,175 +1,99 @@
-import type { Context } from 'hono';
+import { Context } from 'hono';
 import { setCookie, deleteCookie, getCookie } from 'hono/cookie';
-import { AuthService } from './auth.service.js';
-import { loginSchema, registerSchema } from './auth.validation.js';
-import { redis, isRedisReady } from '../../utils/redis.js';
+import { authService, SESSION_DURATION_SECONDS } from './auth.service.js';
 
 export class AuthController {
-  private authService: AuthService;
-
-  constructor() {
-    this.authService = new AuthService();
+  /**
+   * Request Magic Link email
+   */
+  async requestMagicLink(c: Context) {
+    const body = await c.req.json();
+    const result = await authService.requestMagicLink(body);
+    return c.json({
+      status: 'success',
+      message: result.message,
+      data: result,
+    }, 200);
   }
 
-  public register = async (c: Context) => {
-    try {
-      const rawBody = await c.req.json();
-      const body = registerSchema.parse(rawBody);
-
-      const jwtSecret = process.env.JWT_SECRET;
-      if (!jwtSecret) {
-        return c.json({
-          status: 'error',
-          message: 'Internal Server Error',
-        }, 500);
+  /**
+   * Verify Magic Link token and create 30-day session
+   */
+  async verifyMagicLink(c: Context) {
+    let token = c.req.query('token') || '';
+    if (!token && c.req.header('Content-Type')?.includes('application/json')) {
+      try {
+        const body = await c.req.json();
+        token = body.token || '';
+      } catch {
+        // Fallback
       }
-
-      const ipAddress = c.req.header('x-forwarded-for') || 'unknown';
-      const userAgent = c.req.header('user-agent') || 'unknown';
-      
-      const data = await this.authService.register(body, jwtSecret, ipAddress, userAgent);
-
-      setCookie(c, 'token', data.token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'Strict',
-        path: '/',
-        maxAge: 7 * 24 * 60 * 60,
-      });
-
-      return c.json({
-        status: 'success',
-        message: 'User registered successfully',
-        data,
-      }, 201);
-    } catch (err: any) {
-      return c.json({
-        status: 'error',
-        message: err.message || 'Registration failed',
-      }, 400);
     }
-  };
 
-  public login = async (c: Context) => {
-    try {
-      const rawBody = await c.req.json();
-      const body = loginSchema.parse(rawBody);
-      
-      const jwtSecret = process.env.JWT_SECRET;
-      if (!jwtSecret) {
-        return c.json({
-          status: 'error',
-          message: 'Internal Server Error',
-        }, 500);
-      }
-
-      const ipAddress = c.req.header('x-forwarded-for') || 'unknown';
-      const userAgent = c.req.header('user-agent') || 'unknown';
-
-      const data = await this.authService.login(body, jwtSecret, ipAddress, userAgent);
-
-      setCookie(c, 'token', data.token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'Strict',
-        path: '/',
-        maxAge: 7 * 24 * 60 * 60,
-      });
-
-      return c.json({
-        status: 'success',
-        message: 'Login successful',
-        data,
-      }, 200);
-    } catch (err: any) {
-      return c.json({
-        status: 'error',
-        message: err.message || 'Login failed',
-      }, 401);
+    if (!token) {
+      return c.json({ status: 'error', message: 'Token is required' }, 400);
     }
-  };
 
-  public logout = async (c: Context) => {
-    try {
-      const user = c.get('user');
-      const sessionId = c.get('sessionId');
+    const ipAddress = c.req.header('x-forwarded-for') || c.req.header('cf-connecting-ip') || undefined;
+    const userAgent = c.req.header('user-agent') || undefined;
 
-      if (sessionId && user?.id && redis && isRedisReady()) {
-        try {
-          await redis.del(`session:${user.id}:${sessionId}`);
-        } catch (err) {
-          console.error('[Redis] Failed to delete session on logout:', err);
-        }
+    const result = await authService.verifyMagicLink({ token }, ipAddress, userAgent);
+
+    // Set secure 30-day HTTP-Only Cookie
+    setCookie(c, 'session_token', result.sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Lax',
+      maxAge: SESSION_DURATION_SECONDS, // 30 Days
+      path: '/',
+    });
+
+    return c.json({
+      status: 'success',
+      message: 'Magic link verified successfully! Logged in for 30 days.',
+      data: {
+        sessionToken: result.sessionToken,
+        user: result.user,
+        expiresAt: result.expiresAt,
+      },
+    }, 200);
+  }
+
+  /**
+   * Logout single session
+   */
+  async logout(c: Context) {
+    let sessionToken = getCookie(c, 'session_token') || getCookie(c, 'token') || '';
+    if (!sessionToken) {
+      const authHeader = c.req.header('Authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        sessionToken = authHeader.substring(7);
       }
-
-      deleteCookie(c, 'token', {
-        path: '/',
-        secure: true,
-        sameSite: 'Strict',
-        httpOnly: true,
-      });
-
-      return c.json({
-        status: 'success',
-        message: 'Logout successful',
-      }, 200);
-    } catch (err: any) {
-      return c.json({
-        status: 'error',
-        message: err.message || 'Logout failed',
-      }, 400);
     }
-  };
 
-  public refresh = async (c: Context) => {
-    try {
-      const token = getCookie(c, 'token');
-      if (!token) {
-        return c.json({
-          status: 'error',
-          message: 'Unauthorized: Missing token cookie',
-        }, 401);
-      }
-
-      const jwtSecret = process.env.JWT_SECRET;
-      if (!jwtSecret) {
-        return c.json({
-          status: 'error',
-          message: 'Internal Server Error',
-        }, 500);
-      }
-
-      const ipAddress = c.req.header('x-forwarded-for') || 'unknown';
-      const userAgent = c.req.header('user-agent') || 'unknown';
-
-      const data = await this.authService.refreshSession(token, jwtSecret, ipAddress, userAgent);
-
-      setCookie(c, 'token', data.token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'Strict',
-        path: '/',
-        maxAge: 7 * 24 * 60 * 60,
-      });
-
-      return c.json({
-        status: 'success',
-        message: 'Token refreshed successfully',
-        data,
-      }, 200);
-    } catch (err: any) {
-      return c.json({
-        status: 'error',
-        message: err.message || 'Token refresh failed',
-      }, 401);
+    if (sessionToken) {
+      await authService.logout(sessionToken);
     }
-  };
 
-  public me = async (c: Context) => {
+    deleteCookie(c, 'session_token', { path: '/' });
+    deleteCookie(c, 'token', { path: '/' });
+
+    return c.json({
+      status: 'success',
+      message: 'Logged out successfully',
+    }, 200);
+  }
+
+  /**
+   * Get current authenticated user profile
+   */
+  async getMe(c: Context) {
     const user = c.get('user');
     return c.json({
       status: 'success',
       data: { user },
     }, 200);
-  };
+  }
 }
+
+export const authController = new AuthController();

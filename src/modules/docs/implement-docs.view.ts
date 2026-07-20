@@ -55,15 +55,23 @@ export function getImplementDocsHtml(): string {
       </div>
       <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Frontend Feature Implementation Guide</h1>
       <p class="text-zinc-400 text-base max-w-2xl">
-        Complete reference for frontend engineers implementing the dynamic Admin Email Settings UI, manual trigger APIs, and learner notification suppressions.
+        Complete reference for frontend engineers implementing Magic Link Auth, 30-Day Sessions, dynamic Admin Email Settings, and manual trigger APIs.
       </p>
     </section>
 
     <!-- Overview Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-5 space-y-2">
+        <div class="text-purple-400 font-mono text-sm font-semibold flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-purple-500"></span> 1. Magic Link & 30-Day Sessions
+        </div>
+        <p class="text-zinc-400 text-xs leading-relaxed">
+          Passwordless login via email link. Automatically logs the user in for 30 days using HTTP-Only cookies or Bearer headers.
+        </p>
+      </div>
       <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-5 space-y-2">
         <div class="text-indigo-400 font-mono text-sm font-semibold flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-indigo-500"></span> 1. Dynamic Admin Toggles UI
+          <span class="h-2 w-2 rounded-full bg-indigo-500"></span> 2. Dynamic Admin Toggles UI
         </div>
         <p class="text-zinc-400 text-xs leading-relaxed">
           Build UI switches in the Admin Panel to enable/disable email notifications dynamically without server restarts.
@@ -71,7 +79,7 @@ export function getImplementDocsHtml(): string {
       </div>
       <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-5 space-y-2">
         <div class="text-emerald-400 font-mono text-sm font-semibold flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-emerald-500"></span> 2. Manual Email Trigger APIs
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span> 3. Manual Email Trigger APIs
         </div>
         <p class="text-zinc-400 text-xs leading-relaxed">
           Allow admins to dispatch enrollment, receipt, access granted, or custom announcement emails directly.
@@ -79,7 +87,7 @@ export function getImplementDocsHtml(): string {
       </div>
       <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-5 space-y-2">
         <div class="text-amber-400 font-mono text-sm font-semibold flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-amber-500"></span> 3. Learner Notification Suppress
+          <span class="h-2 w-2 rounded-full bg-amber-500"></span> 4. Learner Notification Suppress
         </div>
         <p class="text-zinc-400 text-xs leading-relaxed">
           Pass <code>"notifyUser": false</code> when adding manual enrollments during bulk imports or test account setups.
@@ -87,10 +95,57 @@ export function getImplementDocsHtml(): string {
       </div>
     </section>
 
-    <!-- SECTION 1: DYNAMIC ADMIN EMAIL SETTINGS -->
+    <!-- SECTION 1: MAGIC LINK & 30-DAY SESSIONS -->
     <section class="space-y-6 pt-4 border-t border-zinc-900">
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-indigo-400 font-medium uppercase tracking-wider">Feature #1</div>
+        <div class="flex items-center gap-2 text-xs font-mono text-purple-400 font-medium uppercase tracking-wider">Feature #1</div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Passwordless Magic Link & 30-Day Sessions</h2>
+        <p class="text-zinc-400 text-sm">
+          Allow users to sign in without passwords by requesting a Magic Link. Upon verification, the user receives a 30-day persistent session.
+        </p>
+      </div>
+
+      <!-- Request Magic Link -->
+      <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2 font-mono text-sm">
+            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">POST</span>
+            <span class="text-zinc-200 font-semibold">/v1/auth/magic-link/request</span>
+          </div>
+          <span class="text-xs text-zinc-500 font-mono">Public Endpoint</span>
+        </div>
+        <p class="text-xs text-zinc-400">Request a 15-minute one-time magic login link sent to the user's email inbox.</p>
+        <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "email": "student@example.com"
+}</code></pre>
+      </div>
+
+      <!-- Verify Magic Link -->
+      <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2 font-mono text-sm">
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">GET</span>
+            <span class="text-zinc-200 font-semibold">/v1/auth/magic-link/verify?token=...</span>
+          </div>
+          <span class="text-xs text-emerald-400 font-mono">Sets 30-Day HTTP-Only Cookie: session_token</span>
+        </div>
+        <p class="text-xs text-zinc-400">Verify magic link token when user clicks email button. Returns user object and 30-day session token.</p>
+        <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-400 border border-zinc-800/60 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Magic link verified successfully! Logged in for 30 days.",
+  "data": {
+    "sessionToken": "a3f...91c",
+    "user": { "id": "...", "email": "student@example.com", "role": "student" },
+    "expiresAt": "2026-08-19T22:30:00.000Z"
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- SECTION 2: DYNAMIC ADMIN EMAIL SETTINGS -->
+    <section class="space-y-6 pt-6 border-t border-zinc-900">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-xs font-mono text-indigo-400 font-medium uppercase tracking-wider">Feature #2</div>
         <h2 class="text-2xl font-bold text-white tracking-tight">Admin Dynamic Email Settings UI</h2>
         <p class="text-zinc-400 text-sm">
           Implement a Settings page in the Admin Dashboard with toggle switches for global and category-level email dispatching.
@@ -146,10 +201,10 @@ export function getImplementDocsHtml(): string {
       </div>
     </section>
 
-    <!-- SECTION 2: MANUAL EMAIL DISPATCH APIS -->
+    <!-- SECTION 3: MANUAL EMAIL DISPATCH APIS -->
     <section class="space-y-6 pt-6 border-t border-zinc-900">
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Feature #2</div>
+        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Feature #3</div>
         <h2 class="text-2xl font-bold text-white tracking-tight">User-Specific & Manual Email Dispatch APIs</h2>
         <p class="text-zinc-400 text-sm">
           Use these endpoints to manually trigger custom emails or resend lost receipts/enrollments directly from student profiles in the Admin Frontend.
@@ -230,10 +285,10 @@ export function getImplementDocsHtml(): string {
       </div>
     </section>
 
-    <!-- SECTION 3: ADMIN ENROLLMENT SUPPRESSION -->
+    <!-- SECTION 4: ADMIN ENROLLMENT SUPPRESSION -->
     <section class="space-y-6 pt-6 border-t border-zinc-900">
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-amber-400 font-medium uppercase tracking-wider">Feature #3</div>
+        <div class="flex items-center gap-2 text-xs font-mono text-amber-400 font-medium uppercase tracking-wider">Feature #4</div>
         <h2 class="text-2xl font-bold text-white tracking-tight">Admin Enrollment Email Suppression</h2>
         <p class="text-zinc-400 text-sm">
           When creating manual enrollments via Admin Panel, include the optional <code>notifyUser</code> checkbox in your frontend form.

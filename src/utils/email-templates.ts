@@ -315,3 +315,57 @@ Electronic City Phase-1, Bengaluru, BLR 560100, India
 
   return { subject, html, text };
 }
+
+export interface MagicLinkTemplatePayload {
+  studentName?: string;
+  magicLinkUrl: string;
+  expiresInMinutes?: number;
+}
+
+/**
+ * 5. Passwordless Magic Link Sign-In Email Template
+ */
+export function generateMagicLinkEmail(payload: MagicLinkTemplatePayload): { subject: string; html: string; text: string } {
+  const {
+    studentName,
+    magicLinkUrl,
+    expiresInMinutes = 15,
+  } = payload;
+
+  const nameGreeting = studentName ? ` ${studentName}` : '';
+  const subject = `Your Magic Link to Sign In to Codekaro 🪄`;
+
+  const html = renderBaseLayout(
+    subject,
+    `
+    <p>Hello${nameGreeting}!</p>
+
+    <p>Click the button below to sign in to your Codekaro account instantly. No password required!</p>
+
+    <div>
+      <a href="${magicLinkUrl}" class="btn">Sign In to Codekaro</a>
+    </div>
+
+    <p style="font-size: 13px; color: #525252;">This magic link will expire in ${expiresInMinutes} minutes and can only be used once.</p>
+
+    <p style="font-size: 13px; color: #525252;">If you did not request this login link, no further action is required.</p>
+    `
+  );
+
+  const text = `Hello${nameGreeting}!
+
+Click the link below to sign in to your Codekaro account:
+
+${magicLinkUrl}
+
+This link will expire in ${expiresInMinutes} minutes.
+
+Regards,
+Codekaro
+
+Electronic City Phase-1, Bengaluru, BLR 560100, India
+© ${new Date().getFullYear()} Codekaro. All rights reserved.`;
+
+  return { subject, html, text };
+}
+
