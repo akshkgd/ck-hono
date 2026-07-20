@@ -2,6 +2,7 @@ import type { Context } from 'hono';
 import { getDocsHtml } from './docs.view.js';
 import { getPaymentsDocsHtml } from './payments-docs.view.js';
 import { getImplementDocsHtml } from './implement-docs.view.js';
+import { getEmailPreviewHtml } from './email-preview.view.js';
 
 export class DocsController {
   public serve = (c: Context) => {
@@ -16,6 +17,11 @@ export class DocsController {
 
   public serveImplement = (c: Context) => {
     const html = getImplementDocsHtml();
+    return c.html(html);
+  };
+
+  public serveEmailPreview = (c: Context) => {
+    const html = getEmailPreviewHtml();
     return c.html(html);
   };
 }
