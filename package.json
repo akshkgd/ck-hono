@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "worker": "tsx watch src/workers/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "start:worker": "node dist/workers/index.js",
     "test": "vitest run",
     "db:init": "tsx scripts/init-db.ts",
     "db:generate": "drizzle-kit generate",
@@ -22,6 +24,7 @@
     "@hono/node-server": "^2.0.6",
     "@hono/zod-validator": "^0.8.0",
     "argon2": "^0.44.0",
+    "bullmq": "^5.41.0",
     "compression": "^1.8.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

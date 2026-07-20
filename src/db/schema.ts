@@ -224,6 +224,27 @@ export const courseProgress = pgTable('course_progress', {
   index('course_progress_assignment_status_updated_at_idx').on(table.assignmentStatus, table.updatedAt),
 ]);
 
+export const jobStatusEnum = pgEnum('job_status', ['pending', 'processing', 'completed', 'failed']);
+
+export const jobAuditLogs = pgTable('job_audit_logs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  jobId: varchar('job_id', { length: 255 }).notNull(),
+  queueName: varchar('queue_name', { length: 100 }).notNull(),
+  jobName: varchar('job_name', { length: 100 }).notNull(),
+  status: jobStatusEnum('status').default('pending').notNull(),
+  payload: jsonb('payload').default({}),
+  result: jsonb('result').default({}),
+  error: text('error'),
+  durationMs: integer('duration_ms'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('job_audit_logs_job_id_idx').on(table.jobId),
+  index('job_audit_logs_queue_name_idx').on(table.queueName),
+  index('job_audit_logs_status_idx').on(table.status),
+  index('job_audit_logs_created_at_idx').on(table.createdAt),
+]);
+
 
 
 
