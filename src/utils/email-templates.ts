@@ -35,7 +35,7 @@ export interface GenericTemplatePayload {
 }
 
 /**
- * Base HTML Template wrapper for responsive, consistent email rendering across clients.
+ * Base HTML Template wrapper matching Codekaro minimalist email design specification.
  */
 function renderBaseLayout(title: string, contentHtml: string): string {
   const currentYear = new Date().getFullYear();
@@ -49,114 +49,110 @@ function renderBaseLayout(title: string, contentHtml: string): string {
     body {
       margin: 0;
       padding: 0;
-      background-color: #f4f6f9;
+      background-color: #fafafa;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #1f2937;
+      color: #111827;
       -webkit-font-smoothing: antialiased;
     }
     .wrapper {
       width: 100%;
       table-layout: fixed;
-      background-color: #f4f6f9;
-      padding: 30px 0;
+      background-color: #fafafa;
+      padding: 40px 16px;
+      box-sizing: border-box;
     }
     .main-card {
-      max-width: 600px;
+      max-width: 580px;
       margin: 0 auto;
       background-color: #ffffff;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 40px;
+      box-sizing: border-box;
     }
-    .header {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      padding: 28px 32px;
-      text-align: center;
-    }
-    .header h1 {
-      color: #ffffff;
-      margin: 0;
+    h1, h2 {
+      color: #111827;
+      margin: 0 0 20px 0;
       font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
     }
-    .header p {
-      color: #94a3b8;
-      margin: 6px 0 0 0;
-      font-size: 13px;
-    }
-    .content {
-      padding: 32px;
-    }
-    .footer {
-      background-color: #f8fafc;
-      padding: 24px 32px;
-      text-align: center;
-      border-top: 1px solid #e2e8f0;
-      font-size: 12px;
-      color: #64748b;
-    }
-    .footer a {
-      color: #2563eb;
-      text-decoration: none;
+    p {
+      color: #1f2937;
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 0 0 20px 0;
     }
     .btn {
       display: inline-block;
-      background-color: #2563eb;
+      background-color: #000000;
       color: #ffffff !important;
-      font-weight: 600;
-      font-size: 15px;
-      padding: 12px 28px;
-      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 12px 22px;
+      border-radius: 6px;
       text-decoration: none;
-      margin: 20px 0 10px 0;
-      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+      margin: 10px 0 24px 0;
     }
-    .badge-success {
-      display: inline-block;
-      background-color: #dcfce7;
-      color: #166534;
-      font-weight: 600;
-      font-size: 12px;
-      padding: 4px 12px;
-      border-radius: 9999px;
-      margin-bottom: 16px;
+    .regards {
+      margin-top: 24px;
+      margin-bottom: 0;
+      color: #111827;
+      font-size: 15px;
+      line-height: 1.6;
     }
-    .info-table {
-      width: 100%;
-      border-collapse: collapse;
+    .divider {
+      border-top: 1px solid #f3f4f6;
+      margin-top: 32px;
+      padding-top: 24px;
+    }
+    .footer-text {
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .info-box {
+      background-color: #f9fafb;
+      border: 1px solid #f3f4f6;
+      border-radius: 6px;
+      padding: 16px 20px;
       margin: 20px 0;
     }
-    .info-table td {
-      padding: 10px 14px;
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
       font-size: 14px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid #f3f4f6;
     }
-    .info-table td.label {
-      color: #64748b;
-      font-weight: 500;
-      width: 40%;
+    .info-row:last-child {
+      border-bottom: none;
     }
-    .info-table td.value {
-      color: #0f172a;
+    .info-label {
+      color: #6b7280;
+    }
+    .info-val {
+      color: #111827;
       font-weight: 600;
-      text-align: right;
     }
   </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="main-card">
-      <div class="header">
-        <h1>Coding Kampus</h1>
-        <p>Empowering Tech Learning & Career Growth</p>
+      ${contentHtml}
+
+      <div class="regards">
+        Regards,<br>
+        <strong>Codekaro</strong>
       </div>
-      <div class="content">
-        ${contentHtml}
-      </div>
-      <div class="footer">
-        <p>© ${currentYear} Coding Kampus. All rights reserved.</p>
-        <p>Need help? Contact support at <a href="mailto:support@codingkampus.com">support@codingkampus.com</a></p>
+
+      <div class="divider">
+        <p class="footer-text">
+          Electronic City Phase-1, Bengaluru, BLR 560100, India<br>
+          © ${currentYear} Codekaro. All rights reserved.
+        </p>
       </div>
     </div>
   </div>
@@ -171,78 +167,64 @@ export function generateEnrollmentEmail(payload: EnrollmentTemplatePayload): { s
   const {
     studentName,
     courseName,
-    startDate = 'Immediately Available',
+    startDate = 'Immediate Access',
     whatsappLink,
     telegramLink,
     meetingLink,
-    dashboardUrl = process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
+    dashboardUrl = process.env.FRONTEND_URL || 'https://codekaro.in/dashboard',
   } = payload;
 
   const subject = `Welcome to ${courseName}! Enrollment Confirmed 🎉`;
 
-  const communityLinks = [];
-  if (whatsappLink) {
-    communityLinks.push(`<a href="${whatsappLink}" style="color: #16a34a; font-weight: 600; text-decoration: none;">Join WhatsApp Group →</a>`);
-  }
-  if (telegramLink) {
-    communityLinks.push(`<a href="${telegramLink}" style="color: #0284c7; font-weight: 600; text-decoration: none;">Join Telegram Channel →</a>`);
-  }
-  if (meetingLink) {
-    communityLinks.push(`<a href="${meetingLink}" style="color: #2563eb; font-weight: 600; text-decoration: none;">Live Class Room Link →</a>`);
-  }
-
   const html = renderBaseLayout(
     subject,
     `
-    <span class="badge-success">✓ Enrollment Active</span>
-    <h2 style="margin-top: 8px; color: #0f172a;">Welcome aboard, ${studentName}!</h2>
-    <p style="color: #475569; line-height: 1.6;">
-      Congratulations! Your enrollment for <strong>${courseName}</strong> has been successfully confirmed. You now have access to your learning materials and cohort features.
+    <h1>Hello ${studentName}!</h1>
+
+    <p>
+      You are receiving this email because your enrollment for <strong>${courseName}</strong> has been successfully confirmed.
     </p>
 
-    <table class="info-table">
-      <tr>
-        <td class="label">Course Name</td>
-        <td class="value">${courseName}</td>
-      </tr>
-      <tr>
-        <td class="label">Start Date</td>
-        <td class="value">${startDate}</td>
-      </tr>
-      <tr>
-        <td class="label">Student Name</td>
-        <td class="value">${studentName}</td>
-      </tr>
-    </table>
-
-    ${communityLinks.length > 0 ? `
-    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 20px 0;">
-      <h4 style="margin: 0 0 10px 0; color: #1e293b;">Cohort Community Links:</h4>
-      <ul style="margin: 0; padding-left: 20px; color: #334155;">
-        ${communityLinks.map(link => `<li style="margin-bottom: 6px;">${link}</li>`).join('')}
-      </ul>
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Course Name</span>
+        <span class="info-val">${courseName}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Start Date</span>
+        <span class="info-val">${startDate}</span>
+      </div>
     </div>
+
+    ${whatsappLink || telegramLink || meetingLink ? `
+    <p><strong>Cohort Community & Meeting Links:</strong></p>
+    <p>
+      ${whatsappLink ? `<a href="${whatsappLink}" style="color: #000000; font-weight: 600; text-decoration: underline;">Join WhatsApp Group →</a><br>` : ''}
+      ${telegramLink ? `<a href="${telegramLink}" style="color: #000000; font-weight: 600; text-decoration: underline;">Join Telegram Channel →</a><br>` : ''}
+      ${meetingLink ? `<a href="${meetingLink}" style="color: #000000; font-weight: 600; text-decoration: underline;">Live Class Link →</a><br>` : ''}
+    </p>
     ` : ''}
 
-    <div style="text-align: center;">
-      <a href="${dashboardUrl}" class="btn">Go to Learning Dashboard</a>
+    <div>
+      <a href="${dashboardUrl}" class="btn">Access Dashboard</a>
     </div>
 
-    <p style="color: #64748b; font-size: 13px; margin-top: 24px; line-height: 1.5;">
-      If you have any questions or require assistance setting up your environment, reply directly to this email or reach out via our community links.
-    </p>
+    <p>If you did not request this enrollment or need any assistance, feel free to contact our support team.</p>
     `
   );
 
-  const text = `Hi ${studentName},
+  const text = `Hello ${studentName}!
 
-Welcome aboard! Your enrollment for ${courseName} is confirmed.
+Your enrollment for ${courseName} is confirmed.
 Start Date: ${startDate}
 
 Dashboard: ${dashboardUrl}
 
-Happy learning!
-- Coding Kampus Team`;
+Regards,
+Codekaro
+
+Electronic City Phase-1, Bengaluru, BLR 560100, India
+© ${new Date().getFullYear()} Codekaro. All rights reserved.`;
 
   return { subject, html, text };
 }
@@ -259,7 +241,7 @@ export function generatePaymentSuccessEmail(payload: PaymentSuccessTemplatePaylo
     transactionId = 'N/A',
     invoiceId = 'N/A',
     paymentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-    dashboardUrl = process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
+    dashboardUrl = process.env.FRONTEND_URL || 'https://codekaro.in/dashboard',
   } = payload;
 
   const formattedAmount = new Intl.NumberFormat('en-IN', {
@@ -268,63 +250,63 @@ export function generatePaymentSuccessEmail(payload: PaymentSuccessTemplatePaylo
     maximumFractionDigits: 2,
   }).format(amountPaid);
 
-  const subject = `Payment Receipt for ${itemName} [${transactionId}]`;
+  const subject = `Payment Receipt for ${itemName}`;
 
   const html = renderBaseLayout(
     subject,
     `
-    <span class="badge-success">✓ Payment Received</span>
-    <h2 style="margin-top: 8px; color: #0f172a;">Payment Receipt</h2>
-    <p style="color: #475569; line-height: 1.6;">
-      Hi ${studentName}, thank you for your payment! We have successfully received your payment for <strong>${itemName}</strong>.
+    <h1>Hello ${studentName}!</h1>
+
+    <p>
+      Thank you for your payment! We have successfully received your payment for <strong>${itemName}</strong>.
     </p>
 
-    <table class="info-table">
-      <tr>
-        <td class="label">Item Purchased</td>
-        <td class="value">${itemName}</td>
-      </tr>
-      <tr>
-        <td class="label">Amount Paid</td>
-        <td class="value" style="color: #16a34a; font-size: 16px;">${formattedAmount}</td>
-      </tr>
-      <tr>
-        <td class="label">Transaction ID</td>
-        <td class="value">${transactionId}</td>
-      </tr>
-      <tr>
-        <td class="label">Invoice ID</td>
-        <td class="value">${invoiceId}</td>
-      </tr>
-      <tr>
-        <td class="label">Payment Date</td>
-        <td class="value">${paymentDate}</td>
-      </tr>
-    </table>
-
-    <div style="text-align: center;">
-      <a href="${dashboardUrl}" class="btn">View Order & Access Course</a>
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Item Purchased</span>
+        <span class="info-val">${itemName}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Amount Paid</span>
+        <span class="info-val">${formattedAmount}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Transaction ID</span>
+        <span class="info-val">${transactionId}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Invoice ID</span>
+        <span class="info-val">${invoiceId}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Payment Date</span>
+        <span class="info-val">${paymentDate}</span>
+      </div>
     </div>
 
-    <p style="color: #64748b; font-size: 13px; margin-top: 24px; line-height: 1.5;">
-      Keep this email as your official receipt for this transaction.
-    </p>
+    <div>
+      <a href="${dashboardUrl}" class="btn">View Order & Course</a>
+    </div>
+
+    <p>This email serves as your official transaction receipt.</p>
     `
   );
 
-  const text = `Hi ${studentName},
+  const text = `Hello ${studentName}!
 
-Thank you for your payment!
-Item: ${itemName}
+Thank you for your payment for ${itemName}.
 Amount: ${formattedAmount}
 Transaction ID: ${transactionId}
 Invoice ID: ${invoiceId}
 Date: ${paymentDate}
 
-Access your item at: ${dashboardUrl}
+Dashboard: ${dashboardUrl}
 
-Thank you,
-- Coding Kampus Team`;
+Regards,
+Codekaro
+
+Electronic City Phase-1, Bengaluru, BLR 560100, India
+© ${new Date().getFullYear()} Codekaro. All rights reserved.`;
 
   return { subject, html, text };
 }
@@ -337,58 +319,63 @@ export function generateAccessGrantedEmail(payload: AccessGrantedTemplatePayload
     userName,
     resourceName,
     accessType = 'Full Access',
-    accessTillDate = 'Lifetime / Unlimited',
-    dashboardUrl = process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
+    accessTillDate = 'Unlimited Access',
+    dashboardUrl = process.env.FRONTEND_URL || 'https://codekaro.in/dashboard',
   } = payload;
 
-  const subject = `Access Granted to ${resourceName} 🔑`;
+  const subject = `Access Granted to ${resourceName}`;
 
   const html = renderBaseLayout(
     subject,
     `
-    <span class="badge-success">✓ Access Granted</span>
-    <h2 style="margin-top: 8px; color: #0f172a;">Access Granted</h2>
-    <p style="color: #475569; line-height: 1.6;">
-      Hi ${userName}, access to <strong>${resourceName}</strong> has been granted to your account.
+    <h1>Hello ${userName}!</h1>
+
+    <p>
+      Access to <strong>${resourceName}</strong> has been granted to your Codekaro account.
     </p>
 
-    <table class="info-table">
-      <tr>
-        <td class="label">Resource / Course</td>
-        <td class="value">${resourceName}</td>
-      </tr>
-      <tr>
-        <td class="label">Access Permission</td>
-        <td class="value">${accessType}</td>
-      </tr>
-      <tr>
-        <td class="label">Valid Until</td>
-        <td class="value">${accessTillDate}</td>
-      </tr>
-    </table>
-
-    <div style="text-align: center;">
-      <a href="${dashboardUrl}" class="btn">Access Resource Now</a>
+    <div class="info-box">
+      <div class="info-row">
+        <span class="info-label">Resource</span>
+        <span class="info-val">${resourceName}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Access Type</span>
+        <span class="info-val">${accessType}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Valid Until</span>
+        <span class="info-val">${accessTillDate}</span>
+      </div>
     </div>
+
+    <div>
+      <a href="${dashboardUrl}" class="btn">Access Resource</a>
+    </div>
+
+    <p>If you have any questions, feel free to reply to this email.</p>
     `
   );
 
-  const text = `Hi ${userName},
+  const text = `Hello ${userName}!
 
 Access to ${resourceName} has been granted.
-Type: ${accessType}
+Access Type: ${accessType}
 Valid Until: ${accessTillDate}
 
-Access URL: ${dashboardUrl}
+Dashboard: ${dashboardUrl}
 
-Best regards,
-- Coding Kampus Team`;
+Regards,
+Codekaro
+
+Electronic City Phase-1, Bengaluru, BLR 560100, India
+© ${new Date().getFullYear()} Codekaro. All rights reserved.`;
 
   return { subject, html, text };
 }
 
 /**
- * 4. Generic / Custom System Notification Email Template
+ * 4. Generic Notification Email Template
  */
 export function generateGenericEmail(payload: GenericTemplatePayload): { subject: string; html: string; text: string } {
   const {
@@ -403,26 +390,29 @@ export function generateGenericEmail(payload: GenericTemplatePayload): { subject
   const html = renderBaseLayout(
     subject,
     `
-    <h2 style="margin-top: 8px; color: #0f172a;">${title}</h2>
-    <div style="color: #475569; line-height: 1.6; white-space: pre-line; margin: 16px 0;">
-      ${message}
-    </div>
+    <h1>Hello!</h1>
+
+    <p style="white-space: pre-line;">${message}</p>
 
     ${actionText && actionUrl ? `
-    <div style="text-align: center;">
+    <div>
       <a href="${actionUrl}" class="btn">${actionText}</a>
     </div>
     ` : ''}
     `
   );
 
-  const text = `${title}
+  const text = `Hello!
 
 ${message}
 
 ${actionText && actionUrl ? `${actionText}: ${actionUrl}` : ''}
 
-- Coding Kampus Team`;
+Regards,
+Codekaro
+
+Electronic City Phase-1, Bengaluru, BLR 560100, India
+© ${new Date().getFullYear()} Codekaro. All rights reserved.`;
 
   return { subject, html, text };
 }
