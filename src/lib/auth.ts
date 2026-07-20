@@ -12,6 +12,8 @@ export const auth = betterAuth({
   trustedOrigins: [
     process.env.FRONTEND_URL || 'http://localhost:3000',
     'https://codekaro.in',
+    'https://app.codekaro.in',
+    'http://app.codekaro.in',
     'http://localhost:3000',
     'http://localhost:5173',
   ],
