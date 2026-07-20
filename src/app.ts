@@ -52,7 +52,13 @@ app.use('*', requestId());
 app.use('*', loggerMiddleware());
 app.use('*', cors({
   origin: (origin) => {
-    const allowedOrigins = ['https://codekaro.pages.dev', 'http://localhost:5173'];
+    const allowedOrigins = [
+      'https://app.codekaro.in',
+      'https://codekaro.in',
+      'https://codekaro.pages.dev',
+      'http://localhost:3000',
+      'http://localhost:5173',
+    ];
     if (!origin) return allowedOrigins[0];
     return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
   },
@@ -103,6 +109,7 @@ v1.route('/emails', emailRouter);
 
 // Register Routes
 app.route('/v1', v1);
+app.route('/api/auth', authRouter);
 app.route('/docs', docsRouter);
 app.route('/changelog', changelogRouter);
 app.route('/playground', playgroundRouter);
