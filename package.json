@@ -14,7 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx scripts/seed-users.ts",
-    "db:seed:all": "tsx scripts/seed-all.ts"
+    "db:seed:all": "tsx scripts/seed-all.ts",
+    "test:email": "tsx scripts/test-email-send.ts"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,7 @@
     "hono": "^4.12.27",
     "ioredis": "^5.11.1",
     "jose": "^6.2.3",
+    "nodemailer": "^6.9.16",
     "pg": "^8.22.0",
     "pino": "^10.3.1",
     "pino-http": "^11.0.0",
@@ -41,6 +43,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/nodemailer": "^6.4.17",
     "@types/node": "^26.0.0",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",

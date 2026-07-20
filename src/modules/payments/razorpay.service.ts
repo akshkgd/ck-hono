@@ -9,6 +9,7 @@ import argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import { AuthService } from '../auth/auth.service.js';
+import { queuePaymentSuccessEmail, queueEnrollmentEmail, queueAccessGrantedEmail } from '../../queues/index.js';
 
 export class RazorpayService {
   private userRepository: UserRepository;
@@ -352,6 +353,50 @@ export class RazorpayService {
         }
       }
     });
+
+    // Queue asynchronous background notification emails (Payment Success + Enrollment/Access Granted)
+    try {
+      const user = await this.userRepository.findById(enrollment.userId);
+      const batch = await this.batchRepository.findById(enrollment.batchId);
+
+      if (user && user.email) {
+        const studentName = user.name || user.email.split('@')[0];
+        const itemName = batch?.name || 'Cohort Batch Enrollment';
+
+        // 1. Payment Success Receipt Email
+        await queuePaymentSuccessEmail(user.email, {
+          studentName,
+          itemName,
+          amountPaid: paymentAmountRupees,
+          currency: 'INR',
+          transactionId: paymentId,
+          invoiceId: `inv-rp-${paymentId}`,
+          dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
+        });
+
+        // 2. Enrollment / Access Granted Email
+        if (purpose === 'renew') {
+          await queueAccessGrantedEmail(user.email, {
+            userName: studentName,
+            resourceName: itemName,
+            accessType: 'Batch Subscription Renewal',
+            dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
+          });
+        } else {
+          await queueEnrollmentEmail(user.email, {
+            studentName,
+            courseName: itemName,
+            startDate: batch?.startDate ? new Date(batch.startDate).toLocaleDateString() : 'Immediate',
+            whatsappLink: batch?.whatsAppLink || undefined,
+            telegramLink: batch?.telegramLink || undefined,
+            meetingLink: batch?.meetingLink || undefined,
+            dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
+          });
+        }
+      }
+    } catch (emailErr: any) {
+      console.error('[Payment Process] Failed to queue notification emails:', emailErr);
+    }
   }
 
   /**

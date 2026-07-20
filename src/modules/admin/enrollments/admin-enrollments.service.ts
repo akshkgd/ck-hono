@@ -8,6 +8,7 @@ import type {
   UpdateEnrollmentInput,
   EnrollmentSearchQueryInput
 } from '../../enrollments/enrollment.validation.js';
+import { queueEnrollmentEmail, queuePaymentSuccessEmail } from '../../../queues/index.js';
 
 function sanitizeString(val: string | null | undefined): string | null {
   if (!val) return null;
@@ -112,6 +113,42 @@ export class AdminEnrollmentsService {
 
       return newEnrollment;
     });
+
+    // Queue background notification emails for the student
+    try {
+      if (user && user.email) {
+        const studentName = user.name || user.email.split('@')[0];
+        const courseName = batch.name || 'Cohort Batch';
+
+        // 1. Enrollment Welcome Email
+        await queueEnrollmentEmail(user.email, {
+          studentName,
+          courseName,
+          startDate: batch.startDate ? new Date(batch.startDate).toLocaleDateString() : 'Immediate Access',
+          whatsappLink: batch.whatsAppLink || undefined,
+          telegramLink: batch.telegramLink || undefined,
+          meetingLink: batch.meetingLink || undefined,
+          dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
+        });
+
+        // 2. Optional Payment Receipt Email if amount paid > 0
+        if (enrollmentResult.amountPaid && enrollmentResult.amountPaid > 0) {
+          await queuePaymentSuccessEmail(user.email, {
+            studentName,
+            itemName: courseName,
+            amountPaid: enrollmentResult.amountPaid,
+            currency: 'INR',
+            transactionId: enrollmentResult.transactionId || `tx-${enrollmentResult.id}`,
+            invoiceId: enrollmentResult.invoiceId || `inv-${enrollmentResult.id}`,
+            dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
+          });
+        }
+      }
+    } catch (emailErr: any) {
+      console.error('[Admin Enrollment] Failed to queue email notifications:', emailErr);
+    }
+
+    return enrollmentResult;
   }
 
   public async searchEnrollments(input: EnrollmentSearchQueryInput) {

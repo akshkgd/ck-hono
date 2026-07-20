@@ -1,5 +1,11 @@
-import { Queue } from 'bullmq';
+import { Queue, JobsOptions } from 'bullmq';
 import { redisConnection } from './config.js';
+import {
+  EnrollmentTemplatePayload,
+  PaymentSuccessTemplatePayload,
+  AccessGrantedTemplatePayload,
+  GenericTemplatePayload,
+} from '../utils/email-templates.js';
 
 // Default options: Remove completed & failed jobs to conserve Redis RAM on Droplets
 const defaultJobOptions = {
@@ -42,12 +48,18 @@ export const migrationQueue = new Queue('migration-queue', {
   },
 });
 
+export type EmailCategory = 'ENROLLMENT' | 'PAYMENT_SUCCESS' | 'ACCESS_GRANTED' | 'GENERIC' | 'CUSTOM';
+
 // Helper type definitions
 export interface EmailJobData {
-  to: string;
+  to: string | string[];
   subject: string;
+  category?: EmailCategory;
+  payload?: EnrollmentTemplatePayload | PaymentSuccessTemplatePayload | AccessGrantedTemplatePayload | GenericTemplatePayload | Record<string, any>;
   body?: string;
   html?: string;
+  cc?: string | string[];
+  bcc?: string | string[];
   templateId?: string;
   templateData?: Record<string, any>;
   metadata?: Record<string, any>;
@@ -69,14 +81,78 @@ export interface MigrationJobData {
 }
 
 // Queue Helper Functions
-export const addEmailJob = async (name: string, data: EmailJobData, opts?: any) => {
+export const addEmailJob = async (name: string, data: EmailJobData, opts?: JobsOptions) => {
   return emailQueue.add(name, data, opts);
 };
 
-export const addCrawlerJob = async (name: string, data: CrawlerJobData, opts?: any) => {
+export const queueEnrollmentEmail = async (
+  to: string | string[],
+  payload: EnrollmentTemplatePayload,
+  metadata?: Record<string, any>,
+  opts?: JobsOptions
+) => {
+  const data: EmailJobData = {
+    to,
+    subject: `Welcome to ${payload.courseName}! Enrollment Confirmed 🎉`,
+    category: 'ENROLLMENT',
+    payload,
+    metadata,
+  };
+  return emailQueue.add('send-enrollment-email', data, opts);
+};
+
+export const queuePaymentSuccessEmail = async (
+  to: string | string[],
+  payload: PaymentSuccessTemplatePayload,
+  metadata?: Record<string, any>,
+  opts?: JobsOptions
+) => {
+  const data: EmailJobData = {
+    to,
+    subject: `Payment Receipt for ${payload.itemName}`,
+    category: 'PAYMENT_SUCCESS',
+    payload,
+    metadata,
+  };
+  return emailQueue.add('send-payment-success-email', data, opts);
+};
+
+export const queueAccessGrantedEmail = async (
+  to: string | string[],
+  payload: AccessGrantedTemplatePayload,
+  metadata?: Record<string, any>,
+  opts?: JobsOptions
+) => {
+  const data: EmailJobData = {
+    to,
+    subject: `Access Granted to ${payload.resourceName} 🔑`,
+    category: 'ACCESS_GRANTED',
+    payload,
+    metadata,
+  };
+  return emailQueue.add('send-access-granted-email', data, opts);
+};
+
+export const queueGenericEmail = async (
+  to: string | string[],
+  payload: GenericTemplatePayload,
+  metadata?: Record<string, any>,
+  opts?: JobsOptions
+) => {
+  const data: EmailJobData = {
+    to,
+    subject: payload.title,
+    category: 'GENERIC',
+    payload,
+    metadata,
+  };
+  return emailQueue.add('send-generic-email', data, opts);
+};
+
+export const addCrawlerJob = async (name: string, data: CrawlerJobData, opts?: JobsOptions) => {
   return crawlerQueue.add(name, data, opts);
 };
 
-export const addMigrationJob = async (name: string, data: MigrationJobData, opts?: any) => {
+export const addMigrationJob = async (name: string, data: MigrationJobData, opts?: JobsOptions) => {
   return migrationQueue.add(name, data, opts);
 };
