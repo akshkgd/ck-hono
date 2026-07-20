@@ -55,12 +55,12 @@ export function getImplementDocsHtml(): string {
       </div>
       <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Frontend Feature Implementation Guide</h1>
       <p class="text-zinc-400 text-base max-w-2xl">
-        Complete reference for frontend engineers implementing the dynamic Admin Email Settings UI, manual trigger APIs, notification suppressions, and queue health monitoring.
+        Complete reference for frontend engineers implementing the dynamic Admin Email Settings UI, manual trigger APIs, and learner notification suppressions.
       </p>
     </section>
 
     <!-- Overview Cards -->
-    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-5 space-y-2">
         <div class="text-indigo-400 font-mono text-sm font-semibold flex items-center gap-2">
           <span class="h-2 w-2 rounded-full bg-indigo-500"></span> 1. Dynamic Admin Toggles UI
@@ -83,14 +83,6 @@ export function getImplementDocsHtml(): string {
         </div>
         <p class="text-zinc-400 text-xs leading-relaxed">
           Pass <code>"notifyUser": false</code> when adding manual enrollments during bulk imports or test account setups.
-        </p>
-      </div>
-      <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-5 space-y-2">
-        <div class="text-purple-400 font-mono text-sm font-semibold flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-purple-500"></span> 4. Queue Audit & Health Dashboard
-        </div>
-        <p class="text-zinc-400 text-xs leading-relaxed">
-          Monitor SMTP connection health, worker status, and audit log history in real-time.
         </p>
       </div>
     </section>
@@ -270,35 +262,6 @@ export function getImplementDocsHtml(): string {
         <p class="text-xs text-zinc-400">
           Setting <code>"notifyUser": false</code> will execute the DB transaction without queueing welcome or receipt emails. Default is <code>true</code>.
         </p>
-      </div>
-    </section>
-
-    <!-- SECTION 4: AUDIT LOGS & HEALTH MONITORING -->
-    <section class="space-y-6 pt-6 border-t border-zinc-900">
-      <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-purple-400 font-medium uppercase tracking-wider">Feature #4</div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">Queue Audit Logs & SMTP Health UI</h2>
-        <p class="text-zinc-400 text-sm">
-          Endpoints for displaying queue delivery history and real-time transport health status in the Admin dashboard.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5 space-y-3">
-          <div class="flex items-center gap-2 font-mono text-sm">
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">GET</span>
-            <span class="text-zinc-200 font-semibold">/v1/emails/health</span>
-          </div>
-          <p class="text-xs text-zinc-400">Returns SMTP connection status and current mode (SMTP vs Mock/Dev).</p>
-        </div>
-
-        <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5 space-y-3">
-          <div class="flex items-center gap-2 font-mono text-sm">
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">GET</span>
-            <span class="text-zinc-200 font-semibold">/v1/emails/audit-logs?limit=50</span>
-          </div>
-          <p class="text-xs text-zinc-400">Returns recent email delivery job logs (completed/failed/processing status).</p>
-        </div>
       </div>
     </section>
 
