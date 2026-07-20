@@ -35,6 +35,7 @@ export const createEnrollmentSchema = z.object({
   remark: z.string().optional().nullable(),
   sequentialLearning: z.boolean().optional().nullable(),
   sequentialLearningWithAssignments: z.boolean().optional().nullable(),
+  notifyUser: z.boolean().default(true).optional(),
   metadata: z.record(z.string(), z.any()).default({}),
 });
 

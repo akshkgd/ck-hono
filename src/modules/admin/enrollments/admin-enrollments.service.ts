@@ -114,9 +114,9 @@ export class AdminEnrollmentsService {
       return newEnrollment;
     });
 
-    // Queue background notification emails for the student
+    // Queue background notification emails for the student (unless explicitly disabled)
     try {
-      if (user && user.email) {
+      if (input.notifyUser !== false && user && user.email) {
         const studentName = user.name || user.email.split('@')[0];
         const courseName = batch.name || 'Cohort Batch';
 
