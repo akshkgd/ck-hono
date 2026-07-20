@@ -245,6 +245,9 @@ export const jobAuditLogs = pgTable('job_audit_logs', {
   index('job_audit_logs_created_at_idx').on(table.createdAt),
 ]);
 
-
-
-
+export const systemSettings = pgTable('system_settings', {
+  key: varchar('key', { length: 100 }).primaryKey(),
+  value: jsonb('value').notNull(),
+  description: text('description'),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});

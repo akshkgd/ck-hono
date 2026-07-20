@@ -31,6 +31,7 @@ import adminAssignmentsRouter from './modules/admin/assignments/admin-assignment
 import razorpayRouter from './modules/payments/razorpay.route.js';
 import publicBatchesRouter from './modules/batches/public-batches.route.js';
 import { emailRouter } from './modules/email/email.route.js';
+import { adminEmailSettingsRouter } from './modules/admin/email-settings/admin-email-settings.route.js';
 import { activityMiddleware } from './middleware/activity.middleware.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
@@ -93,6 +94,7 @@ v1.route('/admin/logs', adminLogsRouter);
 v1.route('/admin/queues', adminQueuesRouter);
 v1.route('/admin/course-progress', adminProgressRouter);
 v1.route('/admin/assignments', adminAssignmentsRouter);
+v1.route('/admin/email-settings', adminEmailSettingsRouter);
 v1.route('/course-progress', courseProgressRouter);
 v1.route('/student', studentRouter);
 v1.route('/payments/razorpay', razorpayRouter);

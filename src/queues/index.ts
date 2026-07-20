@@ -80,18 +80,21 @@ export interface MigrationJobData {
   metadata?: Record<string, any>;
 }
 
-// Helper function to check if emails are enabled for a category
-export const shouldSendCategoryEmail = (category?: EmailCategory): boolean => {
-  if (process.env.EMAIL_NOTIFICATIONS_ENABLED === 'false') return false;
-  if (category === 'ENROLLMENT' && process.env.EMAIL_NOTIFY_ENROLLMENT === 'false') return false;
-  if (category === 'PAYMENT_SUCCESS' && process.env.EMAIL_NOTIFY_PAYMENT === 'false') return false;
-  if (category === 'ACCESS_GRANTED' && process.env.EMAIL_NOTIFY_ACCESS_GRANTED === 'false') return false;
+import { systemSettingsRepository } from '../modules/system/system-settings.repository.js';
+
+// Helper function to check if emails are enabled for a category (fast cached DB settings)
+export const shouldSendCategoryEmail = async (category?: EmailCategory): Promise<boolean> => {
+  const settings = await systemSettingsRepository.getEmailSettings();
+  if (!settings.enabled) return false;
+  if (category === 'ENROLLMENT' && !settings.enrollment) return false;
+  if (category === 'PAYMENT_SUCCESS' && !settings.payment) return false;
+  if (category === 'ACCESS_GRANTED' && !settings.accessGranted) return false;
   return true;
 };
 
 // Queue Helper Functions
 export const addEmailJob = async (name: string, data: EmailJobData, opts?: JobsOptions) => {
-  if (!shouldSendCategoryEmail(data.category)) {
+  if (!(await shouldSendCategoryEmail(data.category))) {
     return null;
   }
   return emailQueue.add(name, data, opts);
@@ -103,7 +106,7 @@ export const queueEnrollmentEmail = async (
   metadata?: Record<string, any>,
   opts?: JobsOptions
 ) => {
-  if (!shouldSendCategoryEmail('ENROLLMENT')) {
+  if (!(await shouldSendCategoryEmail('ENROLLMENT'))) {
     return null;
   }
   const data: EmailJobData = {
@@ -122,7 +125,7 @@ export const queuePaymentSuccessEmail = async (
   metadata?: Record<string, any>,
   opts?: JobsOptions
 ) => {
-  if (!shouldSendCategoryEmail('PAYMENT_SUCCESS')) {
+  if (!(await shouldSendCategoryEmail('PAYMENT_SUCCESS'))) {
     return null;
   }
   const data: EmailJobData = {
@@ -141,7 +144,7 @@ export const queueAccessGrantedEmail = async (
   metadata?: Record<string, any>,
   opts?: JobsOptions
 ) => {
-  if (!shouldSendCategoryEmail('ACCESS_GRANTED')) {
+  if (!(await shouldSendCategoryEmail('ACCESS_GRANTED'))) {
     return null;
   }
   const data: EmailJobData = {
@@ -160,7 +163,7 @@ export const queueGenericEmail = async (
   metadata?: Record<string, any>,
   opts?: JobsOptions
 ) => {
-  if (!shouldSendCategoryEmail('GENERIC')) {
+  if (!(await shouldSendCategoryEmail('GENERIC'))) {
     return null;
   }
   const data: EmailJobData = {
