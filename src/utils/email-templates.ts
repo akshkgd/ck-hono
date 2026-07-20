@@ -11,7 +11,7 @@ export interface EnrollmentTemplatePayload {
 export interface PaymentSuccessTemplatePayload {
   studentName: string;
   itemName: string;
-  amountPaid: number; // In main currency (e.g. 4999 INR)
+  amountPaid: number;
   currency?: string;
   transactionId?: string;
   invoiceId?: string;
@@ -35,7 +35,7 @@ export interface GenericTemplatePayload {
 }
 
 /**
- * Base HTML Template wrapper with neutral colors, zero border-radius, and default font.
+ * Base HTML Template wrapper matching Codekaro minimalist email design specification.
  */
 function renderBaseLayout(title: string, contentHtml: string): string {
   const currentYear = new Date().getFullYear();
@@ -70,21 +70,16 @@ function renderBaseLayout(title: string, contentHtml: string): string {
       padding: 40px;
       box-sizing: border-box;
     }
-    h1, h2 {
-      color: #171717;
-      margin: 0 0 20px 0;
-      font-size: 22px;
-      font-weight: 600;
-    }
     p {
       color: #171717;
       font-size: 15px;
       line-height: 1.6;
       margin: 0 0 20px 0;
+      font-weight: normal;
     }
     .btn {
       display: inline-block;
-      background-color: #171717;
+      background-color: #000000;
       color: #ffffff !important;
       font-weight: 500;
       font-size: 14px;
@@ -94,11 +89,12 @@ function renderBaseLayout(title: string, contentHtml: string): string {
       margin: 10px 0 24px 0;
     }
     .regards {
-      margin-top: 24px;
+      margin-top: 28px;
       margin-bottom: 0;
       color: #171717;
       font-size: 15px;
       line-height: 1.6;
+      font-weight: normal;
     }
     .divider {
       border-top: 1px solid #e5e5e5;
@@ -111,30 +107,6 @@ function renderBaseLayout(title: string, contentHtml: string): string {
       line-height: 1.6;
       margin: 0;
     }
-    .info-box {
-      background-color: #fafafa;
-      border: 1px solid #e5e5e5;
-      border-radius: 0px;
-      padding: 16px 20px;
-      margin: 20px 0;
-    }
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      font-size: 14px;
-      border-bottom: 1px solid #e5e5e5;
-    }
-    .info-row:last-child {
-      border-bottom: none;
-    }
-    .info-label {
-      color: #525252;
-    }
-    .info-val {
-      color: #171717;
-      font-weight: 600;
-    }
   </style>
 </head>
 <body>
@@ -144,7 +116,7 @@ function renderBaseLayout(title: string, contentHtml: string): string {
 
       <div class="regards">
         Regards,<br>
-        <strong>Codekaro</strong>
+        Codekaro
       </div>
 
       <div class="divider">
@@ -166,37 +138,23 @@ export function generateEnrollmentEmail(payload: EnrollmentTemplatePayload): { s
   const {
     studentName,
     courseName,
-    startDate = 'Immediate Access',
     whatsappLink,
     telegramLink,
     meetingLink,
     dashboardUrl = process.env.FRONTEND_URL || 'https://codekaro.in/dashboard',
   } = payload;
 
+  const nameGreeting = studentName ? ` ${studentName}` : '';
   const subject = `Welcome to ${courseName}! Enrollment Confirmed 🎉`;
 
   const html = renderBaseLayout(
     subject,
     `
-    <h1>Hello ${studentName}!</h1>
+    <p>Hello${nameGreeting}!</p>
 
-    <p>
-      You are receiving this email because your enrollment for <strong>${courseName}</strong> has been successfully confirmed.
-    </p>
-
-    <div class="info-box">
-      <div class="info-row">
-        <span class="info-label">Course Name</span>
-        <span class="info-val">${courseName}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Start Date</span>
-        <span class="info-val">${startDate}</span>
-      </div>
-    </div>
+    <p>You now have access to <strong>${courseName}</strong>.</p>
 
     ${whatsappLink || telegramLink || meetingLink ? `
-    <p><strong>Cohort Community & Meeting Links:</strong></p>
     <p>
       ${whatsappLink ? `<a href="${whatsappLink}" style="color: #171717; font-weight: 600; text-decoration: underline;">Join WhatsApp Group →</a><br>` : ''}
       ${telegramLink ? `<a href="${telegramLink}" style="color: #171717; font-weight: 600; text-decoration: underline;">Join Telegram Channel →</a><br>` : ''}
@@ -205,19 +163,16 @@ export function generateEnrollmentEmail(payload: EnrollmentTemplatePayload): { s
     ` : ''}
 
     <div>
-      <a href="${dashboardUrl}" class="btn">Access Dashboard</a>
+      <a href="${dashboardUrl}" class="btn">Start Learning</a>
     </div>
-
-    <p>If you did not request this enrollment or need any assistance, feel free to contact our support team.</p>
     `
   );
 
-  const text = `Hello ${studentName}!
+  const text = `Hello${nameGreeting}!
 
-Your enrollment for ${courseName} is confirmed.
-Start Date: ${startDate}
+You now have access to ${courseName}.
 
-Dashboard: ${dashboardUrl}
+Start Learning: ${dashboardUrl}
 
 Regards,
 Codekaro
@@ -237,9 +192,6 @@ export function generatePaymentSuccessEmail(payload: PaymentSuccessTemplatePaylo
     itemName,
     amountPaid,
     currency = 'INR',
-    transactionId = 'N/A',
-    invoiceId = 'N/A',
-    paymentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
     dashboardUrl = process.env.FRONTEND_URL || 'https://codekaro.in/dashboard',
   } = payload;
 
@@ -249,57 +201,27 @@ export function generatePaymentSuccessEmail(payload: PaymentSuccessTemplatePaylo
     maximumFractionDigits: 2,
   }).format(amountPaid);
 
+  const nameGreeting = studentName ? ` ${studentName}` : '';
   const subject = `Payment Receipt for ${itemName}`;
 
   const html = renderBaseLayout(
     subject,
     `
-    <h1>Hello ${studentName}!</h1>
+    <p>Hello${nameGreeting}!</p>
 
-    <p>
-      Thank you for your payment! We have successfully received your payment for <strong>${itemName}</strong>.
-    </p>
-
-    <div class="info-box">
-      <div class="info-row">
-        <span class="info-label">Item Purchased</span>
-        <span class="info-val">${itemName}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Amount Paid</span>
-        <span class="info-val">${formattedAmount}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Transaction ID</span>
-        <span class="info-val">${transactionId}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Invoice ID</span>
-        <span class="info-val">${invoiceId}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Payment Date</span>
-        <span class="info-val">${paymentDate}</span>
-      </div>
-    </div>
+    <p>We received your payment of <strong>${formattedAmount}</strong> for <strong>${itemName}</strong>.</p>
 
     <div>
-      <a href="${dashboardUrl}" class="btn">View Order & Course</a>
+      <a href="${dashboardUrl}" class="btn">Access Course</a>
     </div>
-
-    <p>This email serves as your official transaction receipt.</p>
     `
   );
 
-  const text = `Hello ${studentName}!
+  const text = `Hello${nameGreeting}!
 
-Thank you for your payment for ${itemName}.
-Amount: ${formattedAmount}
-Transaction ID: ${transactionId}
-Invoice ID: ${invoiceId}
-Date: ${paymentDate}
+We received your payment of ${formattedAmount} for ${itemName}.
 
-Dashboard: ${dashboardUrl}
+Access Course: ${dashboardUrl}
 
 Regards,
 Codekaro
@@ -317,52 +239,30 @@ export function generateAccessGrantedEmail(payload: AccessGrantedTemplatePayload
   const {
     userName,
     resourceName,
-    accessType = 'Full Access',
-    accessTillDate = 'Unlimited Access',
     dashboardUrl = process.env.FRONTEND_URL || 'https://codekaro.in/dashboard',
   } = payload;
 
+  const nameGreeting = userName ? ` ${userName}` : '';
   const subject = `Access Granted to ${resourceName}`;
 
   const html = renderBaseLayout(
     subject,
     `
-    <h1>Hello ${userName}!</h1>
+    <p>Hello${nameGreeting}!</p>
 
-    <p>
-      Access to <strong>${resourceName}</strong> has been granted to your Codekaro account.
-    </p>
-
-    <div class="info-box">
-      <div class="info-row">
-        <span class="info-label">Resource</span>
-        <span class="info-val">${resourceName}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Access Type</span>
-        <span class="info-val">${accessType}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Valid Until</span>
-        <span class="info-val">${accessTillDate}</span>
-      </div>
-    </div>
+    <p>You now have access to <strong>${resourceName}</strong>.</p>
 
     <div>
-      <a href="${dashboardUrl}" class="btn">Access Resource</a>
+      <a href="${dashboardUrl}" class="btn">Start Learning</a>
     </div>
-
-    <p>If you have any questions, feel free to reply to this email.</p>
     `
   );
 
-  const text = `Hello ${userName}!
+  const text = `Hello${nameGreeting}!
 
-Access to ${resourceName} has been granted.
-Access Type: ${accessType}
-Valid Until: ${accessTillDate}
+You now have access to ${resourceName}.
 
-Dashboard: ${dashboardUrl}
+Start Learning: ${dashboardUrl}
 
 Regards,
 Codekaro
@@ -374,7 +274,7 @@ Electronic City Phase-1, Bengaluru, BLR 560100, India
 }
 
 /**
- * 4. Generic Notification Email Template
+ * 4. Generic / Password Reset Notification Email Template
  */
 export function generateGenericEmail(payload: GenericTemplatePayload): { subject: string; html: string; text: string } {
   const {
@@ -389,7 +289,7 @@ export function generateGenericEmail(payload: GenericTemplatePayload): { subject
   const html = renderBaseLayout(
     subject,
     `
-    <h1>Hello!</h1>
+    <p>Hello!</p>
 
     <p style="white-space: pre-line;">${message}</p>
 
