@@ -33,10 +33,20 @@ authRouter.get('/me', authMiddleware(), (c) => {
   });
 });
 
-// Mount Better Auth HTTP Handler with error boundary for all endpoints
+// Mount Better Auth HTTP Handler with URL path normalization for both /v1/auth and /api/auth
 authRouter.on(['GET', 'POST'], '/*', async (c) => {
   try {
-    const res = await auth.handler(c.req.raw);
+    let rawReq = c.req.raw;
+    const url = new URL(rawReq.url);
+
+    // Normalize /v1/auth path to /api/auth for Better Auth internal router
+    if (url.pathname.includes('/v1/auth')) {
+      const normalizedPath = url.pathname.replace('/v1/auth', '/api/auth');
+      url.pathname = normalizedPath;
+      rawReq = new Request(url.toString(), rawReq);
+    }
+
+    const res = await auth.handler(rawReq);
     return res;
   } catch (err: any) {
     console.error('[BetterAuth] Handler caught exception:', err?.message || err);
