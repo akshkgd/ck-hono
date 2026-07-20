@@ -29,7 +29,7 @@ export const auth = betterAuth({
   rateLimit: {
     window: 60, // 60 Seconds window
     max: 10, // Max 10 requests per minute per IP
-    storage: 'database', // Rate limit tracking stored in database
+    storage: 'memory', // Fast in-memory rate limiting without DB overhead
   },
   advanced: {
     ipAddress: {
