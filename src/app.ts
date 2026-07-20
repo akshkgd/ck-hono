@@ -54,6 +54,8 @@ app.use('*', cors({
   origin: (origin) => {
     const allowedOrigins = [
       'https://app.codekaro.in',
+      'https://live.codekaro.in',
+      'http://live.codekaro.in',
       'https://codekaro.in',
       'https://codekaro.pages.dev',
       'http://localhost:3000',

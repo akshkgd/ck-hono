@@ -14,6 +14,8 @@ export const auth = betterAuth({
     'https://codekaro.in',
     'https://app.codekaro.in',
     'http://app.codekaro.in',
+    'https://live.codekaro.in',
+    'http://live.codekaro.in',
     'http://localhost:3000',
     'http://localhost:5173',
   ],
