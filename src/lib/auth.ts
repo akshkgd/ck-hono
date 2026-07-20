@@ -8,10 +8,10 @@ import { generateMagicLinkEmail } from '../utils/email-templates.js';
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET || process.env.JWT_SECRET || 'codekaro-default-auth-secret-key-32chars',
-  baseURL: process.env.BETTER_AUTH_URL || process.env.FRONTEND_URL || 'http://localhost:3000',
+  baseURL: process.env.BETTER_AUTH_URL || process.env.FRONTEND_URL || 'https://app.codekaro.in',
   basePath: '/api/auth',
   trustedOrigins: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
+    process.env.FRONTEND_URL || 'https://app.codekaro.in',
     'https://codekaro.in',
     'https://app.codekaro.in',
     'http://app.codekaro.in',
@@ -49,10 +49,23 @@ export const auth = betterAuth({
     magicLink({
       sendMagicLink: async ({ email, url }: { email: string; url: string; token: string }) => {
         try {
+          // Normalize URL domain to frontend app domain (app.codekaro.in)
+          let targetUrl = url;
+          const frontendOrigin = process.env.FRONTEND_URL || 'https://app.codekaro.in';
+          try {
+            const parsedUrl = new URL(url);
+            const parsedOrigin = new URL(frontendOrigin);
+            parsedUrl.protocol = parsedOrigin.protocol;
+            parsedUrl.host = parsedOrigin.host;
+            targetUrl = parsedUrl.toString();
+          } catch {
+            targetUrl = url;
+          }
+
           const studentName = email.split('@')[0];
           const emailTemplate = generateMagicLinkEmail({
             studentName,
-            magicLinkUrl: url,
+            magicLinkUrl: targetUrl,
             expiresInMinutes: 15,
           });
 
@@ -60,7 +73,7 @@ export const auth = betterAuth({
             title: emailTemplate.subject,
             message: emailTemplate.text,
             actionText: 'Sign In to Codekaro',
-            actionUrl: url,
+            actionUrl: targetUrl,
           });
         } catch (err: any) {
           console.error('[MagicLink] Failed to dispatch magic link email:', err);
