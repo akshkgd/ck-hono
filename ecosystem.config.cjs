@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'ck-hono-api',
+      name: 'codekaro-api',
       script: './dist/index.js',
       instances: 'max',
       exec_mode: 'cluster',
@@ -11,7 +11,7 @@ module.exports = {
       },
     },
     {
-      name: 'ck-hono-workers',
+      name: 'codekaro-workers',
       script: './dist/workers/index.js',
       instances: 1, // Single worker process managing all 3 queue listeners cleanly
       exec_mode: 'fork',
