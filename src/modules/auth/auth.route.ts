@@ -4,8 +4,7 @@ import { authMiddleware } from '../../middleware/auth.middleware.js';
 
 const authRouter = new Hono();
 
-// Explicit handler for get-session to prevent 500 error when unauthenticated
-authRouter.get('/get-session', async (c) => {
+const getSessionHandler = async (c: any) => {
   try {
     const sessionData = await auth.api.getSession({
       headers: c.req.raw.headers,
@@ -14,10 +13,15 @@ authRouter.get('/get-session', async (c) => {
       return c.json({ user: null, session: null }, 200);
     }
     return c.json(sessionData, 200);
-  } catch {
+  } catch (err: any) {
+    console.error('[AuthSession] Handled unauthenticated session check:', err?.message);
     return c.json({ user: null, session: null }, 200);
   }
-});
+};
+
+// Explicit session handlers to prevent 500 errors when unauthenticated
+authRouter.get('/get-session', getSessionHandler);
+authRouter.get('/session', getSessionHandler);
 
 // Helper route to get current user profile
 authRouter.get('/me', authMiddleware(), (c) => {
@@ -29,9 +33,21 @@ authRouter.get('/me', authMiddleware(), (c) => {
   });
 });
 
-// Mount Better Auth HTTP Handler for all Better Auth endpoints (/v1/auth/*)
-authRouter.on(['GET', 'POST'], '/*', (c) => {
-  return auth.handler(c.req.raw);
+// Mount Better Auth HTTP Handler with error boundary for all endpoints
+authRouter.on(['GET', 'POST'], '/*', async (c) => {
+  try {
+    const res = await auth.handler(c.req.raw);
+    return res;
+  } catch (err: any) {
+    console.error('[BetterAuth] Handler caught exception:', err?.message || err);
+    if (c.req.path.includes('/get-session') || c.req.path.includes('/session')) {
+      return c.json({ user: null, session: null }, 200);
+    }
+    return c.json({
+      status: 'error',
+      message: err?.message || 'Authentication request failed',
+    }, 400);
+  }
 });
 
 export default authRouter;
