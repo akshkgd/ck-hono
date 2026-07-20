@@ -35,7 +35,7 @@ export interface GenericTemplatePayload {
 }
 
 /**
- * Base HTML Template wrapper matching Codekaro minimalist email design specification.
+ * Base HTML Template wrapper with neutral colors, zero border-radius, and default font.
  */
 function renderBaseLayout(title: string, contentHtml: string): string {
   const currentYear = new Date().getFullYear();
@@ -49,15 +49,15 @@ function renderBaseLayout(title: string, contentHtml: string): string {
     body {
       margin: 0;
       padding: 0;
-      background-color: #fafafa;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #111827;
+      background-color: #ffffff;
+      font-family: sans-serif;
+      color: #171717;
       -webkit-font-smoothing: antialiased;
     }
     .wrapper {
       width: 100%;
       table-layout: fixed;
-      background-color: #fafafa;
+      background-color: #ffffff;
       padding: 40px 16px;
       box-sizing: border-box;
     }
@@ -65,57 +65,56 @@ function renderBaseLayout(title: string, contentHtml: string): string {
       max-width: 580px;
       margin: 0 auto;
       background-color: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
+      border: 1px solid #e5e5e5;
+      border-radius: 0px;
       padding: 40px;
       box-sizing: border-box;
     }
     h1, h2 {
-      color: #111827;
+      color: #171717;
       margin: 0 0 20px 0;
       font-size: 22px;
       font-weight: 600;
-      letter-spacing: -0.3px;
     }
     p {
-      color: #1f2937;
+      color: #171717;
       font-size: 15px;
       line-height: 1.6;
       margin: 0 0 20px 0;
     }
     .btn {
       display: inline-block;
-      background-color: #000000;
+      background-color: #171717;
       color: #ffffff !important;
       font-weight: 500;
       font-size: 14px;
       padding: 12px 22px;
-      border-radius: 6px;
+      border-radius: 0px;
       text-decoration: none;
       margin: 10px 0 24px 0;
     }
     .regards {
       margin-top: 24px;
       margin-bottom: 0;
-      color: #111827;
+      color: #171717;
       font-size: 15px;
       line-height: 1.6;
     }
     .divider {
-      border-top: 1px solid #f3f4f6;
+      border-top: 1px solid #e5e5e5;
       margin-top: 32px;
       padding-top: 24px;
     }
     .footer-text {
-      color: #6b7280;
+      color: #525252;
       font-size: 13px;
       line-height: 1.6;
       margin: 0;
     }
     .info-box {
-      background-color: #f9fafb;
-      border: 1px solid #f3f4f6;
-      border-radius: 6px;
+      background-color: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 0px;
       padding: 16px 20px;
       margin: 20px 0;
     }
@@ -124,16 +123,16 @@ function renderBaseLayout(title: string, contentHtml: string): string {
       justify-content: space-between;
       padding: 6px 0;
       font-size: 14px;
-      border-bottom: 1px solid #f3f4f6;
+      border-bottom: 1px solid #e5e5e5;
     }
     .info-row:last-child {
       border-bottom: none;
     }
     .info-label {
-      color: #6b7280;
+      color: #525252;
     }
     .info-val {
-      color: #111827;
+      color: #171717;
       font-weight: 600;
     }
   </style>
@@ -199,9 +198,9 @@ export function generateEnrollmentEmail(payload: EnrollmentTemplatePayload): { s
     ${whatsappLink || telegramLink || meetingLink ? `
     <p><strong>Cohort Community & Meeting Links:</strong></p>
     <p>
-      ${whatsappLink ? `<a href="${whatsappLink}" style="color: #000000; font-weight: 600; text-decoration: underline;">Join WhatsApp Group →</a><br>` : ''}
-      ${telegramLink ? `<a href="${telegramLink}" style="color: #000000; font-weight: 600; text-decoration: underline;">Join Telegram Channel →</a><br>` : ''}
-      ${meetingLink ? `<a href="${meetingLink}" style="color: #000000; font-weight: 600; text-decoration: underline;">Live Class Link →</a><br>` : ''}
+      ${whatsappLink ? `<a href="${whatsappLink}" style="color: #171717; font-weight: 600; text-decoration: underline;">Join WhatsApp Group →</a><br>` : ''}
+      ${telegramLink ? `<a href="${telegramLink}" style="color: #171717; font-weight: 600; text-decoration: underline;">Join Telegram Channel →</a><br>` : ''}
+      ${meetingLink ? `<a href="${meetingLink}" style="color: #171717; font-weight: 600; text-decoration: underline;">Live Class Link →</a><br>` : ''}
     </p>
     ` : ''}
 
