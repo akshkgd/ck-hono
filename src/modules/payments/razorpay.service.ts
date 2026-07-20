@@ -253,10 +253,8 @@ export class RazorpayService {
 
     // Security: Only auto-login if the role is student (prevent admin/teacher account takeover)
     if (user && user.role === 'student') {
-      const authService = new AuthService();
-      const result = await authService.create30DaySession(user);
-      token = result.token;
-      userProfile = result.user;
+      const { password, ...userWithoutPassword } = user;
+      userProfile = userWithoutPassword;
     }
 
     const batch = await this.batchRepository.findById(enrollment.batchId);

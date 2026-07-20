@@ -14,6 +14,16 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  rateLimit: {
+    window: 60, // 60 Seconds window
+    max: 10, // Max 10 requests per minute per IP
+    storage: 'database', // Rate limit tracking stored in database
+  },
+  advanced: {
+    ipAddress: {
+      headerName: 'x-forwarded-for',
+    },
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 30, // 30 Days in seconds (2,592,000s)
     updateAge: 60 * 60 * 24, // Update session activity daily
