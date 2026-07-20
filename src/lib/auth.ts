@@ -45,19 +45,23 @@ export const auth = betterAuth({
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url }: { email: string; url: string; token: string }) => {
-        const studentName = email.split('@')[0];
-        const emailTemplate = generateMagicLinkEmail({
-          studentName,
-          magicLinkUrl: url,
-          expiresInMinutes: 15,
-        });
+        try {
+          const studentName = email.split('@')[0];
+          const emailTemplate = generateMagicLinkEmail({
+            studentName,
+            magicLinkUrl: url,
+            expiresInMinutes: 15,
+          });
 
-        await queueGenericEmail(email, {
-          title: emailTemplate.subject,
-          message: emailTemplate.text,
-          actionText: 'Sign In to Codekaro',
-          actionUrl: url,
-        });
+          await queueGenericEmail(email, {
+            title: emailTemplate.subject,
+            message: emailTemplate.text,
+            actionText: 'Sign In to Codekaro',
+            actionUrl: url,
+          });
+        } catch (err: any) {
+          console.error('[MagicLink] Failed to dispatch magic link email:', err);
+        }
       },
     }),
   ],

@@ -10,7 +10,7 @@ export const batchStatusEnum = pgEnum('batch_status', ['active', 'private', 'com
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
+  password: varchar('password', { length: 255 }),
   name: varchar('name', { length: 255 }),
   mobile: varchar('mobile', { length: 20 }),
   avatarUrl: text('avatar_url'),
