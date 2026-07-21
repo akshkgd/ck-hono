@@ -4,7 +4,7 @@ export function getImplementDocsHtml(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Better Auth OTP & Magic Link Implementation Guide - Codekaro Dev Docs</title>
+  <title>Better Auth Email OTP Implementation Guide - Codekaro Dev Docs</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,11 +52,11 @@ export function getImplementDocsHtml(): string {
     <!-- Hero / Title Section -->
     <section class="space-y-4">
       <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 text-xs font-mono font-medium border border-indigo-500/20">
-        Better Auth OTP & Magic Link Reference
+        Better Auth Email OTP Guide
       </div>
       <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Email 6-Digit OTP & 30-Day Session Guide</h1>
       <p class="text-zinc-400 text-base max-w-2xl">
-        Complete step-by-step reference for frontend engineers implementing 6-digit Email OTP login, Magic Links, and 30-day persistent session management using Better Auth.
+        Complete step-by-step reference for frontend engineers implementing 6-digit Email OTP passwordless login and 30-day persistent session management using Better Auth.
       </p>
     </section>
 
@@ -86,10 +86,10 @@ export function getImplementDocsHtml(): string {
     <!-- SECTION: EMAIL OTP WORKFLOW -->
     <section class="space-y-6 pt-4 border-t border-zinc-900">
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Option A (Recommended)</div>
+        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Primary Authentication</div>
         <h2 class="text-2xl font-bold text-white tracking-tight">6-Digit Email OTP Login Flow</h2>
         <p class="text-zinc-400 text-sm">
-          Send a 6-digit one-time passcode to the student's email. Extremely reliable on all mobile devices and web browsers.
+          Send a 6-digit one-time passcode to the student's email. Reliable across all mobile devices and web browsers.
         </p>
       </div>
 
@@ -154,36 +154,6 @@ export function getImplementDocsHtml(): string {
     "token": "XPjhBWHgLTDmpJZCl0RLlnAzUoXHAsCg",
     "expiresAt": "2026-08-20T04:15:47.897Z"
   }
-}</code></pre>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION: MAGIC LINK WORKFLOW -->
-    <section class="space-y-6 pt-6 border-t border-zinc-900">
-      <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-indigo-400 font-medium uppercase tracking-wider">Option B</div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">1-Click Magic Link Login Flow</h2>
-        <p class="text-zinc-400 text-sm">
-          Send a 1-click login button to the student's inbox.
-        </p>
-      </div>
-
-      <!-- Request Magic Link -->
-      <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <div class="flex items-center gap-2 font-mono text-sm">
-            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">POST</span>
-            <span class="text-zinc-200 font-semibold">/api/auth/sign-in/magic-link</span>
-          </div>
-          <span class="text-xs text-zinc-500 font-mono">Public Endpoint</span>
-        </div>
-
-        <div>
-          <span class="text-xs text-zinc-400 font-mono block mb-1">Request Payload:</span>
-          <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
-  "email": "student@example.com",
-  "callbackURL": "https://app.codekaro.in/verify-magic-link"
 }</code></pre>
         </div>
       </div>
@@ -262,7 +232,7 @@ export function getImplementDocsHtml(): string {
 
   <!-- Footer -->
   <footer class="border-t border-zinc-900 bg-zinc-950 py-6 text-center text-xs text-zinc-500 font-mono">
-    Codekaro Developer Documentation • Better Auth OTP & Magic Link Integration Guide
+    Codekaro Developer Documentation • Better Auth 6-Digit Email OTP Implementation Guide
   </footer>
 </body>
 </html>`;
