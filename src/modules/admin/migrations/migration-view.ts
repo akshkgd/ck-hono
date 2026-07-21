@@ -38,6 +38,7 @@ export function getMigrationProgressHtml(): string {
         <span class="text-zinc-50 font-semibold tracking-wide text-sm font-mono">Migration & DB Inspector</span>
       </div>
       <div class="flex items-center space-x-3">
+        <button onclick="clearLogs()" class="px-3 py-1.5 rounded bg-zinc-800 hover:bg-rose-900/40 text-rose-400 border border-rose-500/20 text-xs font-mono transition">Purge Audit Logs</button>
         <button onclick="fetchStatus()" class="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono transition">Refresh Now</button>
         <span id="auto-refresh-indicator" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono border border-emerald-500/20">
           <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span> Live (2s)
@@ -202,6 +203,18 @@ export function getMigrationProgressHtml(): string {
         }
       } catch (err) {
         console.error('Error fetching migration status:', err);
+      }
+    }
+
+    async function clearLogs() {
+      if (!confirm('Are you sure you want to purge old migration audit logs to free disk space?')) return;
+      try {
+        const res = await fetch('/v1/admin/migrations/clear-logs', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message || 'Audit logs cleared.');
+        fetchStatus();
+      } catch (err) {
+        alert('Failed to clear logs: ' + err.message);
       }
     }
 

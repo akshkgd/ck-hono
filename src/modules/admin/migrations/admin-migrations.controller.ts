@@ -54,6 +54,21 @@ export class AdminMigrationsController {
       }, 400);
     }
   };
+
+  /**
+   * POST /v1/admin/migrations/clear-logs - Purge Old Migration Audit Logs
+   */
+  public clearMigrationLogs = async (c: Context) => {
+    try {
+      const result = await adminMigrationsService.clearMigrationLogs();
+      return c.json(result, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to clear migration audit logs',
+      }, 400);
+    }
+  };
 }
 
 export const adminMigrationsController = new AdminMigrationsController();

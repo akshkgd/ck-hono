@@ -16,7 +16,7 @@ export class AdminMigrationsService {
     const batchSize = input.chunk_size || input.batchSize || 2000;
     const jobId = `user_mig_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // Create initial audit log entry
+    // Create lightweight audit log entry (omits huge raw user array payload)
     await logJobStart(
       jobId,
       'migration-queue',
@@ -68,6 +68,14 @@ export class AdminMigrationsService {
       status: 'processing',
       statusUrl: `/v1/admin/migrations/status/${jobId}`,
     };
+  }
+
+  /**
+   * Clear migration audit logs to reclaim disk space
+   */
+  async clearMigrationLogs() {
+    await db.delete(jobAuditLogs).where(eq(jobAuditLogs.queueName, 'migration-queue'));
+    return { success: true, message: 'Migration audit logs cleared successfully.' };
   }
 
   /**

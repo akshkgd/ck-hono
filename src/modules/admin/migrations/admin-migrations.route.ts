@@ -6,14 +6,17 @@ import type { AppEnv } from '../../../app.js';
 
 const adminMigrationsRouter = new Hono<AppEnv>();
 
-// Queue Bulk User Migration Job (POST /migration/users or /v1/migration/users or /v1/admin/migrations/users)
+// Queue Bulk User Migration Job
 adminMigrationsRouter.post(
   '/users',
   zValidator('json', bulkUserMigrationSchema),
   adminMigrationsController.queueUserMigration
 );
 
-// Check Live Migration Job Status (GET /migration/status/:jobId)
+// Check Live Migration Job Status
 adminMigrationsRouter.get('/status/:jobId', adminMigrationsController.getMigrationStatus);
+
+// Clear Migration Audit Logs
+adminMigrationsRouter.post('/clear-logs', adminMigrationsController.clearMigrationLogs);
 
 export default adminMigrationsRouter;
