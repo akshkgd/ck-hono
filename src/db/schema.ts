@@ -292,11 +292,4 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const rateLimit = pgTable('rate_limit', {
-  id: text('id').primaryKey(),
-  key: text('key').notNull(),
-  count: integer('count').notNull(),
-  lastRequest: bigint('last_request', { mode: 'number' }).notNull(),
-});
-
 
