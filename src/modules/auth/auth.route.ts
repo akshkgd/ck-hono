@@ -4,6 +4,10 @@ import { authMiddleware } from '../../middleware/auth.middleware.js';
 
 const authRouter = new Hono();
 
+/**
+ * Fast session getter for frontend load checks.
+ * Guarantees 200 OK with null session when unauthenticated.
+ */
 const getSessionHandler = async (c: any) => {
   try {
     const sessionData = await auth.api.getSession({
@@ -14,16 +18,15 @@ const getSessionHandler = async (c: any) => {
     }
     return c.json(sessionData, 200);
   } catch (err: any) {
-    console.error('[AuthSession] Handled unauthenticated session check:', err?.message);
     return c.json({ user: null, session: null }, 200);
   }
 };
 
-// Explicit session handlers to prevent 500 errors when unauthenticated
+// Mount fast session routes
 authRouter.get('/get-session', getSessionHandler);
 authRouter.get('/session', getSessionHandler);
 
-// Helper route to get current user profile
+// Profile endpoint
 authRouter.get('/me', authMiddleware(), (c) => {
   const user = c.get('user' as any);
   const session = c.get('session' as any);
@@ -33,24 +36,27 @@ authRouter.get('/me', authMiddleware(), (c) => {
   });
 });
 
-// Mount Better Auth HTTP Handler with URL path normalization for both /v1/auth and /api/auth
-authRouter.on(['GET', 'POST'], '/*', async (c) => {
+// Primary Better Auth Handler with path normalization (/v1/auth -> /api/auth)
+authRouter.on(['GET', 'POST', 'PUT', 'DELETE'], '/*', async (c) => {
   try {
-    let rawReq = c.req.raw;
+    const rawReq = c.req.raw;
     const url = new URL(rawReq.url);
 
-    // Normalize /v1/auth path to /api/auth for Better Auth internal router
+    // If request route is prefixed with /v1/auth, create normalized Request for Better Auth
     if (url.pathname.includes('/v1/auth')) {
-      const normalizedPath = url.pathname.replace('/v1/auth', '/api/auth');
-      url.pathname = normalizedPath;
-      rawReq = new Request(url.toString(), rawReq);
+      url.pathname = url.pathname.replace('/v1/auth', '/api/auth');
+      const normalizedReq = new Request(url.toString(), {
+        method: rawReq.method,
+        headers: rawReq.headers,
+        body: ['GET', 'HEAD'].includes(rawReq.method) ? undefined : await rawReq.clone().blob(),
+      });
+      return await auth.handler(normalizedReq);
     }
 
-    const res = await auth.handler(rawReq);
-    return res;
+    return await auth.handler(rawReq);
   } catch (err: any) {
-    console.error('[BetterAuth] Handler caught exception:', err?.message || err);
-    if (c.req.path.includes('/get-session') || c.req.path.includes('/session')) {
+    console.error('[BetterAuth] Handler caught error:', err?.message || err);
+    if (c.req.path.includes('session')) {
       return c.json({ user: null, session: null }, 200);
     }
     return c.json({
