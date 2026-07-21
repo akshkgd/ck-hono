@@ -51,11 +51,11 @@ export function getMigrationProgressHtml(): string {
     <section class="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl flex flex-col sm:flex-row items-center gap-3 justify-between">
       <div class="flex items-center gap-3 w-full sm:w-auto">
         <span class="text-xs font-mono text-zinc-400">Job ID:</span>
-        <input type="text" id="job-id-input" placeholder="e.g. user_mig_17849..." class="bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs font-mono px-3 py-2 rounded-lg w-full sm:w-72 focus:outline-none focus:border-indigo-500">
+        <input type="text" id="job-id-input" placeholder="Auto-detecting active job..." class="bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs font-mono px-3 py-2 rounded-lg w-full sm:w-80 focus:outline-none focus:border-indigo-500">
       </div>
       <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-        <button onclick="fetchStatus()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono px-4 py-2 rounded-lg transition font-medium">Check Status</button>
-        <button onclick="fetchLatestMetrics()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-mono px-3 py-2 rounded-lg transition">Fetch Latest Job</button>
+        <button onclick="fetchStatus()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono px-4 py-2 rounded-lg transition font-medium">Refresh Status</button>
+        <button onclick="clearAndFetchLatest()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-mono px-3 py-2 rounded-lg transition">Detect Active Job</button>
       </div>
     </section>
 
@@ -65,7 +65,7 @@ export function getMigrationProgressHtml(): string {
       <div class="flex items-center justify-between flex-wrap gap-4 border-b border-zinc-800 pb-6">
         <div>
           <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Migration Job State</div>
-          <div id="job-state" class="text-2xl font-bold text-white font-mono mt-1">Awaiting Input...</div>
+          <div id="job-state" class="text-2xl font-bold text-white font-mono mt-1">Detecting...</div>
         </div>
         <div class="text-right">
           <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Progress Percentage</div>
@@ -106,53 +106,34 @@ export function getMigrationProgressHtml(): string {
     <section class="space-y-3">
       <div class="flex items-center justify-between text-xs font-mono text-zinc-400">
         <span>Raw Real-time Job Metrics Response</span>
-        <span class="text-zinc-600">GET /v1/admin/migrations/status/:jobId</span>
+        <span class="text-zinc-600">GET /v1/admin/migrations/status/latest</span>
       </div>
-      <pre id="raw-json" class="bg-zinc-950 p-5 rounded-xl border border-zinc-800 text-xs font-mono text-indigo-300 overflow-x-auto max-h-72 custom-scrollbar">Loading real-time migration status...</pre>
+      <pre id="raw-json" class="bg-zinc-950 p-5 rounded-xl border border-zinc-800 text-xs font-mono text-indigo-300 overflow-x-auto max-h-72 custom-scrollbar">Fetching live migration metrics...</pre>
     </section>
 
   </main>
 
   <script>
-    let activeJobId = '';
-    let autoRefreshTimer = null;
-
-    async function fetchLatestMetrics() {
-      try {
-        const res = await fetch('/v1/admin/queues/metrics');
-        const json = await res.json();
-        if (json.data && json.data.activeJobs && json.data.activeJobs.length > 0) {
-          activeJobId = json.data.activeJobs[0].id;
-          document.getElementById('job-id-input').value = activeJobId;
-          fetchStatus();
-        } else if (json.data && json.data.completedJobs && json.data.completedJobs.length > 0) {
-          activeJobId = json.data.completedJobs[0].id;
-          document.getElementById('job-id-input').value = activeJobId;
-          fetchStatus();
-        } else {
-          document.getElementById('raw-json').textContent = 'No active or recent migration jobs found in queue.';
-        }
-      } catch (e) {
-        console.error('Failed to fetch metrics:', e);
-      }
-    }
-
     async function fetchStatus() {
       const inputVal = document.getElementById('job-id-input').value.trim();
-      if (!inputVal) return;
-      activeJobId = inputVal;
+      const targetId = inputVal || 'latest';
 
       try {
-        const res = await fetch('/v1/admin/migrations/status/' + activeJobId);
+        const res = await fetch('/v1/admin/migrations/status/' + targetId);
         const json = await res.json();
         
         document.getElementById('raw-json').textContent = JSON.stringify(json, null, 2);
 
         if (json.data) {
           const d = json.data;
-          document.getElementById('job-state').textContent = (d.state || 'active').toUpperCase();
+
+          if (d.jobId && d.jobId !== 'none' && !inputVal) {
+            document.getElementById('job-id-input').value = d.jobId;
+          }
+
+          document.getElementById('job-state').textContent = (d.state || 'idle').toUpperCase();
           document.getElementById('progress-percent').textContent = d.progress?.percentage || '0%';
-          document.getElementById('processed-ratio').textContent = (d.progress?.processed || 0) + ' / ' + (d.progress?.total || 0);
+          document.getElementById('processed-ratio').textContent = (d.progress?.processed || 0).toLocaleString() + ' / ' + (d.progress?.total || 0).toLocaleString();
           
           const pct = parseFloat(d.progress?.percentage || '0');
           document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
@@ -163,7 +144,7 @@ export function getMigrationProgressHtml(): string {
           if (d.timestamp) {
             const start = new Date(d.timestamp).getTime();
             const end = d.finishedOn ? new Date(d.finishedOn).getTime() : Date.now();
-            const durationSec = Math.round((end - start) / 1000);
+            const durationSec = Math.max(0, Math.round((end - start) / 1000));
             document.getElementById('duration').textContent = durationSec + 's';
           }
         }
@@ -172,17 +153,16 @@ export function getMigrationProgressHtml(): string {
       }
     }
 
+    function clearAndFetchLatest() {
+      document.getElementById('job-id-input').value = '';
+      fetchStatus();
+    }
+
     // Auto-poll every 2 seconds
-    autoRefreshTimer = setInterval(() => {
-      if (activeJobId) {
-        fetchStatus();
-      } else {
-        fetchLatestMetrics();
-      }
-    }, 2000);
+    setInterval(fetchStatus, 2000);
 
     // Initial load
-    fetchLatestMetrics();
+    fetchStatus();
   </script>
 </body>
 </html>`;

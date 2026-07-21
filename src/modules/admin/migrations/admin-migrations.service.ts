@@ -54,35 +54,78 @@ export class AdminMigrationsService {
   }
 
   /**
-   * Get live progress status of a running migration job
+   * Get live progress status of a running migration job (or latest active/completed job)
    */
-  async getMigrationStatus(jobId: string) {
-    const job = await migrationQueue.getJob(jobId);
+  async getMigrationStatus(jobId?: string) {
+    let targetJob: any = null;
 
-    if (!job) {
-      return null;
+    if (jobId && jobId !== 'latest') {
+      targetJob = await migrationQueue.getJob(jobId);
     }
 
-    const state = await job.getState();
-    const progressData = typeof job.progress === 'object' ? job.progress : { processed: 0, total: job.data.metadata?.totalRecords || 0 };
-    const total = job.data.metadata?.totalRecords || 0;
-    const processed = (progressData as any)?.processed || 0;
-    const percentage = total > 0 ? ((processed / total) * 100).toFixed(1) + '%' : '0%';
+    // If no specific jobId provided or 'latest' requested, find active or most recent job
+    if (!targetJob) {
+      const activeJobs = await migrationQueue.getJobs(['active'], 0, 10);
+      if (activeJobs.length > 0) {
+        targetJob = activeJobs[0];
+      } else {
+        const waitingJobs = await migrationQueue.getJobs(['waiting'], 0, 10);
+        if (waitingJobs.length > 0) {
+          targetJob = waitingJobs[0];
+        } else {
+          const completedJobs = await migrationQueue.getJobs(['completed'], 0, 10);
+          if (completedJobs.length > 0) {
+            targetJob = completedJobs[completedJobs.length - 1];
+          } else {
+            const failedJobs = await migrationQueue.getJobs(['failed'], 0, 10);
+            if (failedJobs.length > 0) {
+              targetJob = failedJobs[failedJobs.length - 1];
+            }
+          }
+        }
+      }
+    }
+
+    const queueCounts = await migrationQueue.getJobCounts('waiting', 'active', 'completed', 'failed');
+
+    if (!targetJob) {
+      return {
+        jobId: 'none',
+        name: 'No active jobs',
+        state: 'idle',
+        queueCounts,
+        progress: {
+          processed: 0,
+          total: 0,
+          percentage: '0%',
+          successCount: 0,
+          failedCount: 0,
+        },
+        timestamp: null,
+      };
+    }
+
+    const state = await targetJob.getState();
+    const progressData = typeof targetJob.progress === 'object' ? targetJob.progress : { processed: 0, total: targetJob.data.metadata?.totalRecords || 0 };
+    const total = targetJob.data.metadata?.totalRecords || 0;
+    const processed = (progressData as any)?.processed || (state === 'completed' ? total : 0);
+    const percentage = total > 0 ? ((processed / total) * 100).toFixed(1) + '%' : (state === 'completed' ? '100%' : '0%');
 
     return {
-      jobId: job.id,
-      name: job.name,
+      jobId: targetJob.id,
+      name: targetJob.name,
       state, // "queued" | "active" | "completed" | "failed"
+      queueCounts,
       progress: {
         processed,
         total,
         percentage,
-        successCount: (progressData as any)?.successCount || 0,
+        successCount: (progressData as any)?.successCount || (state === 'completed' ? total : 0),
         failedCount: (progressData as any)?.failedCount || 0,
       },
-      failedReason: job.failedReason || null,
-      timestamp: job.timestamp ? new Date(job.timestamp).toISOString() : null,
-      finishedOn: job.finishedOn ? new Date(job.finishedOn).toISOString() : null,
+      failedReason: targetJob.failedReason || null,
+      timestamp: targetJob.timestamp ? new Date(targetJob.timestamp).toISOString() : null,
+      finishedOn: targetJob.finishedOn ? new Date(targetJob.finishedOn).toISOString() : null,
     };
   }
 }
