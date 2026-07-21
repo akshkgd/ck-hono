@@ -8,6 +8,7 @@ web_modules/
 dist/
 build/
 .tsc-out/
+*.tsbuildinfo
 
 # Log files
 npm-debug.log*
