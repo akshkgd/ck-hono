@@ -36,9 +36,9 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
       try {
         // Transform legacy PHP payload rows to PostgreSQL Hono Schema
         const recordsToInsert = chunk.map((u) => {
-          // Normalize role (0 -> student, 1 -> admin)
+          // Normalize role (1 -> student, 100 -> admin)
           let roleValue: 'student' | 'admin' | 'user' | 'moderator' = 'student';
-          if (u.role === 1 || u.role === '1' || u.role === 'admin') {
+          if (u.role === 100 || u.role === '100' || u.role === 'admin') {
             roleValue = 'admin';
           } else if (u.role === 'moderator') {
             roleValue = 'moderator';
