@@ -22,7 +22,7 @@ export const migrationWorker = new Worker(
   },
   {
     connection: redisConnection,
-    concurrency: 1, // MUST be 1 for strict sequential execution
-    lockDuration: 300000, // 5 minute lock duration for background migrations
+    concurrency: 5, // Process 5 migration chunks in parallel
+    lockDuration: 60000, // 60 seconds lock duration
   }
 );

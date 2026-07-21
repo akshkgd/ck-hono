@@ -1,10 +1,11 @@
 import { addMigrationJob, migrationQueue } from '../../../queues/index.js';
 import { BulkUserMigrationInput } from './admin-migrations.validation.js';
 import { logJobStart } from '../../../workers/audit.js';
+import { processMigrationJob } from '../../../jobs/migration.job.js';
 
 export class AdminMigrationsService {
   /**
-   * Queue a 10 Lakh (1 Million) Bulk User Migration Job in BullMQ
+   * Queue & Process a Bulk User Migration Job
    */
   async queueUserMigration(input: BulkUserMigrationInput, adminId: string) {
     const userRecords = input.data || input.users || [];
@@ -42,13 +43,26 @@ export class AdminMigrationsService {
       { jobId }
     );
 
+    // Execute direct inline batch insertion immediately (guarantees execution even if worker daemon is paused)
+    processMigrationJob({
+      migrationName: 'BULK_USER_MIGRATION',
+      batchSize,
+      dryRun: input.dryRun,
+      metadata: {
+        jobId,
+        adminId,
+        totalRecords,
+        users: userRecords,
+      },
+    }).catch((err) => console.error(`[InlineMigration] Error processing batch ${jobId}:`, err));
+
     return {
       jobId,
       bullJobId: job.id,
       totalRecords,
       batchSize,
       dryRun: input.dryRun,
-      status: 'queued',
+      status: 'processing',
       statusUrl: `/v1/admin/migrations/status/${jobId}`,
     };
   }
