@@ -3,6 +3,7 @@ import { logger } from '../utils/logger.js';
 import { db } from '../db/index.js';
 import { users } from '../db/schema.js';
 import { Job } from 'bullmq';
+import { sql } from 'drizzle-orm';
 
 function isValidEmail(email: any): boolean {
   if (!email || typeof email !== 'string') return false;
@@ -133,9 +134,17 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           });
         }
 
-        // High-Performance Batch Insert with ON CONFLICT DO NOTHING for valid records
+        // High-Performance Batch Upsert (Updates role, status, and name if email already exists)
         if (recordsToInsert.length > 0) {
-          await db.insert(users).values(recordsToInsert).onConflictDoNothing({ target: users.email });
+          await db.insert(users).values(recordsToInsert).onConflictDoUpdate({
+            target: users.email,
+            set: {
+              role: sql`EXCLUDED.role`,
+              status: sql`EXCLUDED.status`,
+              name: sql`EXCLUDED.name`,
+              updatedAt: new Date(),
+            },
+          });
           successCount += recordsToInsert.length;
         }
       } catch (err: any) {
