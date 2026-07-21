@@ -8,7 +8,6 @@ import type { CreateRazorpayOrderInput, VerifyRazorpayPaymentInput } from './raz
 import argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
-import { AuthService } from '../auth/auth.service.js';
 import { queuePaymentSuccessEmail, queueEnrollmentEmail, queueAccessGrantedEmail } from '../../queues/index.js';
 
 export class RazorpayService {
