@@ -7,8 +7,9 @@ export class AdminMigrationsService {
    * Queue a 10 Lakh (1 Million) Bulk User Migration Job in BullMQ
    */
   async queueUserMigration(input: BulkUserMigrationInput, adminId: string) {
-    const totalRecords = input.users.length;
-    const batchSize = input.batchSize || 2000;
+    const userRecords = input.data || input.users || [];
+    const totalRecords = userRecords.length;
+    const batchSize = input.chunk_size || input.batchSize || 2000;
     const jobId = `user_mig_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
     // Create initial audit log entry
@@ -35,7 +36,7 @@ export class AdminMigrationsService {
           jobId,
           adminId,
           totalRecords,
-          users: input.users,
+          users: userRecords,
         },
       },
       { jobId }

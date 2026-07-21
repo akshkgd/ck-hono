@@ -29,29 +29,66 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
       };
     }
 
-    // Process in chunks of batchSize (e.g. 2000 per chunk)
+    // Process in chunks of batchSize
     for (let i = 0; i < totalRecords; i += batchSize) {
       const chunk = userList.slice(i, i + batchSize);
       
       try {
-        // Prepare clean user records for batch insertion
-        const recordsToInsert = chunk.map((u) => ({
-          email: u.email.toLowerCase().trim(),
-          name: u.name || u.email.split('@')[0],
-          mobile: u.mobile || null,
-          role: u.role || 'student',
-          status: u.status || 'active',
-          avatarUrl: u.avatarUrl || null,
-          bio: u.bio || null,
-          linkedinUrl: u.linkedinUrl || null,
-          githubUrl: u.githubUrl || null,
-          occupationType: u.occupationType || 'other',
-          occupationTitle: u.occupationTitle || null,
-          organization: u.organization || null,
-          experienceYears: u.experienceYears || null,
-          xp: u.xp || 0,
-          metadata: u.metadata || {},
-        }));
+        // Transform legacy PHP payload rows to PostgreSQL Hono Schema
+        const recordsToInsert = chunk.map((u) => {
+          // Normalize role (0 -> student, 1 -> admin)
+          let roleValue: 'student' | 'admin' | 'user' | 'moderator' = 'student';
+          if (u.role === 1 || u.role === '1' || u.role === 'admin') {
+            roleValue = 'admin';
+          } else if (u.role === 'moderator') {
+            roleValue = 'moderator';
+          }
+
+          // Normalize status (1 -> active, 0 -> inactive)
+          let statusValue: 'active' | 'inactive' | 'suspended' = 'active';
+          if (u.status === 0 || u.status === '0' || u.status === 'inactive') {
+            statusValue = 'inactive';
+          } else if (u.status === 'suspended') {
+            statusValue = 'suspended';
+          }
+
+          // Normalize email verification (1 -> true)
+          const isVerified = u.is_verified === 1 || u.is_verified === '1' || u.is_verified === true || u.emailVerified === true;
+
+          // Preserve all extra legacy fields in metadata jsonb
+          const extraMetadata = {
+            legacyId: u.id || null,
+            user_name: u.user_name || null,
+            college: u.college || null,
+            course: u.course || null,
+            gender: u.gender || null,
+            coupan: u.coupan || null,
+            telegramId: u.telegramId || null,
+            ...(u.metadata || {}),
+          };
+
+          return {
+            email: u.email.toLowerCase().trim(),
+            name: u.name || u.user_name || u.email.split('@')[0],
+            mobile: u.mobile || null,
+            googleId: u.google_id || u.googleId || null,
+            avatarUrl: u.avatar || u.avatarUrl || u.avatar_url || null,
+            bio: u.bio || null,
+            role: roleValue,
+            status: statusValue,
+            emailVerified: isVerified,
+            xp: typeof u.xp === 'number' ? u.xp : 0,
+            currentStreak: typeof u.current_streak === 'number' ? u.current_streak : 0,
+            longestStreak: typeof u.longest_streak === 'number' ? u.longest_streak : 0,
+            organization: u.college || u.organization || null,
+            occupationTitle: u.course || u.occupationTitle || null,
+            occupationType: (u.college || u.course ? 'student' : 'other') as any,
+            metadata: extraMetadata,
+            createdAt: u.created_at ? new Date(u.created_at) : new Date(),
+            updatedAt: u.updated_at ? new Date(u.updated_at) : new Date(),
+            lastActiveAt: u.lastActivity ? new Date(u.lastActivity) : (u.last_activity_date ? new Date(u.last_activity_date) : new Date()),
+          };
+        });
 
         // High-Performance Batch Insert with ON CONFLICT DO NOTHING (prevents duplicate email crashes)
         await db.insert(users).values(recordsToInsert).onConflictDoNothing({ target: users.email });
@@ -62,7 +99,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
         failedCount += chunk.length;
       }
 
-      // Update BullMQ Job Progress for live admin status tracking
+      // Update BullMQ Job Progress for live status tracking
       if (job) {
         const processed = Math.min(i + batchSize, totalRecords);
         await job.updateProgress({
