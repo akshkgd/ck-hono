@@ -49,7 +49,7 @@ export const auth = betterAuth({
     magicLink({
       sendMagicLink: async ({ email, url }: { email: string; url: string; token: string }) => {
         try {
-          // Force target domain to app.codekaro.in for both main link and callbackURL parameter
+          // Cleanly rewrite primary domain and callbackURL (strip out development ports like :5173)
           let targetUrl = url;
           const targetDomain = process.env.FRONTEND_URL || 'https://app.codekaro.in';
 
@@ -57,17 +57,19 @@ export const auth = betterAuth({
             const parsedUrl = new URL(url);
             const targetParsed = new URL(targetDomain);
 
-            // 1. Rewrite primary domain (e.g. codekaro.in -> app.codekaro.in)
+            // 1. Rewrite primary domain & port
             parsedUrl.protocol = targetParsed.protocol;
-            parsedUrl.host = targetParsed.host;
+            parsedUrl.hostname = targetParsed.hostname;
+            parsedUrl.port = targetParsed.port;
 
-            // 2. Rewrite callbackURL query parameter if present (e.g. localhost:5173 -> app.codekaro.in)
+            // 2. Rewrite callbackURL parameter & strip dev ports
             const callbackParam = parsedUrl.searchParams.get('callbackURL');
             if (callbackParam) {
               try {
                 const parsedCallback = new URL(callbackParam);
                 parsedCallback.protocol = targetParsed.protocol;
-                parsedCallback.host = targetParsed.host;
+                parsedCallback.hostname = targetParsed.hostname;
+                parsedCallback.port = targetParsed.port;
                 parsedUrl.searchParams.set('callbackURL', parsedCallback.toString());
               } catch {
                 parsedUrl.searchParams.set('callbackURL', `${targetDomain}/verify-magic-link`);
