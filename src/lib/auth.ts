@@ -49,14 +49,33 @@ export const auth = betterAuth({
     magicLink({
       sendMagicLink: async ({ email, url }: { email: string; url: string; token: string }) => {
         try {
-          // Normalize URL domain to frontend app domain (app.codekaro.in)
+          // Force target domain to app.codekaro.in for both main link and callbackURL parameter
           let targetUrl = url;
-          const frontendOrigin = process.env.FRONTEND_URL || 'https://app.codekaro.in';
+          const targetDomain = process.env.FRONTEND_URL || 'https://app.codekaro.in';
+
           try {
             const parsedUrl = new URL(url);
-            const parsedOrigin = new URL(frontendOrigin);
-            parsedUrl.protocol = parsedOrigin.protocol;
-            parsedUrl.host = parsedOrigin.host;
+            const targetParsed = new URL(targetDomain);
+
+            // 1. Rewrite primary domain (e.g. codekaro.in -> app.codekaro.in)
+            parsedUrl.protocol = targetParsed.protocol;
+            parsedUrl.host = targetParsed.host;
+
+            // 2. Rewrite callbackURL query parameter if present (e.g. localhost:5173 -> app.codekaro.in)
+            const callbackParam = parsedUrl.searchParams.get('callbackURL');
+            if (callbackParam) {
+              try {
+                const parsedCallback = new URL(callbackParam);
+                parsedCallback.protocol = targetParsed.protocol;
+                parsedCallback.host = targetParsed.host;
+                parsedUrl.searchParams.set('callbackURL', parsedCallback.toString());
+              } catch {
+                parsedUrl.searchParams.set('callbackURL', `${targetDomain}/verify-magic-link`);
+              }
+            } else {
+              parsedUrl.searchParams.set('callbackURL', `${targetDomain}/verify-magic-link`);
+            }
+
             targetUrl = parsedUrl.toString();
           } catch {
             targetUrl = url;
