@@ -4,7 +4,7 @@ export function getImplementDocsHtml(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Better Auth Magic Link Implementation Guide - Codekaro Dev Docs</title>
+  <title>Better Auth OTP & Magic Link Implementation Guide - Codekaro Dev Docs</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,11 +52,11 @@ export function getImplementDocsHtml(): string {
     <!-- Hero / Title Section -->
     <section class="space-y-4">
       <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 text-xs font-mono font-medium border border-indigo-500/20">
-        Better Auth Passwordless Guide
+        Better Auth OTP & Magic Link Reference
       </div>
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Magic Link & 30-Day Session Implementation</h1>
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Email 6-Digit OTP & 30-Day Session Guide</h1>
       <p class="text-zinc-400 text-base max-w-2xl">
-        Complete step-by-step reference for frontend engineers implementing passwordless Magic Link login and 30-day persistent session management using Better Auth.
+        Complete step-by-step reference for frontend engineers implementing 6-digit Email OTP login, Magic Links, and 30-day persistent session management using Better Auth.
       </p>
     </section>
 
@@ -65,16 +65,16 @@ export function getImplementDocsHtml(): string {
       <h3 class="text-sm font-mono text-indigo-400 font-semibold uppercase tracking-wider">Authentication Workflow Overview</h3>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center text-xs font-mono">
         <div class="bg-zinc-900/70 border border-zinc-800 p-4 rounded-lg space-y-1">
-          <div class="text-indigo-400 font-bold">1. REQUEST LINK</div>
-          <p class="text-zinc-500 text-[11px]">User enters email. API sends 15-min single-use magic link.</p>
+          <div class="text-indigo-400 font-bold">1. REQUEST OTP</div>
+          <p class="text-zinc-500 text-[11px]">User enters email. API sends 10-min 6-digit OTP code.</p>
         </div>
         <div class="bg-zinc-900/70 border border-zinc-800 p-4 rounded-lg space-y-1">
-          <div class="text-emerald-400 font-bold">2. CLICK EMAIL</div>
-          <p class="text-zinc-500 text-[11px]">User opens inbox and clicks [Sign In to Codekaro].</p>
+          <div class="text-emerald-400 font-bold">2. ENTER 6 DIGITS</div>
+          <p class="text-zinc-500 text-[11px]">Student enters code into input fields (e.g. 482910).</p>
         </div>
         <div class="bg-zinc-900/70 border border-zinc-800 p-4 rounded-lg space-y-1">
-          <div class="text-purple-400 font-bold">3. VERIFY TOKEN</div>
-          <p class="text-zinc-500 text-[11px]">Better Auth verifies token & sets 30-day session cookie.</p>
+          <div class="text-purple-400 font-bold">3. VERIFY CODE</div>
+          <p class="text-zinc-500 text-[11px]">Better Auth verifies OTP & sets 30-day session cookie.</p>
         </div>
         <div class="bg-zinc-900/70 border border-zinc-800 p-4 rounded-lg space-y-1">
           <div class="text-amber-400 font-bold">4. AUTHENTICATED</div>
@@ -83,21 +83,22 @@ export function getImplementDocsHtml(): string {
       </div>
     </section>
 
-    <!-- STEP 1: REQUEST MAGIC LINK -->
+    <!-- SECTION: EMAIL OTP WORKFLOW -->
     <section class="space-y-6 pt-4 border-t border-zinc-900">
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-indigo-400 font-medium uppercase tracking-wider">Step 1</div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">Request Passwordless Magic Link</h2>
+        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Option A (Recommended)</div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">6-Digit Email OTP Login Flow</h2>
         <p class="text-zinc-400 text-sm">
-          Call this endpoint when the user submits their email address on the Login modal/page.
+          Send a 6-digit one-time passcode to the student's email. Extremely reliable on all mobile devices and web browsers.
         </p>
       </div>
 
+      <!-- Step 1: Send OTP -->
       <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 space-y-4">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2 font-mono text-sm">
             <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">POST</span>
-            <span class="text-zinc-200 font-semibold">/v1/auth/sign-in/magic-link</span>
+            <span class="text-zinc-200 font-semibold">/api/auth/email-otp/send-verification-otp</span>
           </div>
           <span class="text-xs text-zinc-500 font-mono">Public Endpoint</span>
         </div>
@@ -105,7 +106,8 @@ export function getImplementDocsHtml(): string {
         <div>
           <span class="text-xs text-zinc-400 font-mono block mb-1">Request Payload:</span>
           <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
-  "email": "student@example.com"
+  "email": "student@example.com",
+  "type": "sign-in"
 }</code></pre>
         </div>
 
@@ -113,55 +115,84 @@ export function getImplementDocsHtml(): string {
           <span class="text-xs text-zinc-400 font-mono block mb-1">Response (200 OK):</span>
           <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-400 border border-zinc-800/60 overflow-x-auto"><code>{
   "status": true,
-  "message": "Magic link sent to student@example.com"
+  "message": "OTP code sent to student@example.com"
 }</code></pre>
         </div>
       </div>
-    </section>
 
-    <!-- STEP 2: VERIFY MAGIC LINK TOKEN -->
-    <section class="space-y-6 pt-6 border-t border-zinc-900">
-      <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Step 2</div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">Verify Token & Create 30-Day Session</h2>
-        <p class="text-zinc-400 text-sm">
-          When the user clicks the magic link in their email, they land on your frontend callback route. Pass the <code>token</code> to verify and establish the 30-day session.
-        </p>
-      </div>
-
+      <!-- Step 2: Verify OTP -->
       <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 space-y-4">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2 font-mono text-sm">
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">GET</span>
-            <span class="text-zinc-200 font-semibold">/v1/auth/verify-magic-link?token=...</span>
+            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">POST</span>
+            <span class="text-zinc-200 font-semibold">/api/auth/email-otp/verify-email</span>
           </div>
           <span class="text-xs text-emerald-400 font-mono">Sets 30-Day Cookie: better-auth.session_token</span>
         </div>
 
         <div>
+          <span class="text-xs text-zinc-400 font-mono block mb-1">Request Payload:</span>
+          <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "email": "student@example.com",
+  "otp": "482910"
+}</code></pre>
+        </div>
+
+        <div>
           <span class="text-xs text-zinc-400 font-mono block mb-1">Response (200 OK):</span>
           <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-400 border border-zinc-800/60 overflow-x-auto"><code>{
-  "session": {
-    "id": "sess_89102834",
-    "userId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
-    "token": "token_hash_value...",
-    "expiresAt": "2026-08-19T22:30:00.000Z"
-  },
   "user": {
-    "id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "id": "30959dbb-bc3c-4cbc-936b-bcacaa1989d7",
     "email": "student@example.com",
     "name": "Rahul Sharma",
-    "role": "student"
+    "role": "student",
+    "avatarUrl": null,
+    "mobile": "+919876543210"
+  },
+  "session": {
+    "id": "sess_89102834",
+    "token": "XPjhBWHgLTDmpJZCl0RLlnAzUoXHAsCg",
+    "expiresAt": "2026-08-20T04:15:47.897Z"
   }
 }</code></pre>
         </div>
       </div>
     </section>
 
-    <!-- STEP 3: GET CURRENT USER SESSION -->
+    <!-- SECTION: MAGIC LINK WORKFLOW -->
     <section class="space-y-6 pt-6 border-t border-zinc-900">
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-purple-400 font-medium uppercase tracking-wider">Step 3</div>
+        <div class="flex items-center gap-2 text-xs font-mono text-indigo-400 font-medium uppercase tracking-wider">Option B</div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">1-Click Magic Link Login Flow</h2>
+        <p class="text-zinc-400 text-sm">
+          Send a 1-click login button to the student's inbox.
+        </p>
+      </div>
+
+      <!-- Request Magic Link -->
+      <div class="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2 font-mono text-sm">
+            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">POST</span>
+            <span class="text-zinc-200 font-semibold">/api/auth/sign-in/magic-link</span>
+          </div>
+          <span class="text-xs text-zinc-500 font-mono">Public Endpoint</span>
+        </div>
+
+        <div>
+          <span class="text-xs text-zinc-400 font-mono block mb-1">Request Payload:</span>
+          <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "email": "student@example.com",
+  "callbackURL": "https://app.codekaro.in/verify-magic-link"
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP: GET CURRENT USER SESSION -->
+    <section class="space-y-6 pt-6 border-t border-zinc-900">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-xs font-mono text-purple-400 font-medium uppercase tracking-wider">Session Check</div>
         <h2 class="text-2xl font-bold text-white tracking-tight">Fetch Current Authenticated Session</h2>
         <p class="text-zinc-400 text-sm">
           Call this on app startup or page load to check if the user has an active 30-day session.
@@ -172,33 +203,36 @@ export function getImplementDocsHtml(): string {
         <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2 font-mono text-sm">
             <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">GET</span>
-            <span class="text-zinc-200 font-semibold">/v1/auth/get-session</span>
+            <span class="text-zinc-200 font-semibold">/api/auth/get-session</span>
           </div>
-          <span class="text-xs text-zinc-500 font-mono">Requires Cookie or Bearer Header</span>
+          <span class="text-xs text-zinc-500 font-mono">Guarantees 200 OK with null session when unauthenticated</span>
         </div>
 
         <div>
           <span class="text-xs text-zinc-400 font-mono block mb-1">Response (200 OK):</span>
           <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-400 border border-zinc-800/60 overflow-x-auto"><code>{
   "user": {
-    "id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "id": "30959dbb-bc3c-4cbc-936b-bcacaa1989d7",
     "email": "student@example.com",
     "name": "Rahul Sharma",
-    "role": "student"
+    "role": "student",
+    "avatarUrl": null,
+    "mobile": "+919876543210"
   },
   "session": {
     "id": "sess_89102834",
-    "expiresAt": "2026-08-19T22:30:00.000Z"
+    "token": "XPjhBWHgLTDmpJZCl0RLlnAzUoXHAsCg",
+    "expiresAt": "2026-08-20T04:15:47.897Z"
   }
 }</code></pre>
         </div>
       </div>
     </section>
 
-    <!-- STEP 4: SIGN OUT -->
+    <!-- STEP: SIGN OUT -->
     <section class="space-y-6 pt-6 border-t border-zinc-900">
       <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-amber-400 font-medium uppercase tracking-wider">Step 4</div>
+        <div class="flex items-center gap-2 text-xs font-mono text-amber-400 font-medium uppercase tracking-wider">Sign Out</div>
         <h2 class="text-2xl font-bold text-white tracking-tight">Sign Out & Clear Session</h2>
         <p class="text-zinc-400 text-sm">
           Call this when the user clicks the "Sign Out" button in your UI to invalidate their active 30-day session.
@@ -209,7 +243,7 @@ export function getImplementDocsHtml(): string {
         <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2 font-mono text-sm">
             <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">POST</span>
-            <span class="text-zinc-200 font-semibold">/v1/auth/sign-out</span>
+            <span class="text-zinc-200 font-semibold">/api/auth/sign-out</span>
           </div>
           <span class="text-xs text-zinc-500 font-mono">Invalidates Active Session</span>
         </div>
@@ -228,7 +262,7 @@ export function getImplementDocsHtml(): string {
 
   <!-- Footer -->
   <footer class="border-t border-zinc-900 bg-zinc-950 py-6 text-center text-xs text-zinc-500 font-mono">
-    Codekaro Developer Documentation • Better Auth Magic Link Integration Guide
+    Codekaro Developer Documentation • Better Auth OTP & Magic Link Integration Guide
   </footer>
 </body>
 </html>`;

@@ -1,5 +1,5 @@
 import { betterAuth } from 'better-auth';
-import { magicLink } from 'better-auth/plugins';
+import { emailOTP, magicLink } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '../db/index.js';
 import * as schema from '../db/schema.js';
@@ -69,6 +69,21 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    emailOTP({
+      async sendVerificationOTP({ email, otp, type }: { email: string; otp: string; type: string }) {
+        try {
+          const studentName = email.split('@')[0];
+          await queueGenericEmail(email, {
+            title: `${otp} is your Codekaro Verification Code`,
+            message: `Hello ${studentName},\n\nYour one-time login code is: ${otp}\n\nValid for 10 minutes. Do not share this code with anyone for security.`,
+            actionText: 'Sign In to Codekaro',
+            actionUrl: `${activeFrontendUrl}/login`,
+          });
+        } catch (err: any) {
+          console.error('[EmailOTP] Failed to dispatch OTP email:', err);
+        }
+      },
+    }),
     magicLink({
       sendMagicLink: async ({ email, url }: { email: string; url: string; token: string }) => {
         try {
