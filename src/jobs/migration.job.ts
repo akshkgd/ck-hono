@@ -58,9 +58,18 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           // 4. Occupation Mapping Logic:
           // - college -> organization
           const organizationValue = u.college || u.organization || null;
-          // - occupationType ('student' if college is present, or explicit occupationType, else 'other')
-          const occType: 'student' | 'professional' | 'academic' | 'other' =
-            u.occupationType || (u.college ? 'student' : 'other');
+
+          // Check valid enum types ('student', 'professional', 'academic', 'other')
+          const validOccupationTypes = ['student', 'professional', 'academic', 'other'];
+          let occType: 'student' | 'professional' | 'academic' | 'other' = 'student';
+
+          if (u.occupationType && validOccupationTypes.includes(u.occupationType)) {
+            occType = u.occupationType;
+          } else {
+            // If college is present or contains custom string (e.g. DTU), default to 'student'
+            occType = 'student';
+          }
+
           // - occupationTitle (if student, leave blank; else course -> occupationTitle)
           const occTitle = occType === 'student' ? null : (u.course || u.occupationTitle || null);
 
