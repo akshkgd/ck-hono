@@ -73,15 +73,9 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           // - occupationTitle (if student, leave blank; else course -> occupationTitle)
           const occTitle = occType === 'student' ? null : (u.course || u.occupationTitle || null);
 
-          // 5. Preserve all extra legacy fields in metadata jsonb
+          // 5. Clean metadata object (only legacyId and explicit metadata)
           const extraMetadata = {
             legacyId: u.id || null,
-            user_name: u.user_name || null,
-            college: u.college || null,
-            course: u.course || null,
-            gender: u.gender || null,
-            coupan: u.coupan || null,
-            telegramId: u.telegramId || null,
             ...(u.metadata || {}),
           };
 
