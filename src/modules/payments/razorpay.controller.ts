@@ -1,4 +1,5 @@
 import type { Context } from 'hono';
+import { setCookie } from 'hono/cookie';
 import { RazorpayService } from './razorpay.service.js';
 import { createRazorpayOrderSchema } from './razorpay.validation.js';
 
@@ -54,6 +55,17 @@ export class RazorpayController {
       const input = (c.req as any).valid('json');
 
       const result = await this.razorpayService.verifyPayment(input);
+
+      // Auto-set 30-day session cookie if student token was generated
+      if (result.data?.token) {
+        setCookie(c, 'better-auth.session_token', result.data.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'Lax',
+          maxAge: 60 * 60 * 24 * 30, // 30 Days
+          path: '/',
+        });
+      }
 
       return c.json(result, 200);
     } catch (err: any) {

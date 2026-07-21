@@ -8,6 +8,7 @@ import type { CreateRazorpayOrderInput, VerifyRazorpayPaymentInput } from './raz
 import argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
+import { auth } from '../../lib/auth.js';
 import { queuePaymentSuccessEmail, queueEnrollmentEmail, queueAccessGrantedEmail } from '../../queues/index.js';
 
 export class RazorpayService {
@@ -252,8 +253,23 @@ export class RazorpayService {
 
     // Security: Only auto-login if the role is student (prevent admin/teacher account takeover)
     if (user && user.role === 'student') {
-      const { password, ...userWithoutPassword } = user;
-      userProfile = userWithoutPassword;
+      try {
+        const api = auth.api as any;
+        const session = await api.createSession({
+          body: {
+            userId: user.id,
+          },
+        });
+
+        if (session) {
+          token = session.token;
+          userProfile = session.user || user;
+        }
+      } catch (err: any) {
+        console.error('[Razorpay Auto-Login] Failed to create Better Auth session:', err?.message || err);
+        const { password, ...userWithoutPassword } = user;
+        userProfile = userWithoutPassword;
+      }
     }
 
     const batch = await this.batchRepository.findById(enrollment.batchId);
