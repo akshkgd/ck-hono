@@ -28,6 +28,25 @@ export const auth = betterAuth({
     provider: 'pg',
     schema: schema,
   }),
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        defaultValue: 'student',
+        fieldName: 'role',
+      },
+      avatarUrl: {
+        type: 'string',
+        required: false,
+        fieldName: 'avatar_url',
+      },
+      mobile: {
+        type: 'string',
+        required: false,
+        fieldName: 'mobile',
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },

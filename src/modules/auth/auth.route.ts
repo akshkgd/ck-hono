@@ -6,7 +6,8 @@ const authRouter = new Hono();
 
 /**
  * Fast session getter for frontend load checks.
- * Guarantees 200 OK with null session when unauthenticated.
+ * Guarantees 200 OK with null session when unauthenticated,
+ * and ensures user.role is always present.
  */
 const getSessionHandler = async (c: any) => {
   try {
@@ -16,7 +17,19 @@ const getSessionHandler = async (c: any) => {
     if (!sessionData || !sessionData.user) {
       return c.json({ user: null, session: null }, 200);
     }
-    return c.json(sessionData, 200);
+
+    const user = sessionData.user as any;
+    const userWithDefaults = {
+      ...user,
+      role: user.role || 'student',
+      avatarUrl: user.avatarUrl || user.avatar_url || null,
+      mobile: user.mobile || null,
+    };
+
+    return c.json({
+      session: sessionData.session,
+      user: userWithDefaults,
+    }, 200);
   } catch (err: any) {
     return c.json({ user: null, session: null }, 200);
   }
