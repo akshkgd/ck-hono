@@ -13,6 +13,34 @@ function isValidEmail(email: any): boolean {
   return emailRegex.test(clean);
 }
 
+function parseRole(role: any): 'student' | 'admin' | 'user' | 'moderator' {
+  if (role === undefined || role === null) return 'student';
+  const roleStr = String(role).trim().toLowerCase();
+  const roleNum = Number(role);
+
+  if (roleNum === 100 || roleStr === '100' || roleStr === 'admin') {
+    return 'admin';
+  }
+  if (roleStr === 'moderator') {
+    return 'moderator';
+  }
+  return 'student';
+}
+
+function parseStatus(status: any): 'active' | 'inactive' | 'suspended' {
+  if (status === undefined || status === null) return 'active';
+  const statusStr = String(status).trim().toLowerCase();
+  const statusNum = Number(status);
+
+  if (statusNum === 0 || statusStr === '0' || statusStr === 'inactive' || statusStr === 'deactivated') {
+    return 'inactive';
+  }
+  if (statusStr === 'suspended' || statusStr === 'banned') {
+    return 'suspended';
+  }
+  return 'active';
+}
+
 export async function processMigrationJob(data: MigrationJobData, job?: Job): Promise<Record<string, any>> {
   const startTime = Date.now();
   const batchSize = data.batchSize || 2000;
@@ -56,21 +84,11 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
 
           const cleanEmail = String(u.email).toLowerCase().trim();
 
-          // 1. Normalize role (1 -> student, 100 -> admin)
-          let roleValue: 'student' | 'admin' | 'user' | 'moderator' = 'student';
-          if (u.role === 100 || u.role === '100' || u.role === 'admin') {
-            roleValue = 'admin';
-          } else if (u.role === 'moderator') {
-            roleValue = 'moderator';
-          }
+          // 1. Robust Role Parsing (100 / "100" / "admin" -> 'admin')
+          const roleValue = parseRole(u.role);
 
-          // 2. Normalize status (1 -> active, 0 -> inactive)
-          let statusValue: 'active' | 'inactive' | 'suspended' = 'active';
-          if (u.status === 0 || u.status === '0' || u.status === 'inactive') {
-            statusValue = 'inactive';
-          } else if (u.status === 'suspended') {
-            statusValue = 'suspended';
-          }
+          // 2. Robust Status Parsing (0 / "0" / "inactive" -> 'inactive')
+          const statusValue = parseStatus(u.status);
 
           // 3. Normalize email verification (1 -> true)
           const isVerified = u.is_verified === 1 || u.is_verified === '1' || u.is_verified === true || u.emailVerified === true;
@@ -104,9 +122,9 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             role: roleValue,
             status: statusValue,
             emailVerified: isVerified,
-            xp: typeof u.xp === 'number' ? u.xp : 0,
-            currentStreak: typeof u.current_streak === 'number' ? u.current_streak : 0,
-            longestStreak: typeof u.longest_streak === 'number' ? u.longest_streak : 0,
+            xp: typeof u.xp === 'number' ? u.xp : (Number(u.xp) || 0),
+            currentStreak: typeof u.current_streak === 'number' ? u.current_streak : (Number(u.current_streak) || 0),
+            longestStreak: typeof u.longest_streak === 'number' ? u.longest_streak : (Number(u.longest_streak) || 0),
             organization: organizationValue,
             occupationTitle: occTitle,
             occupationType: occType,
