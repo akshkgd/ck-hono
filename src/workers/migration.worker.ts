@@ -10,7 +10,7 @@ export const migrationWorker = new Worker(
     await logJobStart(job.id || String(job.timestamp), 'migration-queue', job.name, job.data);
 
     try {
-      const result = await processMigrationJob(job.data);
+      const result = await processMigrationJob(job.data, job);
       const durationMs = Date.now() - startTime;
       await logJobSuccess(job.id || String(job.timestamp), result, durationMs);
       return result;
