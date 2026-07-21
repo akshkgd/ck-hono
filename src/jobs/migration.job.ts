@@ -4,6 +4,15 @@ import { db } from '../db/index.js';
 import { users } from '../db/schema.js';
 import { Job } from 'bullmq';
 
+const emailRegex = /^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$/;
+
+function isValidEmail(email: any): boolean {
+  if (!email || typeof email !== 'string') return false;
+  const clean = email.trim();
+  if (clean.length < 5 || clean.length > 254) return false;
+  return emailRegex.test(clean);
+}
+
 export async function processMigrationJob(data: MigrationJobData, job?: Job): Promise<Record<string, any>> {
   const startTime = Date.now();
   const batchSize = data.batchSize || 2000;
@@ -34,8 +43,19 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
       const chunk = userList.slice(i, i + batchSize);
       
       try {
-        // Transform legacy PHP payload rows to PostgreSQL Hono Schema
-        const recordsToInsert = chunk.map((u) => {
+        const recordsToInsert: any[] = [];
+
+        // Filter and transform legacy PHP payload rows
+        for (const u of chunk) {
+          // Skip users with invalid/missing emails
+          if (!isValidEmail(u.email)) {
+            logger.warn(`[MigrationJob] Skipping user record with invalid email: "${u.email}" (Legacy ID: ${u.id || 'N/A'})`);
+            failedCount++;
+            continue;
+          }
+
+          const cleanEmail = String(u.email).toLowerCase().trim();
+
           // 1. Normalize role (1 -> student, 100 -> admin)
           let roleValue: 'student' | 'admin' | 'user' | 'moderator' = 'student';
           if (u.role === 100 || u.role === '100' || u.role === 'admin') {
@@ -56,21 +76,16 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           const isVerified = u.is_verified === 1 || u.is_verified === '1' || u.is_verified === true || u.emailVerified === true;
 
           // 4. Occupation Mapping Logic:
-          // - college -> organization
           const organizationValue = u.college || u.organization || null;
-
-          // Check valid enum types ('student', 'professional', 'academic', 'other')
           const validOccupationTypes = ['student', 'professional', 'academic', 'other'];
           let occType: 'student' | 'professional' | 'academic' | 'other' = 'student';
 
           if (u.occupationType && validOccupationTypes.includes(u.occupationType)) {
             occType = u.occupationType;
           } else {
-            // If college is present or contains custom string (e.g. DTU), default to 'student'
             occType = 'student';
           }
 
-          // - occupationTitle (if student, leave blank; else course -> occupationTitle)
           const occTitle = occType === 'student' ? null : (u.course || u.occupationTitle || null);
 
           // 5. Clean metadata object (only legacyId and explicit metadata)
@@ -79,9 +94,9 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             ...(u.metadata || {}),
           };
 
-          return {
-            email: u.email.toLowerCase().trim(),
-            name: u.name || u.user_name || u.email.split('@')[0],
+          recordsToInsert.push({
+            email: cleanEmail,
+            name: u.name || u.user_name || cleanEmail.split('@')[0],
             mobile: u.mobile || null,
             googleId: u.google_id || u.googleId || null,
             avatarUrl: u.avatar || u.avatarUrl || u.avatar_url || null,
@@ -99,13 +114,14 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             createdAt: u.created_at ? new Date(u.created_at) : new Date(),
             updatedAt: u.updated_at ? new Date(u.updated_at) : new Date(),
             lastActiveAt: u.lastActivity ? new Date(u.lastActivity) : (u.last_activity_date ? new Date(u.last_activity_date) : new Date()),
-          };
-        });
+          });
+        }
 
-        // High-Performance Batch Insert with ON CONFLICT DO NOTHING (prevents duplicate email crashes)
-        await db.insert(users).values(recordsToInsert).onConflictDoNothing({ target: users.email });
-
-        successCount += chunk.length;
+        // High-Performance Batch Insert with ON CONFLICT DO NOTHING for valid records
+        if (recordsToInsert.length > 0) {
+          await db.insert(users).values(recordsToInsert).onConflictDoNothing({ target: users.email });
+          successCount += recordsToInsert.length;
+        }
       } catch (err: any) {
         logger.error(`[MigrationJob] Batch insert failed at index ${i}: ${err.message}`);
         failedCount += chunk.length;
@@ -124,7 +140,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
     }
 
     const durationMs = Date.now() - startTime;
-    logger.info(`[MigrationJob] Bulk User Migration Completed: ${successCount} inserted, ${failedCount} failed in ${durationMs}ms`);
+    logger.info(`[MigrationJob] Bulk User Migration Completed: ${successCount} inserted, ${failedCount} failed/skipped in ${durationMs}ms`);
 
     return {
       migrationName: data.migrationName,

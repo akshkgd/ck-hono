@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const legacyUserItemSchema = z.object({
-  id: z.union([z.number(), z.string()]).optional(),
+  id: z.union([z.number(), z.string()]).optional().nullable(),
   name: z.string().optional().nullable(),
-  email: z.string().email('Invalid email address'),
+  email: z.string().optional().nullable(),
   mobile: z.string().optional().nullable(),
   avatar: z.string().optional().nullable(),
   avatarUrl: z.string().optional().nullable(),
