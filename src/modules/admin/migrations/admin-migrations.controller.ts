@@ -3,7 +3,7 @@ import { adminMigrationsService } from './admin-migrations.service.js';
 
 export class AdminMigrationsController {
   /**
-   * POST /v1/admin/migrations/users - Queue User Migration
+   * POST /v1/migration/users or /v1/admin/migrations/users - Queue User Migration Chunk
    */
   public queueUserMigration = async (c: Context) => {
     try {
@@ -13,12 +13,15 @@ export class AdminMigrationsController {
       const result = await adminMigrationsService.queueUserMigration(body, user?.id || 'admin');
 
       return c.json({
+        success: true,
         status: 'success',
-        message: `Migration job queued successfully for ${result.totalRecords} user records.`,
+        processed: result.totalRecords,
+        message: `Users chunk ${body.batch_index || 1} processed successfully.`,
         data: result,
-      }, 202);
+      }, 200);
     } catch (err: any) {
       return c.json({
+        success: false,
         status: 'error',
         message: err.message || 'Failed to queue user migration job',
       }, 400);

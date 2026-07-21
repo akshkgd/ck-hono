@@ -106,6 +106,7 @@ v1.route('/admin/course-progress', adminProgressRouter);
 v1.route('/admin/assignments', adminAssignmentsRouter);
 v1.route('/admin/email-settings', adminEmailSettingsRouter);
 v1.route('/admin/migrations', adminMigrationsRouter);
+v1.route('/migration', adminMigrationsRouter);
 v1.route('/course-progress', courseProgressRouter);
 v1.route('/student', studentRouter);
 v1.route('/payments/razorpay', razorpayRouter);
