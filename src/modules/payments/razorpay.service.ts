@@ -137,11 +137,12 @@ export class RazorpayService {
         throw new Error('Enrollment not found');
       }
 
-      if (enrollment.paymentStatus === 'captured') {
+      const remainingAmount = enrollment.amountPayable - enrollment.amountPaid;
+      if (remainingAmount <= 0) {
         throw new Error('Payment already completed for this enrollment');
       }
 
-      amountRupees = enrollment.amountPayable - enrollment.amountPaid;
+      amountRupees = remainingAmount;
     } else if (input.paymentType === 'renew') {
       const enrollmentId = input.enrollmentId!;
       enrollment = await this.enrollmentRepository.findById(enrollmentId);
