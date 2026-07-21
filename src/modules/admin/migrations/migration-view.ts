@@ -35,40 +35,52 @@ export function getMigrationProgressHtml(): string {
     <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center space-x-2.5">
         <div class="h-7 w-7 rounded bg-indigo-600 flex items-center justify-center font-semibold text-zinc-50 text-xs tracking-tight shadow-md shadow-indigo-600/20">CK</div>
-        <span class="text-zinc-50 font-semibold tracking-wide text-sm font-mono">10 Lakh User Migration Monitor</span>
+        <span class="text-zinc-50 font-semibold tracking-wide text-sm font-mono">Migration & DB Inspector</span>
       </div>
       <div class="flex items-center space-x-3">
+        <button onclick="fetchStatus()" class="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono transition">Refresh Now</button>
         <span id="auto-refresh-indicator" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono border border-emerald-500/20">
-          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span> Live (Polling 2s)
+          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span> Live (2s)
         </span>
       </div>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-6 py-10 flex-1 w-full space-y-8">
+  <main class="max-w-6xl mx-auto px-6 py-10 flex-1 w-full space-y-8">
 
-    <!-- Search / Input Job ID Bar -->
-    <section class="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl flex flex-col sm:flex-row items-center gap-3 justify-between">
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <span class="text-xs font-mono text-zinc-400">Job ID:</span>
-        <input type="text" id="job-id-input" placeholder="Auto-detecting active job..." class="bg-zinc-950 border border-zinc-800 text-zinc-100 text-xs font-mono px-3 py-2 rounded-lg w-full sm:w-80 focus:outline-none focus:border-indigo-500">
+    <!-- Top PostgreSQL DB Real-time Metrics -->
+    <section class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="bg-zinc-900/60 border border-zinc-800 p-5 rounded-2xl space-y-1">
+        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Total DB Users</div>
+        <div id="db-total-users" class="text-3xl font-extrabold text-white font-mono">0</div>
+        <div class="text-[11px] font-mono text-emerald-400">PostgreSQL Live Count</div>
       </div>
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-        <button onclick="fetchStatus()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono px-4 py-2 rounded-lg transition font-medium">Refresh Status</button>
-        <button onclick="clearAndFetchLatest()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-mono px-3 py-2 rounded-lg transition">Detect Active Job</button>
+      <div class="bg-zinc-900/60 border border-zinc-800 p-5 rounded-2xl space-y-1">
+        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Students Migrated</div>
+        <div id="db-students" class="text-3xl font-extrabold text-indigo-400 font-mono">0</div>
+        <div class="text-[11px] font-mono text-zinc-400">role = "student"</div>
+      </div>
+      <div class="bg-zinc-900/60 border border-zinc-800 p-5 rounded-2xl space-y-1">
+        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Admins Migrated</div>
+        <div id="db-admins" class="text-3xl font-extrabold text-purple-400 font-mono">0</div>
+        <div class="text-[11px] font-mono text-zinc-400">role = "admin" (role: 100)</div>
+      </div>
+      <div class="bg-zinc-900/60 border border-zinc-800 p-5 rounded-2xl space-y-1">
+        <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Redis Queue Chunks</div>
+        <div id="queue-active-waiting" class="text-3xl font-extrabold text-amber-400 font-mono">0</div>
+        <div id="queue-completed" class="text-[11px] font-mono text-zinc-400">0 completed</div>
       </div>
     </section>
 
     <!-- Main Live Stats Card -->
     <section class="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-8 space-y-6">
-      
       <div class="flex items-center justify-between flex-wrap gap-4 border-b border-zinc-800 pb-6">
         <div>
-          <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Migration Job State</div>
+          <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Job ID / Status</div>
           <div id="job-state" class="text-2xl font-bold text-white font-mono mt-1">Detecting...</div>
         </div>
         <div class="text-right">
-          <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Progress Percentage</div>
+          <div class="text-xs font-mono text-zinc-500 uppercase tracking-wider">Chunk Progress</div>
           <div id="progress-percent" class="text-3xl font-extrabold text-emerald-400 font-mono mt-1">0.0%</div>
         </div>
       </div>
@@ -76,7 +88,7 @@ export function getMigrationProgressHtml(): string {
       <!-- Animated Progress Bar -->
       <div class="space-y-2">
         <div class="flex justify-between text-xs font-mono text-zinc-400">
-          <span>Processed Records</span>
+          <span>Current Batch Items</span>
           <span id="processed-ratio">0 / 0</span>
         </div>
         <div class="w-full bg-zinc-950 rounded-full h-4 p-0.5 border border-zinc-800 overflow-hidden">
@@ -87,51 +99,74 @@ export function getMigrationProgressHtml(): string {
       <!-- Grid Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
         <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800/80 space-y-1">
-          <div class="text-xs font-mono text-zinc-500">Successfully Inserted</div>
+          <div class="text-xs font-mono text-zinc-500">Inserted (Current Batch)</div>
           <div id="success-count" class="text-xl font-bold font-mono text-emerald-400">0</div>
         </div>
         <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800/80 space-y-1">
-          <div class="text-xs font-mono text-zinc-500">Failed / Duplicate Rows</div>
+          <div class="text-xs font-mono text-zinc-500">Skipped / Invalid Emails</div>
           <div id="failed-count" class="text-xl font-bold font-mono text-rose-400">0</div>
         </div>
         <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800/80 space-y-1">
-          <div class="text-xs font-mono text-zinc-500">Execution Duration</div>
+          <div class="text-xs font-mono text-zinc-500">Batch Duration</div>
           <div id="duration" class="text-xl font-bold font-mono text-indigo-400">0s</div>
         </div>
       </div>
-
     </section>
 
-    <!-- Raw Live JSON Response Box -->
-    <section class="space-y-3">
-      <div class="flex items-center justify-between text-xs font-mono text-zinc-400">
-        <span>Raw Real-time Job Metrics Response</span>
-        <span class="text-zinc-600">GET /v1/admin/migrations/status/latest</span>
+    <!-- Recent Job Audit Logs Table -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-mono text-zinc-400 uppercase font-semibold">Recent Migration Audit Logs</h3>
+        <span class="text-xs font-mono text-zinc-600">Table: job_audit_logs</span>
       </div>
-      <pre id="raw-json" class="bg-zinc-950 p-5 rounded-xl border border-zinc-800 text-xs font-mono text-indigo-300 overflow-x-auto max-h-72 custom-scrollbar">Fetching live migration metrics...</pre>
+      <div class="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs font-mono">
+            <thead>
+              <tr class="border-b border-zinc-800 bg-zinc-900/60 text-zinc-400">
+                <th class="py-3 px-4 font-medium">Job ID</th>
+                <th class="py-3 px-4 font-medium">Status</th>
+                <th class="py-3 px-4 font-medium">Duration</th>
+                <th class="py-3 px-4 font-medium">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody" class="divide-y divide-zinc-900 text-zinc-300">
+              <tr>
+                <td colspan="4" class="py-6 text-center text-zinc-600">Loading recent audit logs...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
   </main>
 
   <script>
     async function fetchStatus() {
-      const inputVal = document.getElementById('job-id-input').value.trim();
-      const targetId = inputVal || 'latest';
-
       try {
-        const res = await fetch('/v1/admin/migrations/status/' + targetId);
+        const res = await fetch('/v1/admin/migrations/status/latest');
         const json = await res.json();
         
-        document.getElementById('raw-json').textContent = JSON.stringify(json, null, 2);
-
         if (json.data) {
           const d = json.data;
 
-          if (d.jobId && d.jobId !== 'none' && !inputVal) {
-            document.getElementById('job-id-input').value = d.jobId;
+          // 1. Update PostgreSQL DB Stats
+          if (d.dbStats) {
+            document.getElementById('db-total-users').textContent = Number(d.dbStats.totalUsersInDb || 0).toLocaleString();
+            document.getElementById('db-students').textContent = Number(d.dbStats.totalStudentsInDb || 0).toLocaleString();
+            document.getElementById('db-admins').textContent = Number(d.dbStats.totalAdminsInDb || 0).toLocaleString();
           }
 
-          document.getElementById('job-state').textContent = (d.state || 'idle').toUpperCase();
+          // 2. Update Queue Counts
+          if (d.queueCounts) {
+            const activeWaiting = (d.queueCounts.waiting || 0) + (d.queueCounts.active || 0);
+            document.getElementById('queue-active-waiting').textContent = activeWaiting.toLocaleString() + ' pending';
+            document.getElementById('queue-completed').textContent = (d.queueCounts.completed || 0).toLocaleString() + ' completed chunks';
+          }
+
+          // 3. Update Current Job Progress
+          document.getElementById('job-state').textContent = (d.jobId !== 'none' ? (d.jobId + ' (' + (d.state || 'active').toUpperCase() + ')') : 'IDLE');
           document.getElementById('progress-percent').textContent = d.progress?.percentage || '0%';
           document.getElementById('processed-ratio').textContent = (d.progress?.processed || 0).toLocaleString() + ' / ' + (d.progress?.total || 0).toLocaleString();
           
@@ -147,15 +182,27 @@ export function getMigrationProgressHtml(): string {
             const durationSec = Math.max(0, Math.round((end - start) / 1000));
             document.getElementById('duration').textContent = durationSec + 's';
           }
+
+          // 4. Update Audit Logs Table
+          if (d.recentLogs && d.recentLogs.length > 0) {
+            const rowsHtml = d.recentLogs.map(log => {
+              const statusColor = log.status === 'completed' ? 'text-emerald-400' : (log.status === 'failed' ? 'text-rose-400' : 'text-amber-400');
+              const dateStr = log.createdAt ? new Date(log.createdAt).toLocaleTimeString() : 'N/A';
+              return '<tr class="hover:bg-zinc-900/40 transition">' +
+                '<td class="py-2.5 px-4 font-mono text-indigo-300">' + (log.jobId || log.id) + '</td>' +
+                '<td class="py-2.5 px-4 font-semibold uppercase ' + statusColor + '">' + log.status + '</td>' +
+                '<td class="py-2.5 px-4 font-mono text-zinc-400">' + (log.durationMs ? log.durationMs + 'ms' : 'In Progress') + '</td>' +
+                '<td class="py-2.5 px-4 text-zinc-500">' + dateStr + '</td>' +
+              '</tr>';
+            }).join('');
+            document.getElementById('logs-tbody').innerHTML = rowsHtml;
+          } else {
+            document.getElementById('logs-tbody').innerHTML = '<tr><td colspan="4" class="py-4 text-center text-zinc-600">No audit logs recorded yet.</td></tr>';
+          }
         }
       } catch (err) {
-        document.getElementById('raw-json').textContent = 'Error fetching status: ' + err.message;
+        console.error('Error fetching migration status:', err);
       }
-    }
-
-    function clearAndFetchLatest() {
-      document.getElementById('job-id-input').value = '';
-      fetchStatus();
     }
 
     // Auto-poll every 2 seconds

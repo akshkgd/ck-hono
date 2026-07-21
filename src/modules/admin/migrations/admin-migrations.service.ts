@@ -2,6 +2,9 @@ import { addMigrationJob, migrationQueue } from '../../../queues/index.js';
 import { BulkUserMigrationInput } from './admin-migrations.validation.js';
 import { logJobStart } from '../../../workers/audit.js';
 import { processMigrationJob } from '../../../jobs/migration.job.js';
+import { db } from '../../../db/index.js';
+import { users, jobAuditLogs } from '../../../db/schema.js';
+import { sql, eq, desc } from 'drizzle-orm';
 
 export class AdminMigrationsService {
   /**
@@ -68,7 +71,7 @@ export class AdminMigrationsService {
   }
 
   /**
-   * Get live progress status of a running migration job (or latest active/completed job)
+   * Get live progress status, live PostgreSQL user counts, and recent audit logs
    */
   async getMigrationStatus(jobId?: string) {
     let targetJob: any = null;
@@ -77,7 +80,6 @@ export class AdminMigrationsService {
       targetJob = await migrationQueue.getJob(jobId);
     }
 
-    // If no specific jobId provided or 'latest' requested, find active or most recent job
     if (!targetJob) {
       const activeJobs = await migrationQueue.getJobs(['active'], 0, 10);
       if (activeJobs.length > 0) {
@@ -100,14 +102,44 @@ export class AdminMigrationsService {
       }
     }
 
-    const queueCounts = await migrationQueue.getJobCounts('waiting', 'active', 'completed', 'failed');
+    // Fetch live PostgreSQL counts & recent audit logs concurrently
+    const [queueCounts, dbStats, recentLogs] = await Promise.all([
+      migrationQueue.getJobCounts('waiting', 'active', 'completed', 'failed'),
+      (async () => {
+        try {
+          const [totalRes] = await db.select({ count: sql<number>`count(*)` }).from(users);
+          const [adminRes] = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.role, 'admin'));
+          const [studentRes] = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.role, 'student'));
+          return {
+            totalUsersInDb: Number(totalRes?.count || 0),
+            totalAdminsInDb: Number(adminRes?.count || 0),
+            totalStudentsInDb: Number(studentRes?.count || 0),
+          };
+        } catch {
+          return { totalUsersInDb: 0, totalAdminsInDb: 0, totalStudentsInDb: 0 };
+        }
+      })(),
+      (async () => {
+        try {
+          return await db.select()
+            .from(jobAuditLogs)
+            .where(eq(jobAuditLogs.queueName, 'migration-queue'))
+            .orderBy(desc(jobAuditLogs.createdAt))
+            .limit(10);
+        } catch {
+          return [];
+        }
+      })(),
+    ]);
 
     if (!targetJob) {
       return {
         jobId: 'none',
-        name: 'No active jobs',
+        name: 'No active migration jobs',
         state: 'idle',
+        dbStats,
         queueCounts,
+        recentLogs,
         progress: {
           processed: 0,
           total: 0,
@@ -129,7 +161,9 @@ export class AdminMigrationsService {
       jobId: targetJob.id,
       name: targetJob.name,
       state, // "queued" | "active" | "completed" | "failed"
+      dbStats,
       queueCounts,
+      recentLogs,
       progress: {
         processed,
         total,
