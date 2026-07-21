@@ -4,13 +4,11 @@ import { db } from '../db/index.js';
 import { users } from '../db/schema.js';
 import { Job } from 'bullmq';
 
-const emailRegex = /^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$/;
-
 function isValidEmail(email: any): boolean {
   if (!email || typeof email !== 'string') return false;
-  const clean = email.trim();
+  const clean = email.trim().toLowerCase();
   if (clean.length < 5 || clean.length > 254) return false;
-  return emailRegex.test(clean);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean);
 }
 
 function parseRole(role: any): 'student' | 'admin' | 'user' | 'moderator' {
