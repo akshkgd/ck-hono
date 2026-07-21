@@ -120,6 +120,7 @@ app.route('/changelog', changelogRouter);
 app.route('/playground', playgroundRouter);
 app.route('/student-docs', studentDocsRouter);
 app.get('/admin/logs', (c) => c.html(renderLogsView()));
+app.get('/migration-status', (c) => c.html(getMigrationProgressHtml()));
 app.get('/docs/migration-status', (c) => c.html(getMigrationProgressHtml()));
 app.get('/admin/migrations/view', (c) => c.html(getMigrationProgressHtml()));
 
