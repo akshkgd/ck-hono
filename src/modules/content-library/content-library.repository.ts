@@ -6,7 +6,7 @@ export type ContentLibraryItem = typeof contentLibrary.$inferSelect;
 export type NewContentLibraryItem = typeof contentLibrary.$inferInsert;
 
 export class ContentLibraryRepository {
-  public async findById(id: number): Promise<ContentLibraryItem | null> {
+  public async findById(id: string): Promise<ContentLibraryItem | null> {
     const results = await db
       .select()
       .from(contentLibrary)
@@ -25,7 +25,7 @@ export class ContentLibraryRepository {
     return results[0];
   }
 
-  public async update(id: number, data: Partial<NewContentLibraryItem>): Promise<ContentLibraryItem | null> {
+  public async update(id: string, data: Partial<NewContentLibraryItem>): Promise<ContentLibraryItem | null> {
     const results = await db
       .update(contentLibrary)
       .set({
@@ -38,7 +38,7 @@ export class ContentLibraryRepository {
     return results[0] || null;
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: string): Promise<boolean> {
     const results = await db
       .delete(contentLibrary)
       .where(eq(contentLibrary.id, id))

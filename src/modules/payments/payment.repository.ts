@@ -6,7 +6,7 @@ export type Payment = typeof batchEnrollmentPayments.$inferSelect;
 export type NewPayment = typeof batchEnrollmentPayments.$inferInsert;
 
 export class PaymentRepository {
-  public async findById(id: number) {
+  public async findById(id: string) {
     const results = await db
       .select({
         id: batchEnrollmentPayments.id,
@@ -76,7 +76,7 @@ export class PaymentRepository {
     return results[0];
   }
 
-  public async update(id: number, data: Partial<NewPayment>): Promise<Payment | null> {
+  public async update(id: string, data: Partial<NewPayment>): Promise<Payment | null> {
     const results = await db
       .update(batchEnrollmentPayments)
       .set({
@@ -89,7 +89,7 @@ export class PaymentRepository {
     return results[0] || null;
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: string): Promise<boolean> {
     const results = await db
       .delete(batchEnrollmentPayments)
       .where(eq(batchEnrollmentPayments.id, id))
@@ -98,7 +98,7 @@ export class PaymentRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number, batchEnrollmentId?: number) {
+  public async search(queryText: string, limit: number, offset: number, batchEnrollmentId?: string) {
     let query = db
       .select({
         id: batchEnrollmentPayments.id,
@@ -147,7 +147,7 @@ export class PaymentRepository {
     return query.limit(limit).offset(offset);
   }
 
-  public async count(queryText: string, batchEnrollmentId?: number): Promise<number> {
+  public async count(queryText: string, batchEnrollmentId?: string): Promise<number> {
     let query = db
       .select({ count: sql<number>`count(*)` })
       .from(batchEnrollmentPayments)

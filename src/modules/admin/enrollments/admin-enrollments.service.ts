@@ -180,7 +180,7 @@ export class AdminEnrollmentsService {
     };
   }
 
-  public async getEnrollment(id: number) {
+  public async getEnrollment(id: string) {
     const enrollment = await this.enrollmentRepository.findById(id);
     if (!enrollment) {
       throw new Error('Enrollment not found');
@@ -203,7 +203,7 @@ export class AdminEnrollmentsService {
     };
   }
 
-  public async updateEnrollment(id: number, input: UpdateEnrollmentInput) {
+  public async updateEnrollment(id: string, input: UpdateEnrollmentInput) {
     const enrollment = await this.enrollmentRepository.findById(id);
     if (!enrollment) {
       throw new Error('Enrollment not found');
@@ -287,7 +287,7 @@ export class AdminEnrollmentsService {
     });
   }
 
-  public async deleteEnrollment(id: number) {
+  public async deleteEnrollment(id: string) {
     const enrollment = await this.enrollmentRepository.findById(id);
     if (!enrollment) {
       throw new Error('Enrollment not found');

@@ -32,8 +32,8 @@ export class CourseProgressController {
   public getBatchProgress = async (c: Context) => {
     try {
       const user = c.get('user');
-      const batchId = parseInt(c.req.param('batchId')!, 10);
-      if (isNaN(batchId)) {
+      const batchId = c.req.param('batchId') || '';
+      if (!batchId) {
         throw new Error('Invalid batch ID');
       }
 

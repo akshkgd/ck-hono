@@ -14,12 +14,8 @@ export class PublicBatchesController {
       if (!idParam) {
         return c.json({ status: 'error', message: 'Missing batch ID' }, 400);
       }
-      const id = parseInt(idParam, 10);
-      if (isNaN(id)) {
-        return c.json({ status: 'error', message: 'Invalid batch ID' }, 400);
-      }
 
-      const batch = await this.batchRepository.findById(id);
+      const batch = await this.batchRepository.findById(idParam);
       if (!batch) {
         return c.json({ status: 'error', message: 'Batch not found' }, 404);
       }

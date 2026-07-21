@@ -35,8 +35,8 @@ export class AdminBatchContentController {
 
   public get = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid ID');
       }
 
@@ -93,8 +93,8 @@ export class AdminBatchContentController {
 
   public edit = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid ID');
       }
       const rawBody = await c.req.json();
@@ -116,8 +116,8 @@ export class AdminBatchContentController {
 
   public delete = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid ID');
       }
       await this.adminBatchContentService.deleteBatchContent(id);

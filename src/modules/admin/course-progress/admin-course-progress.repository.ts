@@ -6,7 +6,7 @@ export class AdminCourseProgressRepository {
   public async getProgressList(
     start: Date,
     end: Date,
-    batchId?: number,
+    batchId?: string,
     email?: string,
     limit: number = 50,
     offset: number = 0,
@@ -72,7 +72,7 @@ export class AdminCourseProgressRepository {
   public async countProgressTotal(
     start: Date,
     end: Date,
-    batchId?: number,
+    batchId?: string,
     email?: string,
     name?: string
   ): Promise<number> {
@@ -104,7 +104,7 @@ export class AdminCourseProgressRepository {
   public async getProgressAnalytics(
     start: Date,
     end: Date,
-    batchId?: number,
+    batchId?: string,
     email?: string,
     name?: string
   ) {
@@ -140,7 +140,7 @@ export class AdminCourseProgressRepository {
   public async getDailyProgressAnalytics(
     start: Date,
     end: Date,
-    batchId?: number,
+    batchId?: string,
     email?: string,
     name?: string
   ) {
@@ -174,7 +174,7 @@ export class AdminCourseProgressRepository {
       .orderBy(sql`date_trunc('day', ${courseProgress.updatedAt})`);
   }
 
-  public async getEnrollmentDetails(enrollmentId: number) {
+  public async getEnrollmentDetails(enrollmentId: string) {
     const results = await db
       .select({
         id: batchEnrollments.id,
@@ -209,7 +209,7 @@ export class AdminCourseProgressRepository {
     return results[0];
   }
 
-  public async getBatchSections(batchId: number) {
+  public async getBatchSections(batchId: string) {
     return db
       .select({
         id: batchSections.id,
@@ -221,7 +221,7 @@ export class AdminCourseProgressRepository {
       .orderBy(asc(batchSections.order));
   }
 
-  public async getBatchContentWithProgress(batchId: number, userId: string, enrollmentId: number) {
+  public async getBatchContentWithProgress(batchId: string, userId: string, enrollmentId: string) {
     return db
       .select({
         id: batchContent.id,

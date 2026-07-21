@@ -6,7 +6,7 @@ export type Enrollment = typeof batchEnrollments.$inferSelect;
 export type NewEnrollment = typeof batchEnrollments.$inferInsert;
 
 export class EnrollmentRepository {
-  public async findById(id: number, tx: any = db) {
+  public async findById(id: string, tx: any = db) {
     const results = await tx
       .select({
         id: batchEnrollments.id,
@@ -83,7 +83,7 @@ export class EnrollmentRepository {
     return results[0];
   }
 
-  public async update(id: number, data: Partial<NewEnrollment>, tx: any = db): Promise<Enrollment | null> {
+  public async update(id: string, data: Partial<NewEnrollment>, tx: any = db): Promise<Enrollment | null> {
     const results = await tx
       .update(batchEnrollments)
       .set({
@@ -96,7 +96,7 @@ export class EnrollmentRepository {
     return results[0] || null;
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: string): Promise<boolean> {
     const results = await db
       .delete(batchEnrollments)
       .where(eq(batchEnrollments.id, id))
@@ -109,7 +109,7 @@ export class EnrollmentRepository {
     queryText: string,
     limit: number,
     offset: number,
-    batchId?: number,
+    batchId?: string,
     userId?: string,
     paymentStatus?: 'captured' | 'failed' | 'created' | 'refunded',
     sortBy: 'createdAt' | 'progress' | 'amountPaid' | 'timeSpentSeconds' = 'createdAt',
@@ -197,7 +197,7 @@ export class EnrollmentRepository {
 
   public async count(
     queryText: string,
-    batchId?: number,
+    batchId?: string,
     userId?: string,
     paymentStatus?: 'captured' | 'failed' | 'created' | 'refunded'
   ): Promise<number> {
@@ -265,9 +265,9 @@ export class EnrollmentRepository {
       .from(batchEnrollments)
       .leftJoin(batches, eq(batchEnrollments.batchId, batches.id))
       .where(eq(batchEnrollments.userId, userId));
-   }
+  }
 
-  public async recalculateAmountPaid(enrollmentId: number, tx: any = db): Promise<number> {
+  public async recalculateAmountPaid(enrollmentId: string, tx: any = db): Promise<number> {
     const enrollment = await tx
       .select({
         amountPayable: batchEnrollments.amountPayable,
@@ -335,7 +335,7 @@ export class EnrollmentRepository {
     return totalPaid;
   }
 
-  public async findByUserAndBatch(userId: string, batchId: number): Promise<Enrollment | null> {
+  public async findByUserAndBatch(userId: string, batchId: string): Promise<Enrollment | null> {
     const results = await db
       .select()
       .from(batchEnrollments)

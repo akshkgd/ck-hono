@@ -6,7 +6,7 @@ export type CourseProgress = typeof courseProgress.$inferSelect;
 export type NewCourseProgress = typeof courseProgress.$inferInsert;
 
 export class CourseProgressRepository {
-  public async findByEnrollmentAndContent(enrollmentId: number, batchContentId: number): Promise<CourseProgress | null> {
+  public async findByEnrollmentAndContent(enrollmentId: string, batchContentId: string): Promise<CourseProgress | null> {
     const results = await db
       .select()
       .from(courseProgress)
@@ -39,14 +39,14 @@ export class CourseProgressRepository {
     return results[0];
   }
 
-  public async getProgressForEnrollment(enrollmentId: number): Promise<CourseProgress[]> {
+  public async getProgressForEnrollment(enrollmentId: string): Promise<CourseProgress[]> {
     return db
       .select()
       .from(courseProgress)
       .where(eq(courseProgress.enrollmentId, enrollmentId));
   }
 
-  public async getAggregateProgressForEnrollment(enrollmentId: number) {
+  public async getAggregateProgressForEnrollment(enrollmentId: string) {
     const results = await db
       .select({
         totalTimeSpent: sql<number>`coalesce(sum(${courseProgress.timeSpent}), 0)`,

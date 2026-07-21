@@ -24,7 +24,7 @@ export class AdminAssignmentsService {
         start,
         end,
         input.status || undefined,
-        input.batchId,
+        input.batchId || undefined,
         input.email || undefined,
         limit,
         offset,
@@ -34,7 +34,7 @@ export class AdminAssignmentsService {
         start,
         end,
         input.status || undefined,
-        input.batchId,
+        input.batchId || undefined,
         input.email || undefined,
         input.name || undefined
       ),
@@ -50,7 +50,7 @@ export class AdminAssignmentsService {
     };
   }
 
-  public async gradeSubmission(progressId: number, input: GradeAssignmentInput) {
+  public async gradeSubmission(progressId: string, input: GradeAssignmentInput) {
     const progress = await this.repository.findProgressById(progressId);
     if (!progress) {
       throw new Error('Progress record not found');
@@ -70,9 +70,7 @@ export class AdminAssignmentsService {
     return updated;
   }
 
-
-
-  public async getEnrollmentAssignmentsReport(enrollmentId: number) {
+  public async getEnrollmentAssignmentsReport(enrollmentId: string) {
     const report = await this.repository.getEnrollmentAssignments(enrollmentId);
     if (!report) {
       throw new Error('Enrollment not found');
@@ -80,7 +78,7 @@ export class AdminAssignmentsService {
     return report;
   }
 
-  public async getAssignmentSubmission(progressId: number) {
+  public async getAssignmentSubmission(progressId: string) {
     const details = await this.repository.getAssignmentDetailsById(progressId);
     if (!details) {
       throw new Error('Assignment submission not found');

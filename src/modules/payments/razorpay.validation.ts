@@ -2,14 +2,14 @@ import { z } from 'zod';
 
 export const createRazorpayOrderSchema = z.object({
   paymentType: z.enum(['enrollment', 'pending_payment', 'renew']).default('enrollment'),
-  batchId: z.number().int().positive().optional(),
-  enrollmentId: z.number().int().positive().optional(),
+  batchId: z.string().optional(),
+  enrollmentId: z.string().optional(),
   email: z.string().email().optional(),
   phone: z.string().min(10).max(15).optional(),
   name: z.string().max(255).optional(),
 }).refine((data) => {
   if (data.paymentType === 'enrollment') {
-    return data.batchId !== undefined;
+    return data.batchId !== undefined && data.batchId.length > 0;
   }
   return true;
 }, {
@@ -17,7 +17,7 @@ export const createRazorpayOrderSchema = z.object({
   path: ['batchId'],
 }).refine((data) => {
   if (data.paymentType === 'pending_payment' || data.paymentType === 'renew') {
-    return data.enrollmentId !== undefined;
+    return data.enrollmentId !== undefined && data.enrollmentId.length > 0;
   }
   return true;
 }, {
@@ -26,7 +26,7 @@ export const createRazorpayOrderSchema = z.object({
 });
 
 export const verifyRazorpayPaymentSchema = z.object({
-  enrollmentId: z.number().int().positive(),
+  enrollmentId: z.string(),
   razorpay_payment_id: z.string().min(1),
   razorpay_order_id: z.string().min(1),
   razorpay_signature: z.string().min(1),

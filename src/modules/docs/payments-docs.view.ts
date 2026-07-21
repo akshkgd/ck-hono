@@ -111,8 +111,8 @@ export function getPaymentsDocsHtml(): string {
             <div class="text-zinc-400 text-xs font-mono mb-2">Request Payload Schema:</div>
             <pre class="bg-zinc-950 text-zinc-300 p-3 rounded text-xs font-mono overflow-x-auto"><code>{
   "paymentType": "enrollment" | "pending_payment" | "renew", // Optional (defaults to "enrollment")
-  "batchId": number,           // Required ONLY if paymentType is "enrollment"
-  "enrollmentId": number,      // Required ONLY if paymentType is "pending_payment" or "renew"
+  "batchId": string,           // Required ONLY if paymentType is "enrollment" (UUID string)
+  "enrollmentId": string,      // Required ONLY if paymentType is "pending_payment" or "renew" (UUID string)
   "email": string,             // Required for guest checkout (no auth header)
   "phone": string,             // Required for guest checkout (no auth header)
   "name": string               // Optional guest name
@@ -133,8 +133,8 @@ export function getPaymentsDocsHtml(): string {
             <div class="text-zinc-400 text-xs font-mono mb-2">Request Query Parameters Schema:</div>
             <ul class="list-disc pl-5 text-xs text-zinc-400 font-mono space-y-1 mb-4">
               <li><code>paymentType</code>: "enrollment" | "pending_payment" | "renew" (Optional, defaults to <code>"enrollment"</code>)</li>
-              <li><code>batchId</code>: number (Required if paymentType is "enrollment")</li>
-              <li><code>enrollmentId</code>: number (Required if paymentType is "pending_payment" or "renew")</li>
+              <li><code>batchId</code>: string (Required if paymentType is "enrollment" - UUID)</li>
+              <li><code>enrollmentId</code>: string (Required if paymentType is "pending_payment" or "renew" - UUID)</li>
               <li><code>email</code>: string (Required for guest checkout)</li>
               <li><code>phone</code>: string (Required for guest checkout)</li>
               <li><code>name</code>: string (Optional guest name)</li>

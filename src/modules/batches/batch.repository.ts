@@ -6,7 +6,7 @@ export type Batch = typeof batches.$inferSelect;
 export type NewBatch = typeof batches.$inferInsert;
 
 export class BatchRepository {
-  public async findById(id: number): Promise<Batch | null> {
+  public async findById(id: string): Promise<Batch | null> {
     const results = await db
       .select()
       .from(batches)
@@ -16,7 +16,7 @@ export class BatchRepository {
     return results[0] || null;
   }
 
-  public async getBatchStats(batchId: number) {
+  public async getBatchStats(batchId: string) {
     const stats = await db
       .select({
         totalEnrollments: sql<number>`cast(count(${batchEnrollments.id}) as integer)`,
@@ -46,7 +46,7 @@ export class BatchRepository {
     return results[0];
   }
 
-  public async update(id: number, data: Partial<NewBatch>): Promise<Batch | null> {
+  public async update(id: string, data: Partial<NewBatch>): Promise<Batch | null> {
     const results = await db
       .update(batches)
       .set({
@@ -59,7 +59,7 @@ export class BatchRepository {
     return results[0] || null;
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: string): Promise<boolean> {
     const results = await db
       .delete(batches)
       .where(eq(batches.id, id))

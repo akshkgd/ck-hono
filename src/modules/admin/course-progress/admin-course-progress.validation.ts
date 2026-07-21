@@ -12,10 +12,7 @@ export const progressQuerySchema = z.object({
   ]).default('this_week'),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
-  batchId: z.string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : undefined))
-    .refine((val) => val === undefined || !isNaN(val), 'batchId must be a valid number'),
+  batchId: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
   name: z.string().optional().nullable(),
   page: z.string()
@@ -39,9 +36,7 @@ export const progressQuerySchema = z.object({
 export type ProgressQueryInput = z.infer<typeof progressQuerySchema>;
 
 export const enrollmentProgressParamsSchema = z.object({
-  enrollmentId: z.string()
-    .transform((val) => parseInt(val, 10))
-    .refine((val) => !isNaN(val) && val > 0, 'enrollmentId must be a positive number'),
+  enrollmentId: z.string(),
 });
 
 export type EnrollmentProgressParamsInput = z.infer<typeof enrollmentProgressParamsSchema>;

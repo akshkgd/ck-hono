@@ -41,9 +41,8 @@ export class StudentController {
         }, 401);
       }
 
-      const batchIdStr = c.req.param('batchId') || '';
-      const batchId = parseInt(batchIdStr, 10);
-      if (isNaN(batchId)) {
+      const batchId = c.req.param('batchId') || '';
+      if (!batchId) {
         return c.json({
           status: 'error',
           message: 'Bad Request: Invalid batch ID',
@@ -74,9 +73,8 @@ export class StudentController {
         }, 401);
       }
 
-      const batchContentIdStr = c.req.param('batchContentId') || '';
-      const batchContentId = parseInt(batchContentIdStr, 10);
-      if (isNaN(batchContentId)) {
+      const batchContentId = c.req.param('batchContentId') || '';
+      if (!batchContentId) {
         return c.json({
           status: 'error',
           message: 'Bad Request: Invalid batch content ID',
@@ -134,8 +132,8 @@ export class StudentController {
         }, 401);
       }
 
-      const batchContentId = parseInt(c.req.param('batchContentId') || '', 10);
-      if (isNaN(batchContentId)) {
+      const batchContentId = c.req.param('batchContentId') || '';
+      if (!batchContentId) {
         return c.json({
           status: 'error',
           message: 'Bad Request: Invalid batch content ID',

@@ -34,8 +34,8 @@ export class AdminPaymentsController {
 
   public get = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid payment ID');
       }
 
@@ -73,8 +73,8 @@ export class AdminPaymentsController {
 
   public edit = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid payment ID');
       }
       const rawBody = await c.req.json();
@@ -96,8 +96,8 @@ export class AdminPaymentsController {
 
   public delete = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid payment ID');
       }
       await this.adminPaymentsService.deletePayment(id);

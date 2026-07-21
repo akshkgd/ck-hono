@@ -27,7 +27,7 @@ export class AdminBatchSectionsService {
     return section;
   }
 
-  public async getSection(id: number) {
+  public async getSection(id: string) {
     const section = await this.batchSectionRepository.findById(id);
     if (!section) {
       throw new Error('Batch section not found');
@@ -35,7 +35,7 @@ export class AdminBatchSectionsService {
     return section;
   }
 
-  public async updateSection(id: number, input: UpdateBatchSectionInput) {
+  public async updateSection(id: string, input: UpdateBatchSectionInput) {
     const section = await this.batchSectionRepository.findById(id);
     if (!section) {
       throw new Error('Batch section not found');
@@ -55,7 +55,7 @@ export class AdminBatchSectionsService {
     return updated;
   }
 
-  public async deleteSection(id: number) {
+  public async deleteSection(id: string) {
     const section = await this.batchSectionRepository.findById(id);
     if (!section) {
       throw new Error('Batch section not found');
@@ -79,7 +79,7 @@ export class AdminBatchSectionsService {
     };
   }
 
-  public async reorderSections(orders: { id: number; order: number }[]) {
+  public async reorderSections(orders: { id: string; order: number }[]) {
     await this.batchSectionRepository.updateOrders(orders);
     return true;
   }

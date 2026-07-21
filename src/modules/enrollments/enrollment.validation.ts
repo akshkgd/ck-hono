@@ -6,7 +6,7 @@ export const subscriptionStatusSchema = z.enum(['active', 'expired', 'pending'])
 
 export const createEnrollmentSchema = z.object({
   userId: z.string().uuid(),
-  batchId: z.number().int().positive(),
+  batchId: z.string(),
   amountPayable: z.number().int().nonnegative().optional().nullable(),
   enrollmentType: enrollmentTypeSchema.default('oneTime'),
   status: z.number().int().min(0).max(4).default(0),
@@ -43,7 +43,7 @@ export const updateEnrollmentSchema = createEnrollmentSchema.partial();
 
 export const enrollmentSearchQuerySchema = z.object({
   q: z.string().default(''),
-  batchId: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().positive().optional()),
+  batchId: z.string().optional(),
   userId: z.string().uuid().optional(),
   paymentStatus: paymentStatusSchema.optional(),
   sortBy: z.enum(['createdAt', 'progress', 'amountPaid', 'timeSpentSeconds']).optional().default('createdAt'),

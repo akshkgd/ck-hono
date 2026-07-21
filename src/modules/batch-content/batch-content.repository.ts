@@ -6,7 +6,7 @@ export type BatchContent = typeof batchContent.$inferSelect;
 export type NewBatchContent = typeof batchContent.$inferInsert;
 
 export class BatchContentRepository {
-  public async findById(id: number) {
+  public async findById(id: string) {
     const results = await db
       .select({
         id: batchContent.id,
@@ -68,7 +68,7 @@ export class BatchContentRepository {
     return results[0];
   }
 
-  public async update(id: number, data: Partial<NewBatchContent>): Promise<BatchContent | null> {
+  public async update(id: string, data: Partial<NewBatchContent>): Promise<BatchContent | null> {
     const results = await db
       .update(batchContent)
       .set({
@@ -81,7 +81,7 @@ export class BatchContentRepository {
     return results[0] || null;
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: string): Promise<boolean> {
     const results = await db
       .delete(batchContent)
       .where(eq(batchContent.id, id))
@@ -90,7 +90,7 @@ export class BatchContentRepository {
     return results.length > 0;
   }
 
-  public async search(limit: number, offset: number, batchId?: number, sectionId?: number) {
+  public async search(limit: number, offset: number, batchId?: string, sectionId?: string) {
     let query = db
       .select({
         id: batchContent.id,
@@ -141,7 +141,7 @@ export class BatchContentRepository {
       .offset(offset);
   }
 
-  public async count(batchId?: number, sectionId?: number): Promise<number> {
+  public async count(batchId?: string, sectionId?: string): Promise<number> {
     let query = db.select({ count: sql<number>`count(*)` }).from(batchContent).$dynamic();
 
     const conditions = [];
@@ -160,7 +160,7 @@ export class BatchContentRepository {
     return Number(results[0]?.count || 0);
   }
 
-  public async updateOrders(orders: { id: number; order: number }[]): Promise<void> {
+  public async updateOrders(orders: { id: string; order: number }[]): Promise<void> {
     await db.transaction(async (tx) => {
       for (const item of orders) {
         await tx
@@ -172,9 +172,9 @@ export class BatchContentRepository {
   }
 
   public async createBulk(
-    batchId: number,
-    sectionId: number,
-    items: { contentId: number; accessOn: number; accessTill: number; canSubmitAssignment?: boolean | null }[]
+    batchId: string,
+    sectionId: string,
+    items: { contentId: string; accessOn: number; accessTill: number; canSubmitAssignment?: boolean | null }[]
   ): Promise<BatchContent[]> {
     return db.transaction(async (tx) => {
       // 1. Find current max order for this section

@@ -33,8 +33,8 @@ export class AdminContentLibraryController {
 
   public get = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid item ID');
       }
 
@@ -72,8 +72,8 @@ export class AdminContentLibraryController {
 
   public edit = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid item ID');
       }
       const rawBody = await c.req.json();
@@ -95,8 +95,8 @@ export class AdminContentLibraryController {
 
   public delete = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid item ID');
       }
       await this.adminContentLibraryService.deleteItem(id);

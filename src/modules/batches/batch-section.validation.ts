@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createBatchSectionSchema = z.object({
   title: z.string().min(1).max(255),
-  batchId: z.number().int().positive().optional().nullable(),
+  batchId: z.string().optional().nullable(),
   order: z.number().int().optional().nullable(),
 });
 
@@ -10,7 +10,7 @@ export const updateBatchSectionSchema = createBatchSectionSchema.partial();
 
 export const batchSectionSearchQuerySchema = z.object({
   q: z.string().default(''),
-  batchId: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().positive().optional()),
+  batchId: z.string().optional(),
   limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(50).default(10)),
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
 });
@@ -22,7 +22,7 @@ export type BatchSectionSearchQueryInput = z.infer<typeof batchSectionSearchQuer
 export const batchSectionReorderSchema = z.object({
   orders: z.array(
     z.object({
-      id: z.number().int().positive(),
+      id: z.string(),
       order: z.number().int(),
     })
   ),

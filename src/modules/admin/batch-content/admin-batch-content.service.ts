@@ -88,7 +88,7 @@ export class AdminBatchContentService {
     return records;
   }
 
-  public async getBatchContent(id: number) {
+  public async getBatchContent(id: string) {
     const record = await this.batchContentRepository.findById(id);
     if (!record) {
       throw new Error('Batch content linkage not found');
@@ -96,7 +96,7 @@ export class AdminBatchContentService {
     return record;
   }
 
-  public async updateBatchContent(id: number, input: UpdateBatchContentInput) {
+  public async updateBatchContent(id: string, input: UpdateBatchContentInput) {
     const record = await this.batchContentRepository.findById(id);
     if (!record) {
       throw new Error('Batch content linkage not found');
@@ -140,7 +140,7 @@ export class AdminBatchContentService {
     return updated;
   }
 
-  public async deleteBatchContent(id: number) {
+  public async deleteBatchContent(id: string) {
     const record = await this.batchContentRepository.findById(id);
     if (!record) {
       throw new Error('Batch content linkage not found');
@@ -164,7 +164,7 @@ export class AdminBatchContentService {
     };
   }
 
-  public async reorderBatchContents(orders: { id: number; order: number }[]) {
+  public async reorderBatchContents(orders: { id: string; order: number }[]) {
     await this.batchContentRepository.updateOrders(orders);
     return true;
   }

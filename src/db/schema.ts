@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, smallint, boolean, integer, jsonb, timestamp, pgEnum, bigserial, bigint, date, index, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, smallint, boolean, integer, jsonb, timestamp, pgEnum, date, index, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export const occupationTypeEnum = pgEnum('occupation_type', ['student', 'professional', 'academic', 'other']);
 export const roleEnum = pgEnum('role', ['student', 'admin', 'user', 'moderator']);
@@ -41,7 +41,7 @@ export const users = pgTable('users', {
 ]);
 
 export const batches = pgTable('batches', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   topic: varchar('topic', { length: 255 }),
   name: varchar('name', { length: 255 }).notNull(),
   description: varchar('description', { length: 255 }),
@@ -79,9 +79,9 @@ export const paymentStatusEnum = pgEnum('payment_status', ['captured', 'failed',
 export const subscriptionStatusEnum = pgEnum('subscription_status', ['active', 'expired', 'pending']);
 
 export const batchEnrollments = pgTable('batch_enrollments', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id, { onDelete: 'cascade' }).notNull(),
+  batchId: uuid('batch_id').references(() => batches.id, { onDelete: 'cascade' }).notNull(),
   amountPayable: integer('amount_payable'),
   enrollmentType: enrollmentTypeEnum('enrollment_type').default('oneTime').notNull(),
   status: smallint('status').default(0).notNull(), // Active, Inactive, Cancelled, Suspended default inactive (0)
@@ -121,8 +121,8 @@ export const batchEnrollments = pgTable('batch_enrollments', {
 ]);
 
 export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
-  batchEnrollmentId: bigint('batch_enrollment_id', { mode: 'number' }).references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
+  id: uuid('id').defaultRandom().primaryKey(),
+  batchEnrollmentId: uuid('batch_enrollment_id').references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
   amount: integer('amount').notNull(),
   paidAt: timestamp('paid_at').notNull(),
   paymentMethod: varchar('payment_method', { length: 100 }),
@@ -140,9 +140,9 @@ export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
 ]);
 
 export const batchSections = pgTable('batch_sections', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
-  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id, { onDelete: 'cascade' }),
+  batchId: uuid('batch_id').references(() => batches.id, { onDelete: 'cascade' }),
   order: integer('order'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -154,7 +154,7 @@ export const contentLibraryTypeEnum = pgEnum('content_library_type', ['video', '
 export const contentTypeClassEnum = pgEnum('content_type_class', ['primary', 'secondary']);
 
 export const contentLibrary = pgTable('content_library', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
   desc: text('desc'),
   type: contentLibraryTypeEnum('type').notNull(),
@@ -175,10 +175,10 @@ export const contentLibrary = pgTable('content_library', {
 ]);
 
 export const batchContent = pgTable('batch_content', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
-  batchId: bigint('batch_id', { mode: 'number' }).references(() => batches.id, { onDelete: 'cascade' }).notNull(),
-  contentId: bigint('content_id', { mode: 'number' }).references(() => contentLibrary.id, { onDelete: 'cascade' }).notNull(),
-  sectionId: bigint('section_id', { mode: 'number' }).references(() => batchSections.id, { onDelete: 'cascade' }).notNull(),
+  id: uuid('id').defaultRandom().primaryKey(),
+  batchId: uuid('batch_id').references(() => batches.id, { onDelete: 'cascade' }).notNull(),
+  contentId: uuid('content_id').references(() => contentLibrary.id, { onDelete: 'cascade' }).notNull(),
+  sectionId: uuid('section_id').references(() => batchSections.id, { onDelete: 'cascade' }).notNull(),
   order: integer('order'),
   accessOn: integer('access_on').default(0).notNull(),
   accessTill: integer('access_till').default(0).notNull(),
@@ -199,10 +199,10 @@ export const assignmentStatusEnum = pgEnum('assignment_status', ['pending', 'sub
 export const codeSubmittedStatusEnum = pgEnum('code_submitted_status', ['Accepted', 'rejected', 'attempted']);
 
 export const courseProgress = pgTable('course_progress', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  enrollmentId: bigint('enrollment_id', { mode: 'number' }).references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
-  batchContentId: bigint('batch_content_id', { mode: 'number' }).references(() => batchContent.id, { onDelete: 'cascade' }).notNull(),
+  enrollmentId: uuid('enrollment_id').references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
+  batchContentId: uuid('batch_content_id').references(() => batchContent.id, { onDelete: 'cascade' }).notNull(),
   timeSpent: integer('time_spent').default(0).notNull(),
   progress: integer('progress').default(0).notNull(),
   status: userStatusEnum('status').default('not_started').notNull(),
@@ -291,5 +291,3 @@ export const verification = pgTable('verification', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
-
-

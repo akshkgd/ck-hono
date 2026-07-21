@@ -27,8 +27,8 @@ export class AdminAssignmentsController {
 
   public gradeSubmission = async (c: Context) => {
     try {
-      const progressId = parseInt(c.req.param('progressId') || '', 10);
-      if (isNaN(progressId)) {
+      const progressId = c.req.param('progressId') || '';
+      if (!progressId) {
         return c.json({
           status: 'error',
           message: 'Bad Request: Invalid progress ID',

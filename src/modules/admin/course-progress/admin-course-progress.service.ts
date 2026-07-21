@@ -21,10 +21,10 @@ export class AdminCourseProgressService {
 
     // Fetch progress list, totals, summary analytics, and daily breakdown in parallel
     const [logs, totalCount, analytics, chartData] = await Promise.all([
-      this.repository.getProgressList(start, end, input.batchId, input.email || undefined, limit, offset, input.name || undefined),
-      this.repository.countProgressTotal(start, end, input.batchId, input.email || undefined, input.name || undefined),
-      this.repository.getProgressAnalytics(start, end, input.batchId, input.email || undefined, input.name || undefined),
-      this.repository.getDailyProgressAnalytics(start, end, input.batchId, input.email || undefined, input.name || undefined),
+      this.repository.getProgressList(start, end, input.batchId || undefined, input.email || undefined, limit, offset, input.name || undefined),
+      this.repository.countProgressTotal(start, end, input.batchId || undefined, input.email || undefined, input.name || undefined),
+      this.repository.getProgressAnalytics(start, end, input.batchId || undefined, input.email || undefined, input.name || undefined),
+      this.repository.getDailyProgressAnalytics(start, end, input.batchId || undefined, input.email || undefined, input.name || undefined),
     ]);
 
     // Calculate number of calendar days in the selected range to get a true daily average
@@ -49,9 +49,7 @@ export class AdminCourseProgressService {
     };
   }
 
-
-
-  public async getEnrollmentBatchProgress(enrollmentId: number) {
+  public async getEnrollmentBatchProgress(enrollmentId: string) {
     const enrollment = await this.repository.getEnrollmentDetails(enrollmentId);
     if (!enrollment) {
       throw new Error('Enrollment not found');
@@ -79,9 +77,9 @@ export class AdminCourseProgressService {
     ]);
 
     // Map content items to their corresponding sections
-    const sectionsMap = new Map<number, any[]>();
+    const sectionsMap = new Map<string, any[]>();
     for (const section of sections) {
-      sectionsMap.set(section.id, []);
+      sectionsMap.set(String(section.id), []);
     }
 
     const unassignedContents: any[] = [];
@@ -111,7 +109,7 @@ export class AdminCourseProgressService {
         }
       };
 
-      const sId = item.sectionId ? Number(item.sectionId) : null;
+      const sId = item.sectionId ? String(item.sectionId) : null;
       if (sId !== null && sectionsMap.has(sId)) {
         sectionsMap.get(sId)!.push(itemMapped);
       } else {
@@ -121,7 +119,7 @@ export class AdminCourseProgressService {
 
     const sectionsWithContents = sections.map(section => ({
       ...section,
-      contents: sectionsMap.get(section.id) || [],
+      contents: sectionsMap.get(String(section.id)) || [],
     }));
 
     return {

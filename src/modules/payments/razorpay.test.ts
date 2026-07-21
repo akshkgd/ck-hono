@@ -9,7 +9,7 @@ const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
 
 describe('Razorpay Payments Module', () => {
-  let testBatchId: number;
+  let testBatchId: string;
   let jwtToken = '';
   let guestEmail = `guest.${Date.now()}@example.com`;
   let studentEmail = `student.${Date.now()}@example.com`;

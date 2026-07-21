@@ -106,7 +106,7 @@ export class AdminPaymentsService {
     };
   }
 
-  public async getPayment(id: number) {
+  public async getPayment(id: string) {
     const payment = await this.paymentRepository.findById(id);
     if (!payment) {
       throw new Error('Payment not found');
@@ -114,7 +114,7 @@ export class AdminPaymentsService {
     return payment;
   }
 
-  public async updatePayment(id: number, input: UpdatePaymentInput) {
+  public async updatePayment(id: string, input: UpdatePaymentInput) {
     const payment = await this.paymentRepository.findById(id);
     if (!payment) {
       throw new Error('Payment not found');
@@ -169,7 +169,7 @@ export class AdminPaymentsService {
     return updated;
   }
 
-  public async deletePayment(id: number) {
+  public async deletePayment(id: string) {
     const payment = await this.paymentRepository.findById(id);
     if (!payment) {
       throw new Error('Payment not found');

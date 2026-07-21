@@ -33,8 +33,8 @@ export class AdminEnrollmentsController {
 
   public get = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid enrollment ID');
       }
 
@@ -72,8 +72,8 @@ export class AdminEnrollmentsController {
 
   public edit = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid enrollment ID');
       }
       const rawBody = await c.req.json();
@@ -95,8 +95,8 @@ export class AdminEnrollmentsController {
 
   public delete = async (c: Context) => {
     try {
-      const id = parseInt(c.req.param('id')!, 10);
-      if (isNaN(id)) {
+      const id = c.req.param('id') || '';
+      if (!id) {
         throw new Error('Invalid enrollment ID');
       }
       await this.adminEnrollmentsService.deleteEnrollment(id);

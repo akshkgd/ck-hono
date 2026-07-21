@@ -39,7 +39,7 @@ export class AdminBatchesService {
     };
   }
 
-  public async getBatch(id: number) {
+  public async getBatch(id: string) {
     const batch = await this.batchRepository.findById(id);
     if (!batch) {
       throw new Error('Batch not found');
@@ -52,7 +52,7 @@ export class AdminBatchesService {
     };
   }
 
-  public async updateBatch(id: number, input: UpdateBatchInput) {
+  public async updateBatch(id: string, input: UpdateBatchInput) {
     const batch = await this.batchRepository.findById(id);
     if (!batch) {
       throw new Error('Batch not found');
@@ -76,7 +76,7 @@ export class AdminBatchesService {
     return updated;
   }
 
-  public async deleteBatch(id: number) {
+  public async deleteBatch(id: string) {
     const batch = await this.batchRepository.findById(id);
     if (!batch) {
       throw new Error('Batch not found');

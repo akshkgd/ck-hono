@@ -4,7 +4,7 @@ export function getImplementDocsHtml(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Better Auth Email OTP Implementation Guide - Codekaro Dev Docs</title>
+  <title>Frontend Implementation Guide - Codekaro Dev Docs</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,16 +52,169 @@ export function getImplementDocsHtml(): string {
     <!-- Hero / Title Section -->
     <section class="space-y-4">
       <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 text-xs font-mono font-medium border border-indigo-500/20">
-        Better Auth Email OTP Guide
+        Frontend Implementation & Migration Guide
       </div>
-      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Email 6-Digit OTP & 30-Day Session Guide</h1>
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Codekaro API Implementation Guide</h1>
       <p class="text-zinc-400 text-base max-w-2xl">
-        Complete step-by-step reference for frontend engineers implementing 6-digit Email OTP passwordless login and 30-day persistent session management using Better Auth.
+        Complete step-by-step reference for frontend engineers implementing UUID data structures, 6-digit Email OTP passwordless login, and 30-day persistent session management.
       </p>
     </section>
 
-    <!-- Flow Diagram Card -->
-    <section class="border border-zinc-900 bg-zinc-900/30 rounded-xl p-6 space-y-4">
+    <!-- SECTION 1: CRITICAL UUID MIGRATION NOTICE -->
+    <section class="space-y-6 pt-4 border-t border-zinc-900">
+      <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-6 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 text-xs font-mono font-bold border border-amber-500/30 uppercase tracking-wider">🔥 Breaking Change</span>
+            <h2 class="text-lg font-bold text-white tracking-tight">Database Primary & Foreign Keys Migrated to UUID</h2>
+          </div>
+          <span class="text-xs text-amber-400/80 font-mono">Effective Immediately</span>
+        </div>
+        <p class="text-zinc-300 text-sm leading-relaxed">
+          All PostgreSQL primary keys (<code class="text-amber-300 font-mono">id</code>) and relation keys (<code class="text-amber-300 font-mono">batchId</code>, <code class="text-amber-300 font-mono">enrollmentId</code>, <code class="text-amber-300 font-mono">contentId</code>, <code class="text-amber-300 font-mono">sectionId</code>, <code class="text-amber-300 font-mono">batchContentId</code>) have been migrated from auto-increment integers to standard <strong>UUID v4 strings</strong> (e.g. <code class="text-indigo-400 font-mono">"f47ac10b-58cc-4372-a567-0e02b2c3d479"</code>).
+        </p>
+
+        <!-- Summary Table -->
+        <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-lg p-4 font-mono text-xs overflow-x-auto">
+          <table class="w-full text-left text-zinc-300">
+            <thead>
+              <tr class="border-b border-zinc-800 text-zinc-400 uppercase text-[10px]">
+                <th class="pb-2 font-semibold">Entity</th>
+                <th class="pb-2 font-semibold">Key Column(s)</th>
+                <th class="pb-2 font-semibold">Legacy Type</th>
+                <th class="pb-2 font-semibold text-emerald-400">New Type</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-900/60 text-xs">
+              <tr>
+                <td class="py-2 text-white font-medium">Batches</td>
+                <td class="py-2 text-zinc-400">id</td>
+                <td class="py-2 text-zinc-500">number (1, 2, 3)</td>
+                <td class="py-2 text-emerald-400 font-bold">string (UUID)</td>
+              </tr>
+              <tr>
+                <td class="py-2 text-white font-medium">Batch Enrollments</td>
+                <td class="py-2 text-zinc-400">id, batchId, userId</td>
+                <td class="py-2 text-zinc-500">number</td>
+                <td class="py-2 text-emerald-400 font-bold">string (UUID)</td>
+              </tr>
+              <tr>
+                <td class="py-2 text-white font-medium">Batch Sections</td>
+                <td class="py-2 text-zinc-400">id, batchId</td>
+                <td class="py-2 text-zinc-500">number</td>
+                <td class="py-2 text-emerald-400 font-bold">string (UUID)</td>
+              </tr>
+              <tr>
+                <td class="py-2 text-white font-medium">Content Library</td>
+                <td class="py-2 text-zinc-400">id</td>
+                <td class="py-2 text-zinc-500">number</td>
+                <td class="py-2 text-emerald-400 font-bold">string (UUID)</td>
+              </tr>
+              <tr>
+                <td class="py-2 text-white font-medium">Batch Content</td>
+                <td class="py-2 text-zinc-400">id, batchId, sectionId, contentId</td>
+                <td class="py-2 text-zinc-500">number</td>
+                <td class="py-2 text-emerald-400 font-bold">string (UUID)</td>
+              </tr>
+              <tr>
+                <td class="py-2 text-white font-medium">Course Progress</td>
+                <td class="py-2 text-zinc-400">id, enrollmentId, batchContentId</td>
+                <td class="py-2 text-zinc-500">number</td>
+                <td class="py-2 text-emerald-400 font-bold">string (UUID)</td>
+              </tr>
+              <tr>
+                <td class="py-2 text-white font-medium">Payments</td>
+                <td class="py-2 text-zinc-400">id, batchEnrollmentId</td>
+                <td class="py-2 text-zinc-500">number</td>
+                <td class="py-2 text-emerald-400 font-bold">string (UUID)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Action Items for Frontend Engineers -->
+        <div class="space-y-3 pt-2">
+          <h3 class="text-sm font-semibold text-white tracking-tight">Required Frontend Action Checklist:</h3>
+          <ul class="space-y-2 text-xs text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-amber-400 font-mono font-bold">1.</span>
+              <span><strong>Update TypeScript Types & Interfaces</strong>: Change all <code class="text-amber-300 font-mono">id: number</code> properties to <code class="text-emerald-400 font-mono">id: string</code>.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-400 font-mono font-bold">2.</span>
+              <span><strong>Route Parameter Parsing</strong>: Do NOT use <code class="text-amber-300 font-mono">parseInt(params.id, 10)</code> or <code class="text-amber-300 font-mono">Number(params.id)</code> on URL route parameters like <code class="text-zinc-400 font-mono">/courses/:batchId</code>. Pass string parameters directly.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-400 font-mono font-bold">3.</span>
+              <span><strong>JSON Request Payloads</strong>: Send string UUID values for <code class="text-indigo-300 font-mono">batchId</code>, <code class="text-indigo-300 font-mono">enrollmentId</code>, <code class="text-indigo-300 font-mono">batchContentId</code> in POST/PUT API bodies.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-400 font-mono font-bold">4.</span>
+              <span><strong>Clear Legacy Local Cache</strong>: Clear any <code class="text-zinc-400 font-mono">localStorage</code> or state cache storing numeric IDs to avoid stale ID mismatches.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: CODE COMPARISON -->
+    <section class="space-y-6 pt-4 border-t border-zinc-900">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-xs font-mono text-indigo-400 font-medium uppercase tracking-wider">Code Snippet Reference</div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">TypeScript Interface & API Usage Comparison</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Legacy / Before -->
+        <div class="bg-zinc-900/40 border border-red-900/40 rounded-xl p-5 space-y-3">
+          <div class="flex items-center gap-2 text-xs font-mono text-red-400 font-semibold uppercase">
+            <span>❌ Legacy (Incorrect)</span>
+          </div>
+          <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-red-300/80 border border-zinc-800/60 overflow-x-auto"><code>// DEPRECATED TYPES
+interface Batch {
+  id: number; // ❌ Integer ID
+  name: string;
+}
+
+// ❌ WRONG ROUTE PARSING
+const batchId = parseInt(params.id, 10);
+
+// ❌ WRONG REQUEST BODY
+await fetch('/v1/payments/razorpay/create-order', {
+  body: JSON.stringify({
+    batchId: 4, // ❌ Number
+    paymentType: "enrollment"
+  })
+});</code></pre>
+        </div>
+
+        <!-- Updated / After -->
+        <div class="bg-zinc-900/40 border border-emerald-900/40 rounded-xl p-5 space-y-3">
+          <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-semibold uppercase">
+            <span>✅ Updated (Correct)</span>
+          </div>
+          <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-300 border border-zinc-800/60 overflow-x-auto"><code>// UPDATED TYPES
+interface Batch {
+  id: string; // ✅ UUID string
+  name: string;
+}
+
+// ✅ CORRECT ROUTE PARSING
+const batchId = params.id; // String directly
+
+// ✅ CORRECT REQUEST BODY
+await fetch('/v1/payments/razorpay/create-order', {
+  body: JSON.stringify({
+    batchId: "a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d",
+    paymentType: "enrollment"
+  })
+});</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: AUTHENTICATION WORKFLOW OVERVIEW -->
+    <section class="border border-zinc-900 bg-zinc-900/30 rounded-xl p-6 space-y-4 pt-6">
       <h3 class="text-sm font-mono text-indigo-400 font-semibold uppercase tracking-wider">Authentication Workflow Overview</h3>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center text-xs font-mono">
         <div class="bg-zinc-900/70 border border-zinc-800 p-4 rounded-lg space-y-1">
@@ -232,7 +385,7 @@ export function getImplementDocsHtml(): string {
 
   <!-- Footer -->
   <footer class="border-t border-zinc-900 bg-zinc-950 py-6 text-center text-xs text-zinc-500 font-mono">
-    Codekaro Developer Documentation • Better Auth 6-Digit Email OTP Implementation Guide
+    Codekaro Developer Documentation • Implementation Guide
   </footer>
 </body>
 </html>`;

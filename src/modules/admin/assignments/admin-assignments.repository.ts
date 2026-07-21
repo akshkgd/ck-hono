@@ -7,7 +7,7 @@ export class AdminAssignmentsRepository {
     start: Date,
     end: Date,
     status?: 'pending' | 'submitted' | 'under review' | 'approved' | 'rejected',
-    batchId?: number,
+    batchId?: string,
     email?: string,
     limit: number = 50,
     offset: number = 0,
@@ -77,7 +77,7 @@ export class AdminAssignmentsRepository {
     start: Date,
     end: Date,
     status?: 'pending' | 'submitted' | 'under review' | 'approved' | 'rejected',
-    batchId?: number,
+    batchId?: string,
     email?: string,
     name?: string
   ): Promise<number> {
@@ -111,7 +111,7 @@ export class AdminAssignmentsRepository {
   }
 
   public async gradeAssignment(
-    progressId: number,
+    progressId: string,
     data: {
       assignmentStatus: 'pending' | 'submitted' | 'under review' | 'approved' | 'rejected';
       teacherRemark?: string | null;
@@ -133,7 +133,7 @@ export class AdminAssignmentsRepository {
     return results[0] || null;
   }
 
-  public async findProgressById(progressId: number) {
+  public async findProgressById(progressId: string) {
     const results = await db
       .select()
       .from(courseProgress)
@@ -142,7 +142,7 @@ export class AdminAssignmentsRepository {
     return results[0] || null;
   }
 
-  public async getEnrollmentAssignments(enrollmentId: number) {
+  public async getEnrollmentAssignments(enrollmentId: string) {
     const results = await db
       .select({
         enrollmentId: batchEnrollments.id,
@@ -218,7 +218,7 @@ export class AdminAssignmentsRepository {
     };
   }
 
-  public async getAssignmentDetailsById(progressId: number) {
+  public async getAssignmentDetailsById(progressId: string) {
     const results = await db
       .select({
         id: courseProgress.id,

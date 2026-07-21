@@ -34,7 +34,7 @@ export class StudentRepository {
       .orderBy(batchEnrollments.createdAt);
   }
 
-  public async findEnrollment(userId: string, batchId: number) {
+  public async findEnrollment(userId: string, batchId: string) {
     const results = await db
       .select({
         id: batchEnrollments.id,
@@ -63,7 +63,7 @@ export class StudentRepository {
     return results[0];
   }
 
-  public async getBatchSections(batchId: number) {
+  public async getBatchSections(batchId: string) {
     return db
       .select({
         id: batchSections.id,
@@ -75,7 +75,7 @@ export class StudentRepository {
       .orderBy(asc(batchSections.order));
   }
 
-  public async getBatchContentWithProgress(batchId: number, userId: string, enrollmentId: number) {
+  public async getBatchContentWithProgress(batchId: string, userId: string, enrollmentId: string) {
     return db
       .select({
         id: batchContent.id,
@@ -100,7 +100,7 @@ export class StudentRepository {
           solutionCode: contentLibrary.solutionCode,
           hints: contentLibrary.hints,
         },
-         progress: {
+        progress: {
           status: courseProgress.status,
           timeSpent: courseProgress.timeSpent,
           progress: courseProgress.progress,
@@ -131,7 +131,7 @@ export class StudentRepository {
       .orderBy(asc(batchSections.order), asc(batchContent.order));
   }
 
-  public async getBatchContentAccessDetails(batchContentId: number, userId: string) {
+  public async getBatchContentAccessDetails(batchContentId: string, userId: string) {
     const results = await db
       .select({
         batchContentId: batchContent.id,
@@ -180,8 +180,8 @@ export class StudentRepository {
 
   public async upsertContentProgress(
     userId: string,
-    enrollmentId: number,
-    batchContentId: number,
+    enrollmentId: string,
+    batchContentId: string,
     timeSpentDelta: number,
     progress: number,
     status: 'not_started' | 'learning' | 'completed',
@@ -259,7 +259,7 @@ export class StudentRepository {
     return results[0];
   }
 
-  public async countBatchContents(batchId: number): Promise<number> {
+  public async countBatchContents(batchId: string): Promise<number> {
     const results = await db
       .select({ count: sql<number>`cast(count(*) as integer)` })
       .from(batchContent)
@@ -267,7 +267,7 @@ export class StudentRepository {
     return results[0]?.count || 0;
   }
 
-  public async updateEnrollmentAggregates(enrollmentId: number, timeSpentDelta: number, totalContentCount: number) {
+  public async updateEnrollmentAggregates(enrollmentId: string, timeSpentDelta: number, totalContentCount: number) {
     await db
       .update(batchEnrollments)
       .set({
@@ -284,8 +284,8 @@ export class StudentRepository {
 
   public async upsertAssignmentSubmission(
     userId: string,
-    enrollmentId: number,
-    batchContentId: number,
+    enrollmentId: string,
+    batchContentId: string,
     data: {
       githubLink?: string | null;
       deployedLink?: string | null;

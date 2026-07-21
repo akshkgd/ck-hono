@@ -23,7 +23,7 @@ export class StudentService {
     });
   }
 
-  public async getCourseDetails(userId: string, batchId: number) {
+  public async getCourseDetails(userId: string, batchId: string) {
     const enrollment = await this.studentRepository.findEnrollment(userId, batchId);
     if (!enrollment) {
       throw new Error('Enrollment not found for this course');
@@ -65,9 +65,9 @@ export class StudentService {
     ]);
 
     // Map content items to their corresponding sections
-    const sectionsMap = new Map<number, any[]>();
+    const sectionsMap = new Map<string, any[]>();
     for (const section of sections) {
-      sectionsMap.set(section.id, []);
+      sectionsMap.set(String(section.id), []);
     }
 
     const unassignedContents: any[] = [];
@@ -121,7 +121,7 @@ export class StudentService {
         }
       };
 
-      const sId = item.sectionId ? Number(item.sectionId) : null;
+      const sId = item.sectionId ? String(item.sectionId) : null;
       if (sId !== null && sectionsMap.has(sId)) {
         sectionsMap.get(sId)!.push(itemMapped);
       } else {
@@ -131,7 +131,7 @@ export class StudentService {
 
     const sectionsWithContents = sections.map(section => ({
       ...section,
-      contents: sectionsMap.get(section.id) || [],
+      contents: sectionsMap.get(String(section.id)) || [],
     }));
 
     return {
@@ -156,7 +156,7 @@ export class StudentService {
     };
   }
 
-  public async checkContentAccess(userId: string, batchContentId: number) {
+  public async checkContentAccess(userId: string, batchContentId: string) {
     const details = await this.studentRepository.getBatchContentAccessDetails(batchContentId, userId);
     if (!details) {
       throw new Error('Batch content not found');
@@ -312,7 +312,7 @@ export class StudentService {
 
     if (!progressRecord) {
       return {
-        id: 0,
+        id: 'none',
         userId,
         enrollmentId,
         batchContentId: input.batchContentId,
@@ -329,7 +329,7 @@ export class StudentService {
     return progressRecord;
   }
 
-  public async submitAssignment(userId: string, batchContentId: number, input: StudentAssignmentInput) {
+  public async submitAssignment(userId: string, batchContentId: string, input: StudentAssignmentInput) {
     // 1. Verify content and active captured enrollment
     const details = await this.studentRepository.getBatchContentAccessDetails(batchContentId, userId);
     if (!details) {

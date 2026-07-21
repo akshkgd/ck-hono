@@ -295,7 +295,7 @@ export class RazorpayService {
    * Common process flow for successful payments (Verify + Webhook)
    */
   public async processSuccessfulPayment(
-    enrollmentId: number,
+    enrollmentId: string,
     paymentId: string,
     amountPaise: number,
     paymentMethod: string,
@@ -435,9 +435,9 @@ export class RazorpayService {
     if (event.event === 'payment.captured') {
       const payment = event.payload.payment.entity;
       const notes = payment.notes || {};
-      const enrollmentId = Number(notes.enrollmentId);
+      const enrollmentId = String(notes.enrollmentId || '');
       
-      if (!enrollmentId || isNaN(enrollmentId)) {
+      if (!enrollmentId) {
         console.warn('[Razorpay Webhook] Received payment captured event without valid enrollmentId:', notes);
         return { status: 'ignored', reason: 'No enrollment ID in notes' };
       }

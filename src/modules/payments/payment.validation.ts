@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const paymentPurposeSchema = z.enum(['enrollment', 'renewal', 'certificate', 'upgrade', 'refund']);
 
 export const createPaymentSchema = z.object({
-  batchEnrollmentId: z.number().int().positive(),
+  batchEnrollmentId: z.string(),
   amount: z.number().int(),
   paidAt: z.string().refine((val) => !val || !isNaN(Date.parse(val)), 'Must be valid date/time').optional().nullable(),
   paymentMethod: z.string().max(100).optional().nullable(),
@@ -19,7 +19,7 @@ export const updatePaymentSchema = createPaymentSchema.partial();
 
 export const paymentSearchQuerySchema = z.object({
   q: z.string().default(''),
-  batchEnrollmentId: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().positive().optional()),
+  batchEnrollmentId: z.string().optional(),
   limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(50).default(10)),
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
 });

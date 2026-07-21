@@ -54,15 +54,14 @@ export class CourseProgressService {
     return progressRecord;
   }
 
-  public async getBatchProgress(userId: string, batchId: number) {
+  public async getBatchProgress(userId: string, batchId: string) {
     // 1. Verify enrollment exists
     const enrollment = await this.enrollmentRepository.findByUserAndBatch(userId, batchId);
     if (!enrollment) {
       throw new Error('User is not enrolled in this batch');
     }
 
-    // 2. Fetch all content mappings for this batch
-    // We can list all mapped contents for the batch. Let's fetch 500 items max
+    // 2. Fetch all content mappings for this batch (up to 500 items max)
     const contentList = await this.batchContentRepository.search(500, 0, batchId);
 
     // 3. Fetch all progress logs for this enrollment

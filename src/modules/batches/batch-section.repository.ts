@@ -6,7 +6,7 @@ export type BatchSection = typeof batchSections.$inferSelect;
 export type NewBatchSection = typeof batchSections.$inferInsert;
 
 export class BatchSectionRepository {
-  public async findById(id: number): Promise<BatchSection | null> {
+  public async findById(id: string): Promise<BatchSection | null> {
     const results = await db
       .select()
       .from(batchSections)
@@ -25,7 +25,7 @@ export class BatchSectionRepository {
     return results[0];
   }
 
-  public async update(id: number, data: Partial<NewBatchSection>): Promise<BatchSection | null> {
+  public async update(id: string, data: Partial<NewBatchSection>): Promise<BatchSection | null> {
     const results = await db
       .update(batchSections)
       .set({
@@ -38,7 +38,7 @@ export class BatchSectionRepository {
     return results[0] || null;
   }
 
-  public async delete(id: number): Promise<boolean> {
+  public async delete(id: string): Promise<boolean> {
     const results = await db
       .delete(batchSections)
       .where(eq(batchSections.id, id))
@@ -47,7 +47,7 @@ export class BatchSectionRepository {
     return results.length > 0;
   }
 
-  public async search(queryText: string, limit: number, offset: number, batchId?: number): Promise<BatchSection[]> {
+  public async search(queryText: string, limit: number, offset: number, batchId?: string): Promise<BatchSection[]> {
     let query = db.select().from(batchSections).$dynamic();
     
     const conditions = [];
@@ -65,7 +65,7 @@ export class BatchSectionRepository {
     return query.limit(limit).offset(offset);
   }
 
-  public async count(queryText: string, batchId?: number): Promise<number> {
+  public async count(queryText: string, batchId?: string): Promise<number> {
     let query = db.select({ count: sql<number>`count(*)` }).from(batchSections).$dynamic();
     
     const conditions = [];
@@ -84,7 +84,7 @@ export class BatchSectionRepository {
     return Number(results[0]?.count || 0);
   }
 
-  public async updateOrders(orders: { id: number; order: number }[]): Promise<void> {
+  public async updateOrders(orders: { id: string; order: number }[]): Promise<void> {
     await db.transaction(async (tx) => {
       for (const item of orders) {
         await tx

@@ -25,7 +25,7 @@ export class AdminContentLibraryService {
     return item;
   }
 
-  public async getItem(id: number) {
+  public async getItem(id: string) {
     const item = await this.contentLibraryRepository.findById(id);
     if (!item) {
       throw new Error('Content library item not found');
@@ -33,7 +33,7 @@ export class AdminContentLibraryService {
     return item;
   }
 
-  public async updateItem(id: number, input: UpdateContentLibraryInput) {
+  public async updateItem(id: string, input: UpdateContentLibraryInput) {
     const item = await this.contentLibraryRepository.findById(id);
     if (!item) {
       throw new Error('Content library item not found');
@@ -46,7 +46,7 @@ export class AdminContentLibraryService {
     return updated;
   }
 
-  public async deleteItem(id: number) {
+  public async deleteItem(id: string) {
     const item = await this.contentLibraryRepository.findById(id);
     if (!item) {
       throw new Error('Content library item not found');
