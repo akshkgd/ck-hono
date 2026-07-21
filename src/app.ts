@@ -33,6 +33,7 @@ import publicBatchesRouter from './modules/batches/public-batches.route.js';
 import { emailRouter } from './modules/email/email.route.js';
 import { adminEmailSettingsRouter } from './modules/admin/email-settings/admin-email-settings.route.js';
 import adminMigrationsRouter from './modules/admin/migrations/admin-migrations.route.js';
+import { getMigrationProgressHtml } from './modules/admin/migrations/migration-view.js';
 import { activityMiddleware } from './middleware/activity.middleware.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
@@ -119,6 +120,8 @@ app.route('/changelog', changelogRouter);
 app.route('/playground', playgroundRouter);
 app.route('/student-docs', studentDocsRouter);
 app.get('/admin/logs', (c) => c.html(renderLogsView()));
+app.get('/docs/migration-status', (c) => c.html(getMigrationProgressHtml()));
+app.get('/admin/migrations/view', (c) => c.html(getMigrationProgressHtml()));
 
 // Global 404 Handler
 app.notFound((c) => {
