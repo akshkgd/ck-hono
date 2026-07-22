@@ -169,7 +169,7 @@ export class RazorpayService {
 
     // Call Razorpay API to generate order
     const amountPaise = amountRupees * 100;
-    const receipt = `rcpt_${enrollment.id}_${Date.now()}`;
+    const receipt = `r_${enrollment.id}`;
     const notes = {
       enrollmentId: enrollment.id.toString(),
       purpose: input.paymentType,
