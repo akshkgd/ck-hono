@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 export const createRazorpayOrderSchema = z.object({
   paymentType: z.enum(['enrollment', 'pending_payment', 'renew']).default('enrollment'),
-  batchId: z.string().optional(),
-  enrollmentId: z.string().optional(),
+  batchId: z.coerce.string().optional(),
+  enrollmentId: z.coerce.string().optional(),
   email: z.string().email().optional(),
   phone: z.string().min(10).max(15).optional(),
   name: z.string().max(255).optional(),
@@ -26,7 +26,7 @@ export const createRazorpayOrderSchema = z.object({
 });
 
 export const verifyRazorpayPaymentSchema = z.object({
-  enrollmentId: z.string(),
+  enrollmentId: z.coerce.string(),
   razorpay_payment_id: z.string().min(1),
   razorpay_order_id: z.string().min(1),
   razorpay_signature: z.string().min(1),

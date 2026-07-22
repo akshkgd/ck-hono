@@ -27,13 +27,7 @@ export class RazorpayController {
 
       const rawData = { ...query, ...body };
 
-      // Coerce numeric fields if they come from query parameters
-      if (rawData.batchId !== undefined && typeof rawData.batchId === 'string') {
-        rawData.batchId = parseInt(rawData.batchId, 10);
-      }
-      if (rawData.enrollmentId !== undefined && typeof rawData.enrollmentId === 'string') {
-        rawData.enrollmentId = parseInt(rawData.enrollmentId, 10);
-      }
+
 
       const input = createRazorpayOrderSchema.parse(rawData);
       const data = await this.razorpayService.createOrder(input, user);
