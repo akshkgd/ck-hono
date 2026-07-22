@@ -6,8 +6,7 @@ import { adminMiddleware } from '../../../middleware/admin.middleware.js';
 const adminLogsRouter = new Hono();
 const controller = new AdminLogsController();
 
-// Ensure all log API endpoints require admin authentication
-adminLogsRouter.use('*', authMiddleware(), adminMiddleware());
+// Unprotected logs route as requested
 
 adminLogsRouter.get('/files', controller.listFiles);
 adminLogsRouter.get('/data', controller.getLogData);

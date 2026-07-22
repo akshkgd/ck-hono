@@ -208,13 +208,8 @@ export function renderLogsView() {
 
     // Initialize View
     async function init() {
-      const token = getAuthToken();
-      if (!token) {
-        renderEmptyState('Unauthorized: Missing or invalid token. Please log in at the Playground (/playground) first, or pass the token in the URL: /admin/logs?token=YOUR_TOKEN');
-        alert('You are not logged in. Please login via the Playground (/playground) first, or visit /admin/logs?token=YOUR_JWT_TOKEN');
-        window.location.href = '/playground';
-        return;
-      }
+      // Initialize without enforcing client-side login tokens
+
 
       // Setup events
       logFileSelect.addEventListener('change', (e) => {
