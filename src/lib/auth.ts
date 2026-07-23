@@ -58,6 +58,9 @@ export const auth = betterAuth({
     ipAddress: {
       ipAddressHeaders: ['x-forwarded-for'],
     },
+    database: {
+      generateId: 'uuid',
+    },
   },
   session: {
     expiresIn: 60 * 60 * 24 * 30, // 30 Days in seconds (2,592,000s)
