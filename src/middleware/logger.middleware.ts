@@ -4,6 +4,9 @@ import { logger } from '../utils/logger.js';
 export const loggerMiddleware = (): MiddlewareHandler => {
   return async (c, next) => {
     const { method, path } = c.req;
+    if (path.startsWith('/admin/logs') || path.startsWith('/v1/admin/logs') || path === '/favicon.ico') {
+      return await next();
+    }
     const start = Date.now();
     const requestId = c.get('requestId') || 'unknown';
 
