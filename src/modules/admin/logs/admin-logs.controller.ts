@@ -19,6 +19,11 @@ export class AdminLogsController {
         .filter(file => file.startsWith('app-') && file.endsWith('.log'))
         .sort((a, b) => b.localeCompare(a)); // Newest first
 
+      c.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      c.header('Pragma', 'no-cache');
+      c.header('Expires', '0');
+      c.header('Surrogate-Control', 'no-store');
+
       return c.json({
         status: 'success',
         data: files,
@@ -102,6 +107,11 @@ export class AdminLogsController {
       const totalPages = Math.ceil(totalCount / limit);
       const offset = (page - 1) * limit;
       const paginatedLogs = filteredLogs.slice(offset, offset + limit);
+
+      c.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      c.header('Pragma', 'no-cache');
+      c.header('Expires', '0');
+      c.header('Surrogate-Control', 'no-store');
 
       return c.json({
         status: 'success',
