@@ -72,6 +72,10 @@ export const auth = betterAuth({
   },
   plugins: [
     emailOTP({
+      rateLimit: {
+        window: 60,
+        max: 20, // Increased max requests to 20 per minute (default is 3)
+      },
       async sendVerificationOTP({ email, otp, type }: { email: string; otp: string; type: string }) {
         try {
           const studentName = email.split('@')[0];
