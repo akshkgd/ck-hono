@@ -4,6 +4,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '../db/index.js';
 import * as schema from '../db/schema.js';
 import { queueGenericEmail } from '../queues/index.js';
+import { randomUUID } from 'node:crypto';
 
 const isProd = process.env.NODE_ENV === 'production';
 const defaultFrontendUrl = isProd ? 'https://app.codekaro.in' : 'http://localhost:5173';
@@ -55,11 +56,9 @@ export const auth = betterAuth({
     storage: 'memory', // Fast in-memory rate limiting without DB overhead
   },
   advanced: {
+    generateId: () => randomUUID(),
     ipAddress: {
       ipAddressHeaders: ['x-forwarded-for'],
-    },
-    database: {
-      generateId: 'uuid',
     },
   },
   session: {
