@@ -329,6 +329,8 @@ export function renderLogsView() {
           state.selectedFile = state.files[0];
           fetchLogs();
         } else {
+          state.files = [];
+          state.selectedFile = '';
           logFileSelect.innerHTML = '<option value="">No log files found</option>';
           renderEmptyState('No log files available.');
           showLoading(false);
