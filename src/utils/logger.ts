@@ -1,5 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import util from 'util';
+
+// Store references to the original console functions to prevent infinite recursion
+const originalLog = console.log;
+const originalWarn = console.warn;
+const originalError = console.error;
+const originalInfo = console.info;
+const originalDebug = console.debug;
 
 class CustomLogger {
   private logDir: string;
@@ -43,7 +51,7 @@ class CustomLogger {
         }
       }
     } catch (err) {
-      console.error('Failed to cleanup old logs:', err);
+      originalError('Failed to cleanup old logs:', err);
     }
   }
 
@@ -65,14 +73,14 @@ class CustomLogger {
       const logString = JSON.stringify(logEntry) + '\n';
       fs.appendFileSync(this.currentLogFile, logString);
 
-      // Stream to stdout/stderr in development/production console
+      // Stream to stdout/stderr using the original console methods
       if (level === 'error' || level === 'critical') {
-        console.error(logString.trim());
+        originalError(logString.trim());
       } else {
-        console.log(logString.trim());
+        originalLog(logString.trim());
       }
     } catch (err) {
-      console.error('Logging write failed:', err);
+      originalError('Logging write failed:', err);
     }
   }
 
@@ -94,3 +102,43 @@ class CustomLogger {
 }
 
 export const logger = new CustomLogger();
+
+// Intercept global console.log calls
+console.log = (...args: any[]) => {
+  const message = util.format(...args);
+  const errorArg = args.find(arg => arg instanceof Error);
+  const meta = errorArg ? { stack: errorArg.stack } : {};
+  logger.info(message, meta);
+};
+
+// Intercept global console.info calls
+console.info = (...args: any[]) => {
+  const message = util.format(...args);
+  const errorArg = args.find(arg => arg instanceof Error);
+  const meta = errorArg ? { stack: errorArg.stack } : {};
+  logger.info(message, meta);
+};
+
+// Intercept global console.warn calls
+console.warn = (...args: any[]) => {
+  const message = util.format(...args);
+  const errorArg = args.find(arg => arg instanceof Error);
+  const meta = errorArg ? { stack: errorArg.stack } : {};
+  logger.warn(message, meta);
+};
+
+// Intercept global console.error calls
+console.error = (...args: any[]) => {
+  const message = util.format(...args);
+  const errorArg = args.find(arg => arg instanceof Error);
+  const meta = errorArg ? { stack: errorArg.stack } : {};
+  logger.error(message, meta);
+};
+
+// Intercept global console.debug calls
+console.debug = (...args: any[]) => {
+  const message = util.format(...args);
+  const errorArg = args.find(arg => arg instanceof Error);
+  const meta = errorArg ? { stack: errorArg.stack } : {};
+  logger.debug(message, meta);
+};
