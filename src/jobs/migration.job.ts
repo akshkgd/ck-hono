@@ -44,6 +44,17 @@ function parseEnrollmentType(type: any): 'oneTime' | 'Subscription' | 'free' {
   return 'oneTime';
 }
 
+function parseDateString(val: any): string | null {
+  if (!val) return null;
+  try {
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString().split('T')[0];
+  } catch {
+    return null;
+  }
+}
+
 function parseSubscriptionStatus(status: any): 'active' | 'expired' | 'pending' | null {
   if (status === undefined || status === null) return null;
   const sStr = String(status).trim().toLowerCase();
@@ -589,13 +600,13 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             subscriptionStatus: parseSubscriptionStatus(
               e.subscriptionStatus !== undefined ? e.subscriptionStatus : e.subscription_status
             ),
-            subscriptionActiveOn: e.subscriptionActiveOn || e.subscription_active_on || null,
-            subscriptionExpiresOn: e.subscriptionExpiresOn || e.subscription_expires_on || null,
+            subscriptionActiveOn: parseDateString(e.subscriptionActiveOn || e.subscription_active_on),
+            subscriptionExpiresOn: parseDateString(e.subscriptionExpiresOn || e.subscription_expires_on),
             paidAt: e.paidAt || e.paid_at ? new Date(e.paidAt || e.paid_at) : null,
             certificateId: e.certificateId || e.certificate_id || null,
             certificateGeneratedAt: e.certificateGeneratedAt || e.certificate_generated_at ? new Date(e.certificateGeneratedAt || e.certificate_generated_at) : null,
             startedAt: e.startedAt || e.started_at || e.startFrom || e.start_from ? new Date(e.startedAt || e.started_at || e.startFrom || e.start_from) : null,
-            accessTill: e.accessTill || e.access_till || null,
+            accessTill: parseDateString(e.accessTill || e.access_till),
             overrideAccessDays: parseNumber(e.overrideAccessDays || e.override_access_days),
             utmSource: e.utmSource || e.utm_source || null,
             utmMedium: e.utmMedium || e.utm_medium || null,
