@@ -150,6 +150,15 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
 
   logger.info(`[MigrationJob] Starting task: "${data.migrationName}" (Dry run: ${isDryRun}, Batch size: ${batchSize})`);
 
+  // Ensure JSONB legacy ID fields are indexed in the database for O(1) lookups
+  try {
+    await db.execute(sql`CREATE INDEX IF NOT EXISTS users_legacy_id_idx ON users ((metadata->>'legacyId'))`);
+    await db.execute(sql`CREATE INDEX IF NOT EXISTS batches_legacy_id_idx ON batches ((metadata->>'legacyId'))`);
+    await db.execute(sql`CREATE INDEX IF NOT EXISTS batch_enrollments_legacy_id_idx ON batch_enrollments ((metadata->>'legacyId'))`);
+  } catch (err: any) {
+    logger.warn(`[MigrationJob] Index creation optimization failed (non-critical): ${err.message}`);
+  }
+
   if (data.migrationName === 'BULK_USER_MIGRATION' && data.metadata?.users) {
     const userList: any[] = data.metadata.users;
     const totalRecords = userList.length;
