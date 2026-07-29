@@ -64,6 +64,13 @@ function parseSubscriptionStatus(status: any): 'active' | 'expired' | 'pending' 
   return null;
 }
 
+function parseAmount(val: any): number | null {
+  if (val === undefined || val === null) return null;
+  const parsed = parseInt(String(val), 10);
+  if (isNaN(parsed)) return null;
+  return Math.floor(parsed / 100);
+}
+
 function parseBatchTopic(topicId: any): string {
   if (topicId === undefined || topicId === null) return 'frontend';
   const tid = Number(topicId);
@@ -591,13 +598,13 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           recordsToInsert.push({
             userId: resolvedUserId,
             batchId: resolvedBatchId,
-            amountPayable: parseNumber(e.amountPayable || e.amount_payable),
+            amountPayable: parseAmount(e.amountPayable || e.amount_payable),
             enrollmentType: typeValue,
             status: parseStatus(e.status),
             progress: parseStatus(e.progress),
-            timeSpentSeconds: parseStatus(e.timeSpentSeconds || e.time_spent_seconds),
-            amountPaid: parseStatus(e.amountPaid || e.amount_paid),
-            certificateFee: parseNumber(e.certificateFee || e.certificate_fee),
+            timeSpentSeconds: parseStatus(e.timeSpentSeconds || e.time_spent_seconds || e.time_spent),
+            amountPaid: parseAmount(e.amountPaid || e.amount_paid) || 0,
+            certificateFee: parseAmount(e.certificateFee || e.certificate_fee),
             paymentStatus: paymentStatusValue,
             paymentMethod: e.paymentMethod || e.payment_method || null,
             couponCode: e.couponCode || e.coupon_code || e.coupanCode || null,
@@ -725,7 +732,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
 
           recordsToInsert.push({
             batchEnrollmentId: resolvedEnrollmentId,
-            amount: parseNumber(p.amount),
+            amount: parseAmount(p.amount) || 0,
             paidAt: p.paidAt || p.paid_at ? new Date(p.paidAt || p.paid_at) : new Date(),
             paymentMethod: p.paymentMethod || p.payment_method || null,
             transactionId: p.transactionId || p.transaction_id || null,
