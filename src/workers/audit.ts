@@ -1,6 +1,6 @@
 import { db } from '../db/index.js';
 import { jobAuditLogs } from '../db/schema.js';
-import { eq } from 'drizzle-orm';
+import { eq, lt } from 'drizzle-orm';
 import { logger } from '../utils/logger.js';
 
 export async function logJobStart(jobId: string, queueName: string, jobName: string, payload: any) {
@@ -44,6 +44,8 @@ export async function logJobSuccess(jobId: string, result: any, durationMs: numb
     }
   } catch (err: any) {
     logger.error(`[Audit] Failed to log job success for ${jobId}: ${err.message}`);
+  } finally {
+    pruneOldAuditLogs().catch(err => logger.error(`[Audit] Background pruning failed: ${err.message}`));
   }
 }
 
@@ -73,5 +75,17 @@ export async function logJobFailure(jobId: string, error: Error, durationMs: num
     }
   } catch (err: any) {
     logger.error(`[Audit] Failed to log job failure for ${jobId}: ${err.message}`);
+  } finally {
+    pruneOldAuditLogs().catch(err => logger.error(`[Audit] Background pruning failed: ${err.message}`));
+  }
+}
+
+async function pruneOldAuditLogs() {
+  try {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    await db.delete(jobAuditLogs).where(lt(jobAuditLogs.createdAt, sevenDaysAgo));
+  } catch (err: any) {
+    logger.error(`[Audit] Failed to prune old job audit logs: ${err.message}`);
   }
 }
