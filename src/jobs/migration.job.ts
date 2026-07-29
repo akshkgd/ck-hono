@@ -542,6 +542,15 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
         const recordsToInsert: any[] = [];
 
         for (const e of chunk) {
+          const hasPaidVal = e.hasPaid !== undefined ? e.hasPaid : e.has_paid;
+          const isPaid = hasPaidVal === 1 || hasPaidVal === true || String(hasPaidVal) === '1' || String(hasPaidVal) === 'true';
+
+          if (!isPaid) {
+            logger.warn(`[MigrationJob] Skipping enrollment: not paid (hasPaid = ${hasPaidVal}, Legacy ID: ${e.id || 'N/A'})`);
+            failedCount++;
+            continue;
+          }
+
           const emailKey = e.email ? String(e.email).toLowerCase().trim() : null;
           const legacyUserId = e.userId !== undefined && e.userId !== null ? String(e.userId) : (e.user_id !== undefined && e.user_id !== null ? String(e.user_id) : null);
           const resolvedUserId = (legacyUserId ? userMapByLegacyId.get(legacyUserId) : null) || (emailKey ? userMapByEmail.get(emailKey) : null);
@@ -560,8 +569,6 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             e.enrollmentType !== undefined ? e.enrollmentType : (e.enrollment_type !== undefined ? e.enrollment_type : e.type)
           );
           
-          const hasPaidVal = e.hasPaid !== undefined ? e.hasPaid : e.has_paid;
-          const isPaid = hasPaidVal === 1 || hasPaidVal === true || String(hasPaidVal) === '1' || String(hasPaidVal) === 'true';
           const paymentStatusValue = isPaid ? 'captured' : 'created';
 
           const parseNumber = (val: any) => {
