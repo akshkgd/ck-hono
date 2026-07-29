@@ -549,10 +549,9 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             e.enrollmentType !== undefined ? e.enrollmentType : (e.enrollment_type !== undefined ? e.enrollment_type : e.type)
           );
           
-          let paymentStatusValue = parsePaymentStatus(e.paymentStatus || e.payment_status);
-          if (paymentStatusValue === 'created' && (e.hasPaid === 1 || e.hasPaid === true || e.has_paid === 1 || e.has_paid === true)) {
-            paymentStatusValue = 'captured';
-          }
+          const hasPaidVal = e.hasPaid !== undefined ? e.hasPaid : e.has_paid;
+          const isPaid = hasPaidVal === 1 || hasPaidVal === true || String(hasPaidVal) === '1' || String(hasPaidVal) === 'true';
+          const paymentStatusValue = isPaid ? 'captured' : 'created';
 
           const parseNumber = (val: any) => {
             if (val === undefined || val === null) return null;
@@ -595,7 +594,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             paidAt: e.paidAt || e.paid_at ? new Date(e.paidAt || e.paid_at) : null,
             certificateId: e.certificateId || e.certificate_id || null,
             certificateGeneratedAt: e.certificateGeneratedAt || e.certificate_generated_at ? new Date(e.certificateGeneratedAt || e.certificate_generated_at) : null,
-            startedAt: e.startedAt || e.started_at ? new Date(e.startedAt || e.started_at) : null,
+            startedAt: e.startedAt || e.started_at || e.startFrom || e.start_from ? new Date(e.startedAt || e.started_at || e.startFrom || e.start_from) : null,
             accessTill: e.accessTill || e.access_till || null,
             overrideAccessDays: parseNumber(e.overrideAccessDays || e.override_access_days),
             utmSource: e.utmSource || e.utm_source || null,
