@@ -615,6 +615,15 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             ...(e.metadata || {}),
           };
 
+          let timeSpentSecondsValue = 0;
+          if (e.timeSpentSeconds !== undefined && e.timeSpentSeconds !== null) {
+            timeSpentSecondsValue = parseStatus(e.timeSpentSeconds);
+          } else if (e.time_spent_seconds !== undefined && e.time_spent_seconds !== null) {
+            timeSpentSecondsValue = parseStatus(e.time_spent_seconds);
+          } else if (e.time_spent !== undefined && e.time_spent !== null) {
+            timeSpentSecondsValue = parseStatus(e.time_spent) * 60;
+          }
+
           recordsToInsert.push({
             userId: resolvedUserId,
             batchId: resolvedBatchId,
@@ -622,7 +631,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             enrollmentType: typeValue,
             status: parseStatus(e.status),
             progress: parseStatus(e.progress),
-            timeSpentSeconds: parseStatus(e.timeSpentSeconds || e.time_spent_seconds || e.time_spent),
+            timeSpentSeconds: timeSpentSecondsValue,
             amountPaid: parseAmount(e.amountPaid || e.amount_paid) || 0,
             certificateFee: parseAmount(e.certificateFee || e.certificate_fee),
             paymentStatus: paymentStatusValue,
