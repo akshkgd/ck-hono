@@ -29,6 +29,84 @@ export class AdminMigrationsController {
   };
 
   /**
+   * POST /v1/migration/batches or /v1/admin/migrations/batches - Queue Batch Migration Chunk
+   */
+  public queueBatchMigration = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      const body = await c.req.json();
+
+      const result = await adminMigrationsService.queueBatchMigration(body, user?.id || 'admin');
+
+      return c.json({
+        success: true,
+        status: 'success',
+        processed: result.totalRecords,
+        message: `Batches chunk ${body.batch_index || 1} processed successfully.`,
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        success: false,
+        status: 'error',
+        message: err.message || 'Failed to queue batch migration job',
+      }, 400);
+    }
+  };
+
+  /**
+   * POST /v1/migration/enrollments or /v1/admin/migrations/enrollments - Queue Enrollment Migration Chunk
+   */
+  public queueEnrollmentMigration = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      const body = await c.req.json();
+
+      const result = await adminMigrationsService.queueEnrollmentMigration(body, user?.id || 'admin');
+
+      return c.json({
+        success: true,
+        status: 'success',
+        processed: result.totalRecords,
+        message: `Enrollments chunk ${body.batch_index || 1} processed successfully.`,
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        success: false,
+        status: 'error',
+        message: err.message || 'Failed to queue enrollment migration job',
+      }, 400);
+    }
+  };
+
+  /**
+   * POST /v1/migration/payments or /v1/admin/migrations/payments - Queue Payment Migration Chunk
+   */
+  public queuePaymentMigration = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      const body = await c.req.json();
+
+      const result = await adminMigrationsService.queuePaymentMigration(body, user?.id || 'admin');
+
+      return c.json({
+        success: true,
+        status: 'success',
+        processed: result.totalRecords,
+        message: `Payments chunk ${body.batch_index || 1} processed successfully.`,
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        success: false,
+        status: 'error',
+        message: err.message || 'Failed to queue payment migration job',
+      }, 400);
+    }
+  };
+
+  /**
    * GET /v1/admin/migrations/status/:jobId - Check Migration Live Status
    */
   public getMigrationStatus = async (c: Context) => {

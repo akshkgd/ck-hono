@@ -1,9 +1,9 @@
 import { addMigrationJob, migrationQueue } from '../../../queues/index.js';
-import { BulkUserMigrationInput } from './admin-migrations.validation.js';
+import { BulkUserMigrationInput, BulkBatchMigrationInput, BulkEnrollmentMigrationInput, BulkPaymentMigrationInput } from './admin-migrations.validation.js';
 import { logJobStart } from '../../../workers/audit.js';
 import { processMigrationJob } from '../../../jobs/migration.job.js';
 import { db } from '../../../db/index.js';
-import { users, jobAuditLogs } from '../../../db/schema.js';
+import { users, jobAuditLogs, batches, batchEnrollments, batchEnrollmentPayments } from '../../../db/schema.js';
 import { sql, eq, desc } from 'drizzle-orm';
 
 export class AdminMigrationsService {
@@ -71,6 +71,186 @@ export class AdminMigrationsService {
   }
 
   /**
+   * Queue & Process a Bulk Batch Migration Job
+   */
+  async queueBatchMigration(input: BulkBatchMigrationInput, adminId: string) {
+    const batchRecords = input.data || input.batches || [];
+    const totalRecords = batchRecords.length;
+    const batchSize = input.chunk_size || input.batchSize || 2000;
+    const jobId = `batch_mig_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+    await logJobStart(
+      jobId,
+      'migration-queue',
+      'BATCH_MIGRATION',
+      {
+        totalRecords,
+        batchSize,
+        dryRun: input.dryRun,
+        initiatedBy: adminId,
+      }
+    );
+
+    const job = await addMigrationJob(
+      'process-batch-migration',
+      {
+        migrationName: 'BULK_BATCH_MIGRATION',
+        batchSize,
+        dryRun: input.dryRun,
+        metadata: {
+          jobId,
+          adminId,
+          totalRecords,
+          batches: batchRecords,
+        },
+      },
+      { jobId }
+    );
+
+    processMigrationJob({
+      migrationName: 'BULK_BATCH_MIGRATION',
+      batchSize,
+      dryRun: input.dryRun,
+      metadata: {
+        jobId,
+        adminId,
+        totalRecords,
+        batches: batchRecords,
+      },
+    }).catch((err) => console.error(`[InlineMigration] Error processing batches batch ${jobId}:`, err));
+
+    return {
+      jobId,
+      bullJobId: job.id,
+      totalRecords,
+      batchSize,
+      dryRun: input.dryRun,
+      status: 'processing',
+      statusUrl: `/v1/admin/migrations/status/${jobId}`,
+    };
+  }
+
+  /**
+   * Queue & Process a Bulk Enrollment Migration Job
+   */
+  async queueEnrollmentMigration(input: BulkEnrollmentMigrationInput, adminId: string) {
+    const enrollmentRecords = input.data || input.enrollments || [];
+    const totalRecords = enrollmentRecords.length;
+    const batchSize = input.chunk_size || input.batchSize || 2000;
+    const jobId = `enroll_mig_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+    await logJobStart(
+      jobId,
+      'migration-queue',
+      'ENROLLMENT_MIGRATION',
+      {
+        totalRecords,
+        batchSize,
+        dryRun: input.dryRun,
+        initiatedBy: adminId,
+      }
+    );
+
+    const job = await addMigrationJob(
+      'process-enrollment-migration',
+      {
+        migrationName: 'BULK_ENROLLMENT_MIGRATION',
+        batchSize,
+        dryRun: input.dryRun,
+        metadata: {
+          jobId,
+          adminId,
+          totalRecords,
+          enrollments: enrollmentRecords,
+        },
+      },
+      { jobId }
+    );
+
+    processMigrationJob({
+      migrationName: 'BULK_ENROLLMENT_MIGRATION',
+      batchSize,
+      dryRun: input.dryRun,
+      metadata: {
+        jobId,
+        adminId,
+        totalRecords,
+        enrollments: enrollmentRecords,
+      },
+    }).catch((err) => console.error(`[InlineMigration] Error processing enrollments batch ${jobId}:`, err));
+
+    return {
+      jobId,
+      bullJobId: job.id,
+      totalRecords,
+      batchSize,
+      dryRun: input.dryRun,
+      status: 'processing',
+      statusUrl: `/v1/admin/migrations/status/${jobId}`,
+    };
+  }
+
+  /**
+   * Queue & Process a Bulk Payment Migration Job
+   */
+  async queuePaymentMigration(input: BulkPaymentMigrationInput, adminId: string) {
+    const paymentRecords = input.data || input.payments || [];
+    const totalRecords = paymentRecords.length;
+    const batchSize = input.chunk_size || input.batchSize || 2000;
+    const jobId = `pay_mig_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+    await logJobStart(
+      jobId,
+      'migration-queue',
+      'PAYMENT_MIGRATION',
+      {
+        totalRecords,
+        batchSize,
+        dryRun: input.dryRun,
+        initiatedBy: adminId,
+      }
+    );
+
+    const job = await addMigrationJob(
+      'process-payment-migration',
+      {
+        migrationName: 'BULK_PAYMENT_MIGRATION',
+        batchSize,
+        dryRun: input.dryRun,
+        metadata: {
+          jobId,
+          adminId,
+          totalRecords,
+          payments: paymentRecords,
+        },
+      },
+      { jobId }
+    );
+
+    processMigrationJob({
+      migrationName: 'BULK_PAYMENT_MIGRATION',
+      batchSize,
+      dryRun: input.dryRun,
+      metadata: {
+        jobId,
+        adminId,
+        totalRecords,
+        payments: paymentRecords,
+      },
+    }).catch((err) => console.error(`[InlineMigration] Error processing payments batch ${jobId}:`, err));
+
+    return {
+      jobId,
+      bullJobId: job.id,
+      totalRecords,
+      batchSize,
+      dryRun: input.dryRun,
+      status: 'processing',
+      statusUrl: `/v1/admin/migrations/status/${jobId}`,
+    };
+  }
+
+  /**
    * Clear migration audit logs to reclaim disk space
    */
   async clearMigrationLogs() {
@@ -118,13 +298,19 @@ export class AdminMigrationsService {
           const [totalRes] = await db.select({ count: sql<number>`count(*)` }).from(users);
           const [adminRes] = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.role, 'admin'));
           const [studentRes] = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.role, 'student'));
+          const [batchesRes] = await db.select({ count: sql<number>`count(*)` }).from(batches);
+          const [enrollmentsRes] = await db.select({ count: sql<number>`count(*)` }).from(batchEnrollments);
+          const [paymentsRes] = await db.select({ count: sql<number>`count(*)` }).from(batchEnrollmentPayments);
           return {
             totalUsersInDb: Number(totalRes?.count || 0),
             totalAdminsInDb: Number(adminRes?.count || 0),
             totalStudentsInDb: Number(studentRes?.count || 0),
+            totalBatchesInDb: Number(batchesRes?.count || 0),
+            totalEnrollmentsInDb: Number(enrollmentsRes?.count || 0),
+            totalPaymentsInDb: Number(paymentsRes?.count || 0),
           };
         } catch {
-          return { totalUsersInDb: 0, totalAdminsInDb: 0, totalStudentsInDb: 0 };
+          return { totalUsersInDb: 0, totalAdminsInDb: 0, totalStudentsInDb: 0, totalBatchesInDb: 0, totalEnrollmentsInDb: 0, totalPaymentsInDb: 0 };
         }
       })(),
       (async () => {

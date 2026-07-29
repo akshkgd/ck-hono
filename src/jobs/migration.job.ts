@@ -1,9 +1,73 @@
 import { MigrationJobData } from '../queues/index.js';
 import { logger } from '../utils/logger.js';
 import { db } from '../db/index.js';
-import { users } from '../db/schema.js';
+import { users, batches, batchEnrollments, batchEnrollmentPayments } from '../db/schema.js';
 import { Job } from 'bullmq';
-import { sql } from 'drizzle-orm';
+import { sql, eq, inArray } from 'drizzle-orm';
+
+function parseBatchStatus(status: any): 'active' | 'private' | 'completed' {
+  if (status === undefined || status === null) return 'private';
+  const sStr = String(status).trim().toLowerCase();
+  const sNum = Number(status);
+  if (sNum === 0 || sStr === '0' || sStr === 'private') return 'private';
+  if (sNum === 1 || sStr === '1' || sNum === 2 || sStr === '2' || sStr === 'active') return 'active';
+  if (sNum === 3 || sStr === '3' || sStr === 'completed') return 'completed';
+  return 'private';
+}
+
+function parseBatchType(type: any): 'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship' {
+  if (type === undefined || type === null) return 'cohort';
+  const tStr = String(type).trim().toLowerCase();
+  const tNum = Number(type);
+  if (tNum === 1 || tStr === '1' || tStr === 'cohort') return 'cohort';
+  if (tNum === 2 || tStr === '2' || tStr === 'webinar') return 'webinar';
+  if (tStr === 'live') return 'live';
+  if (tStr === 'callbooking') return 'callBooking';
+  if (tStr === 'mentorship') return 'mentorship';
+  return 'cohort';
+}
+
+function parsePaymentStatus(status: any): 'captured' | 'failed' | 'created' | 'refunded' {
+  if (status === undefined || status === null) return 'created';
+  const sStr = String(status).trim().toLowerCase();
+  if (['captured', 'success', 'paid', 'approved'].includes(sStr)) return 'captured';
+  if (['failed', 'declined', 'rejected'].includes(sStr)) return 'failed';
+  if (['refunded', 'reversed'].includes(sStr)) return 'refunded';
+  return 'created';
+}
+
+function parseEnrollmentType(type: any): 'oneTime' | 'Subscription' | 'free' {
+  if (type === undefined || type === null) return 'oneTime';
+  const tStr = String(type).trim().toLowerCase();
+  if (tStr === 'subscription' || tStr === 'recurring') return 'Subscription';
+  if (tStr === 'free') return 'free';
+  return 'oneTime';
+}
+
+function parseBatchTopic(topicId: any): string {
+  if (topicId === undefined || topicId === null) return 'frontend';
+  const tid = Number(topicId);
+  if (isNaN(tid)) {
+    const tStr = String(topicId).trim().toLowerCase();
+    return tStr ? tStr : 'frontend';
+  }
+  switch (tid) {
+    case 100: return 'css';
+    case 101: return 'js';
+    case 500: return 'fsd';
+    case 501: return 'genAiD';
+    case 1:
+    case 5:
+    case 10: return 'fullstack';
+    case 11: return 'react';
+    case 12: return 'node';
+    case 15: return 'python';
+    case 700: return 'frontend';
+    case 701: return 'backend';
+    case 705: return 'genAi';
+    default: return 'frontend';
+  }
+}
 
 function isValidEmail(email: any): boolean {
   if (!email || typeof email !== 'string') return false;
@@ -166,6 +230,477 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
 
     const durationMs = Date.now() - startTime;
     logger.info(`[MigrationJob] Bulk User Migration Completed: ${successCount} inserted, ${failedCount} failed/skipped in ${durationMs}ms`);
+
+    return {
+      migrationName: data.migrationName,
+      status: 'COMPLETED',
+      totalRecords,
+      successCount,
+      failedCount,
+      durationMs,
+      executedAt: new Date().toISOString(),
+    };
+  }
+
+  if (data.migrationName === 'BULK_BATCH_MIGRATION' && data.metadata?.batches) {
+    const batchList: any[] = data.metadata.batches;
+    const totalRecords = batchList.length;
+    let successCount = 0;
+    let failedCount = 0;
+
+    if (isDryRun) {
+      logger.info(`[MigrationJob] Dry run completed for ${totalRecords} batch records.`);
+      return {
+        migrationName: data.migrationName,
+        status: 'DRY_RUN_COMPLETED',
+        totalRecords,
+        processedItems: totalRecords,
+        dryRun: true,
+        durationMs: Date.now() - startTime,
+      };
+    }
+
+    for (let i = 0; i < totalRecords; i += batchSize) {
+      const chunk = batchList.slice(i, i + batchSize);
+      try {
+        const recordsToInsert: any[] = [];
+        const teacherLegacyIds = Array.from(new Set(
+          chunk.map(b => b.teacherId || b.teacher_id).filter(id => id !== undefined && id !== null).map(String)
+        ));
+
+        const teacherMap = new Map<string, string>();
+        if (teacherLegacyIds.length > 0) {
+          const matchedTeachers = await db.select({
+            id: users.id,
+            legacyId: sql<string>`metadata->>'legacyId'`
+          })
+          .from(users)
+          .where(sql`metadata->>'legacyId' IN (${sql.join(teacherLegacyIds.map(id => sql`${id}`), sql.raw(', '))})`);
+
+          for (const t of matchedTeachers) {
+            if (t.legacyId) {
+              teacherMap.set(String(t.legacyId), t.id);
+            }
+          }
+        }
+
+        for (const b of chunk) {
+          const typeValue = parseBatchType(b.type);
+          const statusValue = parseBatchStatus(b.status);
+          const legacyTeacherId = b.teacherId !== undefined && b.teacherId !== null ? String(b.teacherId) : (b.teacher_id !== undefined && b.teacher_id !== null ? String(b.teacher_id) : null);
+          const resolvedTeacherId = legacyTeacherId ? (teacherMap.get(legacyTeacherId) || null) : null;
+
+          const {
+            topicId, topic_id,
+            payable,
+            offerId, offer_id,
+            schedule,
+            about,
+            learn,
+            benefits,
+            groupLink2,
+            field1, field2, field3, field4, field5,
+            ...otherMetadata
+          } = b.metadata || {};
+
+          const extraMetadata = {
+            legacyId: b.id || null,
+            ...otherMetadata,
+          };
+
+          const parsePrice = (val: any) => {
+            if (val === undefined || val === null) return null;
+            const parsed = parseInt(String(val), 10);
+            return isNaN(parsed) ? null : parsed;
+          };
+
+          const parseLimit = (val: any) => {
+            if (val === undefined || val === null) return 0;
+            const parsed = parseInt(String(val), 10);
+            return isNaN(parsed) ? 0 : parsed;
+          };
+
+          recordsToInsert.push({
+            topic: parseBatchTopic(b.topicId !== undefined && b.topicId !== null ? b.topicId : (b.topic_id !== undefined && b.topic_id !== null ? b.topic_id : null)),
+            name: b.name || 'Unnamed Batch',
+            description: b.description || null,
+            slug: b.slug || `batch-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            price: parsePrice(b.price),
+            certificateFee: parsePrice(b.certificateFee !== undefined ? b.certificateFee : b.certificate_fee) || 0,
+            limit: parseLimit(b.limit),
+            img: b.img || b.image || null,
+            association: b.association || null,
+            logo: b.logo || null,
+            type: typeValue,
+            startDate: b.startDate || b.start_date ? new Date(b.startDate || b.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            endDate: b.endDate || b.end_date ? new Date(b.endDate || b.end_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            whatsAppLink: b.groupLink || b.whatsAppLink || b.whatsapp_link || null,
+            telegramLink: b.groupLink1 || b.telegramLink || b.telegram_link || null,
+            telegramBroadcast: b.telegramBroadcast || null,
+            teacherId: resolvedTeacherId,
+            teacherPayment: b.teacherPayment === 1 || b.teacherPayment === '1' || b.teacherPayment === true || b.TeacherPayment === true || false,
+            meetingLink: b.meetingLink || b.meeting_link || null,
+            nextClassTopic: b.nextClassTopic || b.next_class_topic || null,
+            desc: b.desc || null,
+            nextClass: b.nextClass || b.next_class ? new Date(b.nextClass || b.next_class) : null,
+            status: statusValue,
+            metadata: extraMetadata,
+            accessTillDate: b.accessTillDate || b.access_till_date ? new Date(b.accessTillDate || b.access_till_date).toISOString().split('T')[0] : null,
+            accessTillYear: parseLimit(b.accessTillYear !== undefined ? b.accessTillYear : b.access_till_year) || 1,
+            createdAt: b.created_at ? new Date(b.created_at) : new Date(),
+            updatedAt: b.updated_at ? new Date(b.updated_at) : new Date(),
+          });
+        }
+
+        if (recordsToInsert.length > 0) {
+          await db.insert(batches).values(recordsToInsert).onConflictDoUpdate({
+            target: batches.slug,
+            set: {
+              name: sql`EXCLUDED.name`,
+              description: sql`EXCLUDED.description`,
+              price: sql`EXCLUDED.price`,
+              status: sql`EXCLUDED.status`,
+              updatedAt: new Date(),
+            },
+          });
+          successCount += recordsToInsert.length;
+        }
+      } catch (err: any) {
+        logger.error(`[MigrationJob] Batches batch insert failed at index ${i}: ${err.message}`);
+        failedCount += chunk.length;
+      }
+
+      if (job) {
+        const processed = Math.min(i + batchSize, totalRecords);
+        await job.updateProgress({
+          processed,
+          total: totalRecords,
+          successCount,
+          failedCount,
+        });
+      }
+    }
+
+    const durationMs = Date.now() - startTime;
+    logger.info(`[MigrationJob] Bulk Batch Migration Completed: ${successCount} inserted, ${failedCount} failed/skipped in ${durationMs}ms`);
+
+    return {
+      migrationName: data.migrationName,
+      status: 'COMPLETED',
+      totalRecords,
+      successCount,
+      failedCount,
+      durationMs,
+      executedAt: new Date().toISOString(),
+    };
+  }
+
+  if (data.migrationName === 'BULK_ENROLLMENT_MIGRATION' && data.metadata?.enrollments) {
+    const enrollmentList: any[] = data.metadata.enrollments;
+    const totalRecords = enrollmentList.length;
+    let successCount = 0;
+    let failedCount = 0;
+
+    if (isDryRun) {
+      logger.info(`[MigrationJob] Dry run completed for ${totalRecords} enrollment records.`);
+      return {
+        migrationName: data.migrationName,
+        status: 'DRY_RUN_COMPLETED',
+        totalRecords,
+        processedItems: totalRecords,
+        dryRun: true,
+        durationMs: Date.now() - startTime,
+      };
+    }
+
+    for (let i = 0; i < totalRecords; i += batchSize) {
+      const chunk = enrollmentList.slice(i, i + batchSize);
+      try {
+        const userEmails = Array.from(new Set(chunk.map(e => e.email).filter(Boolean).map(e => String(e).toLowerCase().trim())));
+        const userLegacyIds = Array.from(new Set(chunk.map(e => e.userId || e.user_id).filter(id => id !== undefined && id !== null).map(String)));
+
+        const userMapByEmail = new Map<string, string>();
+        const userMapByLegacyId = new Map<string, string>();
+
+        if (userEmails.length > 0 || userLegacyIds.length > 0) {
+          const emailFilter = userEmails.length > 0 ? inArray(users.email, userEmails) : null;
+          const legacyIdFilter = userLegacyIds.length > 0 ? sql`metadata->>'legacyId' IN (${sql.join(userLegacyIds.map(id => sql`${id}`), sql.raw(', '))})` : null;
+
+          const query = db.select({
+            id: users.id,
+            email: users.email,
+            legacyId: sql<string>`metadata->>'legacyId'`
+          })
+          .from(users);
+
+          let matchedUsers: any[] = [];
+          if (emailFilter && legacyIdFilter) {
+            matchedUsers = await query.where(sql`${emailFilter} OR ${legacyIdFilter}`);
+          } else if (emailFilter) {
+            matchedUsers = await query.where(emailFilter);
+          } else if (legacyIdFilter) {
+            matchedUsers = await query.where(legacyIdFilter);
+          }
+
+          for (const u of matchedUsers) {
+            userMapByEmail.set(u.email.toLowerCase().trim(), u.id);
+            if (u.legacyId) {
+              userMapByLegacyId.set(String(u.legacyId), u.id);
+            }
+          }
+        }
+
+        const batchSlugs = Array.from(new Set(chunk.map(e => e.slug).filter(Boolean).map(s => String(s).toLowerCase().trim())));
+        const batchLegacyIds = Array.from(new Set(chunk.map(e => e.batchId || e.batch_id).filter(id => id !== undefined && id !== null).map(String)));
+
+        const batchMapBySlug = new Map<string, string>();
+        const batchMapByLegacyId = new Map<string, string>();
+
+        if (batchSlugs.length > 0 || batchLegacyIds.length > 0) {
+          const slugFilter = batchSlugs.length > 0 ? inArray(batches.slug, batchSlugs) : null;
+          const legacyIdFilter = batchLegacyIds.length > 0 ? sql`metadata->>'legacyId' IN (${sql.join(batchLegacyIds.map(id => sql`${id}`), sql.raw(', '))})` : null;
+
+          const query = db.select({
+            id: batches.id,
+            slug: batches.slug,
+            legacyId: sql<string>`metadata->>'legacyId'`
+          })
+          .from(batches);
+
+          let matchedBatches: any[] = [];
+          if (slugFilter && legacyIdFilter) {
+            matchedBatches = await query.where(sql`${slugFilter} OR ${legacyIdFilter}`);
+          } else if (slugFilter) {
+            matchedBatches = await query.where(slugFilter);
+          } else if (legacyIdFilter) {
+            matchedBatches = await query.where(legacyIdFilter);
+          }
+
+          for (const b of matchedBatches) {
+            if (b.slug) {
+              batchMapBySlug.set(b.slug.toLowerCase().trim(), b.id);
+            }
+            if (b.legacyId) {
+              batchMapByLegacyId.set(String(b.legacyId), b.id);
+            }
+          }
+        }
+
+        const recordsToInsert: any[] = [];
+
+        for (const e of chunk) {
+          const emailKey = e.email ? String(e.email).toLowerCase().trim() : null;
+          const legacyUserId = e.userId !== undefined && e.userId !== null ? String(e.userId) : (e.user_id !== undefined && e.user_id !== null ? String(e.user_id) : null);
+          const resolvedUserId = (legacyUserId ? userMapByLegacyId.get(legacyUserId) : null) || (emailKey ? userMapByEmail.get(emailKey) : null);
+
+          const slugKey = e.slug ? String(e.slug).toLowerCase().trim() : null;
+          const legacyBatchId = e.batchId !== undefined && e.batchId !== null ? String(e.batchId) : (e.batch_id !== undefined && e.batch_id !== null ? String(e.batch_id) : null);
+          const resolvedBatchId = (legacyBatchId ? batchMapByLegacyId.get(legacyBatchId) : null) || (slugKey ? batchMapBySlug.get(slugKey) : null);
+
+          if (!resolvedUserId || !resolvedBatchId) {
+            logger.warn(`[MigrationJob] Skipping enrollment: User resolved = ${!!resolvedUserId}, Batch resolved = ${!!resolvedBatchId} (Legacy ID: ${e.id || 'N/A'})`);
+            failedCount++;
+            continue;
+          }
+
+          const typeValue = parseEnrollmentType(e.enrollmentType || e.enrollment_type);
+          const paymentStatusValue = parsePaymentStatus(e.paymentStatus || e.payment_status);
+
+          const parseNumber = (val: any) => {
+            if (val === undefined || val === null) return null;
+            const parsed = parseInt(String(val), 10);
+            return isNaN(parsed) ? null : parsed;
+          };
+
+          const parseStatus = (val: any) => {
+            if (val === undefined || val === null) return 0;
+            const parsed = parseInt(String(val), 10);
+            return isNaN(parsed) ? 0 : parsed;
+          };
+
+          const extraMetadata = {
+            legacyId: e.id || null,
+            ...(e.metadata || {}),
+          };
+
+          recordsToInsert.push({
+            userId: resolvedUserId,
+            batchId: resolvedBatchId,
+            amountPayable: parseNumber(e.amountPayable || e.amount_payable),
+            enrollmentType: typeValue,
+            status: parseStatus(e.status),
+            progress: parseStatus(e.progress),
+            timeSpentSeconds: parseStatus(e.timeSpentSeconds || e.time_spent_seconds),
+            amountPaid: parseStatus(e.amountPaid || e.amount_paid),
+            certificateFee: parseNumber(e.certificateFee || e.certificate_fee),
+            paymentStatus: paymentStatusValue,
+            paymentMethod: e.paymentMethod || e.payment_method || null,
+            couponCode: e.couponCode || e.coupon_code || null,
+            transactionId: e.transactionId || e.transaction_id || null,
+            invoiceId: e.invoiceId || e.invoice_id || null,
+            subscriptionId: e.subscriptionId || e.subscription_id || null,
+            subscriptionStatus: e.subscriptionStatus || e.subscription_status || null,
+            subscriptionActiveOn: e.subscriptionActiveOn || e.subscription_active_on || null,
+            subscriptionExpiresOn: e.subscriptionExpiresOn || e.subscription_expires_on || null,
+            paidAt: e.paidAt || e.paid_at ? new Date(e.paidAt || e.paid_at) : null,
+            certificateId: e.certificateId || e.certificate_id || null,
+            certificateGeneratedAt: e.certificateGeneratedAt || e.certificate_generated_at ? new Date(e.certificateGeneratedAt || e.certificate_generated_at) : null,
+            startedAt: e.startedAt || e.started_at ? new Date(e.startedAt || e.started_at) : null,
+            accessTill: e.accessTill || e.access_till || null,
+            overrideAccessDays: parseNumber(e.overrideAccessDays || e.override_access_days),
+            utmSource: e.utmSource || e.utm_source || null,
+            utmMedium: e.utmMedium || e.utm_medium || null,
+            utmCampaign: e.utmCampaign || e.utm_campaign || null,
+            remark: e.remark || null,
+            sequentialLearning: e.sequentialLearning === 1 || e.sequentialLearning === true || e.sequential_learning === 1 || false,
+            sequentialLearningWithAssignments: e.sequentialLearningWithAssignments === 1 || e.sequentialLearningWithAssignments === true || e.sequential_learning_with_assignments === 1 || false,
+            metadata: extraMetadata,
+            createdAt: e.created_at ? new Date(e.created_at) : new Date(),
+            updatedAt: e.updated_at ? new Date(e.updated_at) : new Date(),
+          });
+        }
+
+        if (recordsToInsert.length > 0) {
+          await db.insert(batchEnrollments).values(recordsToInsert);
+          successCount += recordsToInsert.length;
+        }
+      } catch (err: any) {
+        logger.error(`[MigrationJob] Enrollments batch insert failed at index ${i}: ${err.message}`);
+        failedCount += chunk.length;
+      }
+
+      if (job) {
+        const processed = Math.min(i + batchSize, totalRecords);
+        await job.updateProgress({
+          processed,
+          total: totalRecords,
+          successCount,
+          failedCount,
+        });
+      }
+    }
+
+    const durationMs = Date.now() - startTime;
+    logger.info(`[MigrationJob] Bulk Enrollment Migration Completed: ${successCount} inserted, ${failedCount} failed/skipped in ${durationMs}ms`);
+
+    return {
+      migrationName: data.migrationName,
+      status: 'COMPLETED',
+      totalRecords,
+      successCount,
+      failedCount,
+      durationMs,
+      executedAt: new Date().toISOString(),
+    };
+  }
+
+  if (data.migrationName === 'BULK_PAYMENT_MIGRATION' && data.metadata?.payments) {
+    const paymentList: any[] = data.metadata.payments;
+    const totalRecords = paymentList.length;
+    let successCount = 0;
+    let failedCount = 0;
+
+    if (isDryRun) {
+      logger.info(`[MigrationJob] Dry run completed for ${totalRecords} payment records.`);
+      return {
+        migrationName: data.migrationName,
+        status: 'DRY_RUN_COMPLETED',
+        totalRecords,
+        processedItems: totalRecords,
+        dryRun: true,
+        durationMs: Date.now() - startTime,
+      };
+    }
+
+    for (let i = 0; i < totalRecords; i += batchSize) {
+      const chunk = paymentList.slice(i, i + batchSize);
+      try {
+        const legacyEnrollmentIds = Array.from(new Set(chunk.map(p => p.enrollmentId || p.enrollment_id).filter(id => id !== undefined && id !== null).map(String)));
+        const enrollmentMap = new Map<string, string>();
+
+        if (legacyEnrollmentIds.length > 0) {
+          const matchedEnrollments = await db.select({
+            id: batchEnrollments.id,
+            legacyId: sql<string>`metadata->>'legacyId'`
+          })
+          .from(batchEnrollments)
+          .where(sql`metadata->>'legacyId' IN (${sql.join(legacyEnrollmentIds.map(id => sql`${id}`), sql.raw(', '))})`);
+
+          for (const me of matchedEnrollments) {
+            if (me.legacyId) {
+              enrollmentMap.set(String(me.legacyId), me.id);
+            }
+          }
+        }
+
+        const recordsToInsert: any[] = [];
+
+        for (const p of chunk) {
+          const legacyEnrollmentId = p.enrollmentId !== undefined && p.enrollmentId !== null ? String(p.enrollmentId) : (p.enrollment_id !== undefined && p.enrollment_id !== null ? String(p.enrollment_id) : null);
+          const resolvedEnrollmentId = legacyEnrollmentId ? enrollmentMap.get(legacyEnrollmentId) : null;
+
+          if (!resolvedEnrollmentId) {
+            logger.warn(`[MigrationJob] Skipping payment: Enrollment not resolved (Legacy Enrollment ID: ${legacyEnrollmentId || 'N/A'})`);
+            failedCount++;
+            continue;
+          }
+
+          const parseNumber = (val: any) => {
+            if (val === undefined || val === null) return 0;
+            const parsed = parseInt(String(val), 10);
+            return isNaN(parsed) ? 0 : parsed;
+          };
+
+          const extraMetadata = {
+            legacyId: p.id || null,
+            ...(p.metadata || {}),
+          };
+
+          recordsToInsert.push({
+            batchEnrollmentId: resolvedEnrollmentId,
+            amount: parseNumber(p.amount),
+            paidAt: p.paidAt || p.paid_at ? new Date(p.paidAt || p.paid_at) : new Date(),
+            paymentMethod: p.paymentMethod || p.payment_method || null,
+            transactionId: p.transactionId || p.transaction_id || null,
+            invoiceId: p.invoiceId || p.invoice_id || null,
+            purpose: p.purpose || 'enrollment',
+            isGstApplicable: p.isGstApplicable === 1 || p.isGstApplicable === true || p.is_gst_applicable === 1 || false,
+            remarks: p.remarks || null,
+            metadata: extraMetadata,
+            createdAt: p.created_at ? new Date(p.created_at) : new Date(),
+            updatedAt: p.updated_at ? new Date(p.updated_at) : new Date(),
+          });
+        }
+
+        if (recordsToInsert.length > 0) {
+          await db.insert(batchEnrollmentPayments).values(recordsToInsert).onConflictDoUpdate({
+            target: batchEnrollmentPayments.transactionId,
+            set: {
+              amount: sql`EXCLUDED.amount`,
+              paidAt: sql`EXCLUDED.paid_at`,
+              updatedAt: new Date(),
+            },
+          });
+          successCount += recordsToInsert.length;
+        }
+      } catch (err: any) {
+        logger.error(`[MigrationJob] Payments batch insert failed at index ${i}: ${err.message}`);
+        failedCount += chunk.length;
+      }
+
+      if (job) {
+        const processed = Math.min(i + batchSize, totalRecords);
+        await job.updateProgress({
+          processed,
+          total: totalRecords,
+          successCount,
+          failedCount,
+        });
+      }
+    }
+
+    const durationMs = Date.now() - startTime;
+    logger.info(`[MigrationJob] Bulk Payment Migration Completed: ${successCount} inserted, ${failedCount} failed/skipped in ${durationMs}ms`);
 
     return {
       migrationName: data.migrationName,
