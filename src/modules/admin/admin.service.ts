@@ -166,31 +166,17 @@ export class AdminService {
     // Fetch enrolled courses and progress
     const enrollments = await this.enrollmentRepository.findByUserId(id);
 
-    // Fetch active login sessions from Redis
-    const activeSessions: any[] = [];
-    if (redis && isRedisReady()) {
-      try {
-        const sessionKeys = await redis.keys(`session:${id}:*`);
-        for (const key of sessionKeys) {
-          const sessionDataStr = await redis.get(key);
-          if (sessionDataStr) {
-            try {
-              const sessionData = JSON.parse(sessionDataStr);
-              const parts = key.split(':');
-              const sessionId = parts[parts.length - 1];
-              activeSessions.push({
-                sessionId,
-                ...sessionData,
-              });
-            } catch {
-              // Ignore invalid json
-            }
-          }
-        }
-      } catch (err) {
-        console.error('[Redis] Failed to fetch active sessions for user details:', err);
-      }
-    }
+    // Fetch active login sessions from database (Better Auth)
+    const sessionsList = await this.userRepository.findActiveSessions(id);
+    const activeSessions = sessionsList.map((s) => ({
+      sessionId: s.id,
+      token: s.token,
+      expiresAt: s.expiresAt.toISOString(),
+      ipAddress: s.ipAddress,
+      userAgent: s.userAgent,
+      createdAt: s.createdAt.toISOString(),
+      updatedAt: s.updatedAt.toISOString(),
+    }));
 
     return {
       user: userWithoutPassword,
@@ -200,15 +186,10 @@ export class AdminService {
   }
 
   private async clearUserSessions(userId: string) {
-    if (redis && isRedisReady()) {
-      try {
-        const sessionKeys = await redis.keys(`session:${userId}:*`);
-        if (sessionKeys.length > 0) {
-          await redis.del(...sessionKeys);
-        }
-      } catch (err) {
-        console.error('[Redis] Failed to clear user sessions:', err);
-      }
+    try {
+      await this.userRepository.deleteSessions(userId);
+    } catch (err) {
+      console.error('[Database] Failed to clear user sessions:', err);
     }
   }
 }

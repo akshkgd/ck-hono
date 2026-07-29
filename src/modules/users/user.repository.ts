@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
-import { users } from '../../db/schema.js';
-import { eq, or, ilike, and, asc, desc, sql, gte, lte } from 'drizzle-orm';
+import { users, session } from '../../db/schema.js';
+import { eq, or, ilike, and, asc, desc, sql, gte, lte, gt } from 'drizzle-orm';
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -174,5 +174,30 @@ export class UserRepository {
 
     const results = await query;
     return Number(results[0]?.count || 0);
+  }
+
+  public async findActiveSessions(userId: string) {
+    const now = new Date();
+    return db
+      .select({
+        id: session.id,
+        token: session.token,
+        expiresAt: session.expiresAt,
+        ipAddress: session.ipAddress,
+        userAgent: session.userAgent,
+        createdAt: session.createdAt,
+        updatedAt: session.updatedAt,
+      })
+      .from(session)
+      .where(and(eq(session.userId, userId), gt(session.expiresAt, now)))
+      .orderBy(desc(session.createdAt));
+  }
+
+  public async deleteSessions(userId: string): Promise<boolean> {
+    const results = await db
+      .delete(session)
+      .where(eq(session.userId, userId))
+      .returning();
+    return results.length > 0;
   }
 }
