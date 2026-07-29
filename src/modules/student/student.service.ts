@@ -1,11 +1,14 @@
 import { StudentRepository } from './student.repository.js';
+import { UserRepository } from '../users/user.repository.js';
 import type { StudentProgressInput, StudentAssignmentInput, UpdateProfileInput } from './student.validation.js';
 
 export class StudentService {
   private studentRepository: StudentRepository;
+  private userRepository: UserRepository;
 
   constructor() {
     this.studentRepository = new StudentRepository();
+    this.userRepository = new UserRepository();
   }
 
   public async getEnrolledCourses(userId: string) {
@@ -394,5 +397,31 @@ export class StudentService {
     }
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
+  }
+
+  public async getActiveSessions(userId: string) {
+    const sessionsList = await this.userRepository.findActiveSessions(userId);
+    return sessionsList.map((s) => ({
+      sessionId: s.id,
+      token: s.token,
+      expiresAt: s.expiresAt.toISOString(),
+      ipAddress: s.ipAddress,
+      userAgent: s.userAgent,
+      createdAt: s.createdAt.toISOString(),
+      updatedAt: s.updatedAt.toISOString(),
+    }));
+  }
+
+  public async deleteSession(userId: string, sessionId: string) {
+    const deleted = await this.userRepository.deleteSessionById(sessionId, userId);
+    if (!deleted) {
+      throw new Error('Session not found or access denied');
+    }
+    return { success: true };
+  }
+
+  public async deleteAllSessions(userId: string) {
+    await this.userRepository.deleteSessions(userId);
+    return { success: true };
   }
 }

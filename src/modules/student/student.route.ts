@@ -16,4 +16,9 @@ studentRouter.put('/profile', authMiddleware(), zValidator('json', updateProfile
 studentRouter.post('/courses/content/progress', authMiddleware(), zValidator('json', studentProgressSchema), controller.updateProgress);
 studentRouter.post('/courses/content/:batchContentId/assignment', authMiddleware(), zValidator('json', studentAssignmentSchema), controller.submitAssignment);
 
+// Student Login Sessions Management
+studentRouter.get('/sessions', authMiddleware(), controller.getSessions);
+studentRouter.delete('/sessions', authMiddleware(), controller.deleteAllSessions);
+studentRouter.delete('/sessions/:sessionId', authMiddleware(), controller.deleteSession);
+
 export default studentRouter;

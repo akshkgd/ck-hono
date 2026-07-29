@@ -200,4 +200,12 @@ export class UserRepository {
       .returning();
     return results.length > 0;
   }
+
+  public async deleteSessionById(sessionId: string, userId: string): Promise<boolean> {
+    const results = await db
+      .delete(session)
+      .where(and(eq(session.id, sessionId), eq(session.userId, userId)))
+      .returning();
+    return results.length > 0;
+  }
 }

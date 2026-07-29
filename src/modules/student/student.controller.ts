@@ -204,4 +204,81 @@ export class StudentController {
       }, 400);
     }
   };
+
+  public getSessions = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      if (!user || !user.id) {
+        return c.json({
+          status: 'error',
+          message: 'Unauthorized: Missing user context',
+        }, 401);
+      }
+
+      const sessions = await this.studentService.getActiveSessions(user.id);
+      return c.json({
+        status: 'success',
+        data: sessions,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to fetch active sessions',
+      }, 400);
+    }
+  };
+
+  public deleteSession = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      if (!user || !user.id) {
+        return c.json({
+          status: 'error',
+          message: 'Unauthorized: Missing user context',
+        }, 401);
+      }
+
+      const sessionId = c.req.param('sessionId');
+      if (!sessionId) {
+        return c.json({
+          status: 'error',
+          message: 'Bad Request: Session ID is required',
+        }, 400);
+      }
+
+      const result = await this.studentService.deleteSession(user.id, sessionId);
+      return c.json({
+        status: 'success',
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to delete session',
+      }, 400);
+    }
+  };
+
+  public deleteAllSessions = async (c: Context) => {
+    try {
+      const user = c.get('user');
+      if (!user || !user.id) {
+        return c.json({
+          status: 'error',
+          message: 'Unauthorized: Missing user context',
+        }, 401);
+      }
+
+      const result = await this.studentService.deleteAllSessions(user.id);
+      return c.json({
+        status: 'success',
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to delete all sessions',
+      }, 400);
+    }
+  };
 }
