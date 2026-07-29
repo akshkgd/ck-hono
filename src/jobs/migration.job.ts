@@ -55,6 +55,18 @@ function parseDateString(val: any): string | null {
   }
 }
 
+function addOneYear(dateVal: any): string | null {
+  if (!dateVal) return null;
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return null;
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().split('T')[0];
+  } catch {
+    return null;
+  }
+}
+
 function parseSubscriptionStatus(status: any): 'active' | 'expired' | 'pending' | null {
   if (status === undefined || status === null) return null;
   const sStr = String(status).trim().toLowerCase();
@@ -590,6 +602,14 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             return isNaN(parsed) ? 0 : parsed;
           };
 
+          let accessTillValue = parseDateString(e.accessTill || e.access_till);
+          if (!accessTillValue) {
+            const baseDate = e.startedAt || e.started_at || e.startFrom || e.start_from || e.paidAt || e.paid_at;
+            if (baseDate) {
+              accessTillValue = addOneYear(baseDate);
+            }
+          }
+
           const extraMetadata = {
             legacyId: e.id || null,
             ...(e.metadata || {}),
@@ -620,7 +640,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             certificateId: e.certificateId || e.certificate_id || null,
             certificateGeneratedAt: e.certificateGeneratedAt || e.certificate_generated_at ? new Date(e.certificateGeneratedAt || e.certificate_generated_at) : null,
             startedAt: e.startedAt || e.started_at || e.startFrom || e.start_from ? new Date(e.startedAt || e.started_at || e.startFrom || e.start_from) : null,
-            accessTill: parseDateString(e.accessTill || e.access_till),
+            accessTill: accessTillValue,
             overrideAccessDays: parseNumber(e.overrideAccessDays || e.override_access_days),
             utmSource: e.utmSource || e.utm_source || null,
             utmMedium: e.utmMedium || e.utm_medium || null,
