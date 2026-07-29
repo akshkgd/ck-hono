@@ -56,7 +56,7 @@ export function getImplementDocsHtml(): string {
       </div>
       <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Codekaro API Implementation Guide</h1>
       <p class="text-zinc-400 text-base max-w-2xl">
-        Complete step-by-step reference for frontend engineers implementing UUID data structures, 6-digit Email OTP passwordless login, and 30-day persistent session management.
+        Complete step-by-step reference for frontend engineers implementing UUID data structures, 4-digit Email OTP passwordless login, and 30-day persistent session management.
       </p>
     </section>
 
@@ -219,11 +219,11 @@ await fetch('/v1/payments/razorpay/create-order', {
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center text-xs font-mono">
         <div class="bg-zinc-900/70 border border-zinc-800 p-4 rounded-lg space-y-1">
           <div class="text-indigo-400 font-bold">1. REQUEST OTP</div>
-          <p class="text-zinc-500 text-[11px]">User enters email. API sends 10-min 6-digit OTP code.</p>
+          <p class="text-zinc-500 text-[11px]">User enters email. API sends 10-min 4-digit OTP code.</p>
         </div>
         <div class="bg-zinc-900/70 border border-zinc-800 p-4 rounded-lg space-y-1">
-          <div class="text-emerald-400 font-bold">2. ENTER 6 DIGITS</div>
-          <p class="text-zinc-500 text-[11px]">Student enters code into input fields (e.g. 482910).</p>
+          <div class="text-emerald-400 font-bold">2. ENTER 4 DIGITS</div>
+          <p class="text-zinc-500 text-[11px]">Student enters code into input fields (e.g. 4829).</p>
         </div>
         <div class="bg-zinc-900/70 border border-zinc-800 p-4 rounded-lg space-y-1">
           <div class="text-purple-400 font-bold">3. VERIFY CODE</div>
@@ -240,9 +240,9 @@ await fetch('/v1/payments/razorpay/create-order', {
     <section class="space-y-6 pt-4 border-t border-zinc-900">
       <div class="space-y-2">
         <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Primary Authentication</div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">6-Digit Email OTP Login Flow</h2>
+        <h2 class="text-2xl font-bold text-white tracking-tight">4-Digit Email OTP Login Flow</h2>
         <p class="text-zinc-400 text-sm">
-          Send a 6-digit one-time passcode to the student's email. Reliable across all mobile devices and web browsers.
+          Send a 4-digit one-time passcode to the student's email. Reliable across all mobile devices and web browsers.
         </p>
       </div>
 
@@ -287,7 +287,7 @@ await fetch('/v1/payments/razorpay/create-order', {
           <span class="text-xs text-zinc-400 font-mono block mb-1">Request Payload:</span>
           <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
   "email": "student@example.com",
-  "otp": "482910"
+  "otp": "4829"
 }</code></pre>
         </div>
 

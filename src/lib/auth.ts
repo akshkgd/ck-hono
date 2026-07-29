@@ -71,6 +71,7 @@ export const auth = betterAuth({
   },
   plugins: [
     emailOTP({
+      otpLength: 4,
       rateLimit: {
         window: 60,
         max: 20, // Increased max requests to 20 per minute (default is 3)
