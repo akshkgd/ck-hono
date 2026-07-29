@@ -745,6 +745,25 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           }
         }
 
+        // Fetch existing transaction IDs for the chunk to detect conflicts in database
+        const txnIdsInChunk = Array.from(new Set(chunk.map(p => p.transactionId || p.transaction_id).filter(Boolean).map(String)));
+        const existingTxnIds = new Set<string>();
+
+        if (txnIdsInChunk.length > 0) {
+          const matchedTxns = await db.select({
+            transactionId: batchEnrollmentPayments.transactionId
+          })
+          .from(batchEnrollmentPayments)
+          .where(inArray(batchEnrollmentPayments.transactionId, txnIdsInChunk));
+
+          for (const mt of matchedTxns) {
+            if (mt.transactionId) {
+              existingTxnIds.add(mt.transactionId);
+            }
+          }
+        }
+
+        const seenTxnIdsInChunk = new Set<string>();
         const recordsToInsert: any[] = [];
 
         for (const p of chunk) {
@@ -763,11 +782,15 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             continue;
           }
 
-          const parseNumber = (val: any) => {
-            if (val === undefined || val === null) return 0;
-            const parsed = parseInt(String(val), 10);
-            return isNaN(parsed) ? 0 : parsed;
-          };
+          let txnId = p.transactionId || p.transaction_id || null;
+          if (txnId) {
+            const cleanTxnId = String(txnId).trim();
+            if (seenTxnIdsInChunk.has(cleanTxnId) || existingTxnIds.has(cleanTxnId)) {
+              txnId = `${cleanTxnId}-dup-${p.id || Math.floor(Math.random() * 100000)}`;
+            } else {
+              seenTxnIdsInChunk.add(cleanTxnId);
+            }
+          }
 
           const extraMetadata = {
             legacyId: p.id || null,
@@ -779,7 +802,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             amount: parseAmount(p.amount) || 0,
             paidAt: p.paidAt || p.paid_at ? new Date(p.paidAt || p.paid_at) : new Date(),
             paymentMethod: p.paymentMethod || p.payment_method || null,
-            transactionId: p.transactionId || p.transaction_id || null,
+            transactionId: txnId,
             invoiceId: p.invoiceId || p.invoice_id || null,
             purpose: p.purpose || 'enrollment',
             isGstApplicable: p.isGstApplicable === 1 || p.isGstApplicable === true || p.is_gst_applicable === 1 || false,
@@ -791,33 +814,14 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
         }
 
         if (recordsToInsert.length > 0) {
-          // Group by transactionId to avoid duplicate conflict keys in the same bulk INSERT statement
-          const uniqueTxnRecords = new Map<string, any>();
-          const nullTxnRecords: any[] = [];
-
-          for (const record of recordsToInsert) {
-            if (record.transactionId) {
-              uniqueTxnRecords.set(record.transactionId, record);
-            } else {
-              nullTxnRecords.push(record);
-            }
-          }
-
-          const deduplicatedRecords = [
-            ...Array.from(uniqueTxnRecords.values()),
-            ...nullTxnRecords
-          ];
-
-          if (deduplicatedRecords.length > 0) {
-            await db.insert(batchEnrollmentPayments).values(deduplicatedRecords).onConflictDoUpdate({
-              target: batchEnrollmentPayments.transactionId,
-              set: {
-                amount: sql`EXCLUDED.amount`,
-                paidAt: sql`EXCLUDED.paid_at`,
-                updatedAt: new Date(),
-              },
-            });
-          }
+          await db.insert(batchEnrollmentPayments).values(recordsToInsert).onConflictDoUpdate({
+            target: batchEnrollmentPayments.transactionId,
+            set: {
+              amount: sql`EXCLUDED.amount`,
+              paidAt: sql`EXCLUDED.paid_at`,
+              updatedAt: new Date(),
+            },
+          });
           successCount += recordsToInsert.length;
         }
       } catch (err: any) {
