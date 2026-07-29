@@ -138,6 +138,24 @@ export function getStudentDocsHtml(): string {
         </div>
 
         <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Student: Sessions</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#student-get-sessions" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List Sessions</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DELETE</span>
+              <a href="#student-delete-session" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete Single</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DELETE</span>
+              <a href="#student-delete-all-sessions" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete All</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
           <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Student: Profile</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
@@ -1054,6 +1072,122 @@ export function getStudentDocsHtml(): string {
     "status": "active",
     "createdAt": "2026-07-01T12:00:00.000Z",
     "updatedAt": "2026-07-15T12:45:00.000Z"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="border-zinc-900" />
+
+      <!-- Group: Student Sessions -->
+      <section class="space-y-16">
+        <div class="border-b border-zinc-900 pb-2">
+          <h2 class="text-2xl font-normal text-zinc-50 font-mono">Student: Sessions</h2>
+        </div>
+
+        <!-- Endpoint: GET /sessions -->
+        <div id="student-get-sessions" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get Active Sessions</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Returns a list of all active login sessions for the authenticated student.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/student/sessions</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/student/sessions', {
+  method: 'GET'
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": [
+    {
+      "sessionId": "sess_xyz12345",
+      "token": "token_abc123",
+      "expiresAt": "2026-08-28T12:00:00.000Z",
+      "ipAddress": "192.168.1.1",
+      "userAgent": "Mozilla/5.0...",
+      "createdAt": "2026-07-29T10:00:00.000Z",
+      "updatedAt": "2026-07-29T10:00:00.000Z"
+    }
+  ]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoint: DELETE /sessions/:sessionId -->
+        <div id="student-delete-session" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Delete Single Session</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Revokes/deletes a specific login session by ID (e.g. logging out a specific device).
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-bold">DELETE</span>
+              <span class="text-zinc-200">/v1/student/sessions/:sessionId</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/student/sessions/sess_xyz12345', {
+  method: 'DELETE'
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "success": true
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoint: DELETE /sessions -->
+        <div id="student-delete-all-sessions" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Delete All Sessions</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Revokes/deletes all active login sessions for the student.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-bold">DELETE</span>
+              <span class="text-zinc-200">/v1/student/sessions</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/student/sessions', {
+  method: 'DELETE'
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "success": true
   }
 }</code></pre>
             </div>
