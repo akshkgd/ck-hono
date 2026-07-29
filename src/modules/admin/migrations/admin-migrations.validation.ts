@@ -201,6 +201,7 @@ export const legacyPaymentItemSchema = z.object({
   id: z.union([z.number(), z.string()]).optional().nullable(),
   enrollment_id: z.union([z.number(), z.string()]).optional().nullable(),
   enrollmentId: z.union([z.number(), z.string()]).optional().nullable(),
+  course_enrollment_id: z.union([z.number(), z.string()]).optional().nullable(),
   amount: z.union([z.number(), z.string()]).optional().nullable(),
   paid_at: z.string().optional().nullable(),
   paidAt: z.string().optional().nullable(),

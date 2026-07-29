@@ -727,7 +727,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
     for (let i = 0; i < totalRecords; i += batchSize) {
       const chunk = paymentList.slice(i, i + batchSize);
       try {
-        const legacyEnrollmentIds = Array.from(new Set(chunk.map(p => p.enrollmentId || p.enrollment_id).filter(id => id !== undefined && id !== null).map(String)));
+        const legacyEnrollmentIds = Array.from(new Set(chunk.map(p => p.enrollmentId || p.enrollment_id || p.course_enrollment_id).filter(id => id !== undefined && id !== null).map(String)));
         const enrollmentMap = new Map<string, string>();
 
         if (legacyEnrollmentIds.length > 0) {
@@ -748,7 +748,13 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
         const recordsToInsert: any[] = [];
 
         for (const p of chunk) {
-          const legacyEnrollmentId = p.enrollmentId !== undefined && p.enrollmentId !== null ? String(p.enrollmentId) : (p.enrollment_id !== undefined && p.enrollment_id !== null ? String(p.enrollment_id) : null);
+          const legacyEnrollmentId = p.enrollmentId !== undefined && p.enrollmentId !== null 
+            ? String(p.enrollmentId) 
+            : (p.enrollment_id !== undefined && p.enrollment_id !== null 
+              ? String(p.enrollment_id) 
+              : (p.course_enrollment_id !== undefined && p.course_enrollment_id !== null 
+                ? String(p.course_enrollment_id) 
+                : null));
           const resolvedEnrollmentId = legacyEnrollmentId ? enrollmentMap.get(legacyEnrollmentId) : null;
 
           if (!resolvedEnrollmentId) {
