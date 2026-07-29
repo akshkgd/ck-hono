@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batches, batchEnrollments } from '../../db/schema.js';
-import { eq, or, ilike, sql, and } from 'drizzle-orm';
+import { eq, or, ilike, sql, and, desc } from 'drizzle-orm';
 
 export type Batch = typeof batches.$inferSelect;
 export type NewBatch = typeof batches.$inferInsert;
@@ -99,7 +99,10 @@ export class BatchRepository {
       query = query.where(and(...conditions));
     }
 
-    return query.limit(limit).offset(offset);
+    return query
+      .orderBy(desc(batches.createdAt))
+      .limit(limit)
+      .offset(offset);
   }
 
   public async count(queryText: string, type?: string, status?: string): Promise<number> {
