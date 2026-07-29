@@ -181,5 +181,9 @@ export const addCrawlerJob = async (name: string, data: CrawlerJobData, opts?: J
 };
 
 export const addMigrationJob = async (name: string, data: MigrationJobData, opts?: JobsOptions) => {
-  return migrationQueue.add(name, data, opts);
+  return migrationQueue.add(name, data, {
+    removeOnComplete: true, // Automatically remove job payload from Redis on success
+    removeOnFail: 50,      // Keep only the last 50 failed jobs for troubleshooting
+    ...opts,
+  });
 };
