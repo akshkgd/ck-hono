@@ -39,9 +39,18 @@ function parsePaymentStatus(status: any): 'captured' | 'failed' | 'created' | 'r
 function parseEnrollmentType(type: any): 'oneTime' | 'Subscription' | 'free' {
   if (type === undefined || type === null) return 'oneTime';
   const tStr = String(type).trim().toLowerCase();
-  if (tStr === 'subscription' || tStr === 'recurring') return 'Subscription';
-  if (tStr === 'free') return 'free';
+  if (tStr === 'subscription' || tStr === 'recurring' || tStr === '1') return 'Subscription';
+  if (tStr === 'free' || tStr === '2') return 'free';
   return 'oneTime';
+}
+
+function parseSubscriptionStatus(status: any): 'active' | 'expired' | 'pending' | null {
+  if (status === undefined || status === null) return null;
+  const sStr = String(status).trim().toLowerCase();
+  if (sStr === 'active' || sStr === '1') return 'active';
+  if (sStr === 'expired' || sStr === '2') return 'expired';
+  if (sStr === 'pending' || sStr === '0') return 'pending';
+  return null;
 }
 
 function parseBatchTopic(topicId: any): string {
@@ -536,8 +545,14 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             continue;
           }
 
-          const typeValue = parseEnrollmentType(e.enrollmentType || e.enrollment_type);
-          const paymentStatusValue = parsePaymentStatus(e.paymentStatus || e.payment_status);
+          const typeValue = parseEnrollmentType(
+            e.enrollmentType !== undefined ? e.enrollmentType : (e.enrollment_type !== undefined ? e.enrollment_type : e.type)
+          );
+          
+          let paymentStatusValue = parsePaymentStatus(e.paymentStatus || e.payment_status);
+          if (paymentStatusValue === 'created' && (e.hasPaid === 1 || e.hasPaid === true || e.has_paid === 1 || e.has_paid === true)) {
+            paymentStatusValue = 'captured';
+          }
 
           const parseNumber = (val: any) => {
             if (val === undefined || val === null) return null;
@@ -568,11 +583,13 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             certificateFee: parseNumber(e.certificateFee || e.certificate_fee),
             paymentStatus: paymentStatusValue,
             paymentMethod: e.paymentMethod || e.payment_method || null,
-            couponCode: e.couponCode || e.coupon_code || null,
+            couponCode: e.couponCode || e.coupon_code || e.coupanCode || null,
             transactionId: e.transactionId || e.transaction_id || null,
             invoiceId: e.invoiceId || e.invoice_id || null,
             subscriptionId: e.subscriptionId || e.subscription_id || null,
-            subscriptionStatus: e.subscriptionStatus || e.subscription_status || null,
+            subscriptionStatus: parseSubscriptionStatus(
+              e.subscriptionStatus !== undefined ? e.subscriptionStatus : e.subscription_status
+            ),
             subscriptionActiveOn: e.subscriptionActiveOn || e.subscription_active_on || null,
             subscriptionExpiresOn: e.subscriptionExpiresOn || e.subscription_expires_on || null,
             paidAt: e.paidAt || e.paid_at ? new Date(e.paidAt || e.paid_at) : null,
