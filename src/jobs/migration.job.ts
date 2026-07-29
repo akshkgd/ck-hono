@@ -263,7 +263,24 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
     for (let i = 0; i < totalRecords; i += batchSize) {
       const chunk = batchList.slice(i, i + batchSize);
       try {
-        const recordsToInsert: any[] = [];
+        const batchSlugsInChunk = chunk.map(b => b.slug).filter(Boolean).map(s => String(s).toLowerCase().trim());
+        const existingBatchesMap = new Map<string, string>();
+
+        if (batchSlugsInChunk.length > 0) {
+          const matchedExistingBatches = await db.select({
+            id: batches.id,
+            slug: batches.slug
+          })
+          .from(batches)
+          .where(inArray(batches.slug, batchSlugsInChunk));
+
+          for (const eb of matchedExistingBatches) {
+            if (eb.slug) {
+              existingBatchesMap.set(eb.slug.toLowerCase().trim(), eb.id);
+            }
+          }
+        }
+
         const teacherLegacyIds = Array.from(new Set(
           chunk.map(b => b.teacherId || b.teacher_id).filter(id => id !== undefined && id !== null).map(String)
         ));
@@ -283,6 +300,9 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             }
           }
         }
+
+        const recordsToInsert: any[] = [];
+        const recordsToUpdate: { id: string; data: any }[] = [];
 
         for (const b of chunk) {
           const typeValue = parseBatchType(b.type);
@@ -320,7 +340,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             return isNaN(parsed) ? 0 : parsed;
           };
 
-          recordsToInsert.push({
+          const batchRecord = {
             topic: parseBatchTopic(b.topicId !== undefined && b.topicId !== null ? b.topicId : (b.topic_id !== undefined && b.topic_id !== null ? b.topic_id : null)),
             name: b.name || 'Unnamed Batch',
             description: b.description || null,
@@ -349,21 +369,34 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             accessTillYear: parseLimit(b.accessTillYear !== undefined ? b.accessTillYear : b.access_till_year) || 1,
             createdAt: b.created_at ? new Date(b.created_at) : new Date(),
             updatedAt: b.updated_at ? new Date(b.updated_at) : new Date(),
-          });
+          };
+
+          const slugKey = b.slug ? String(b.slug).toLowerCase().trim() : null;
+          const existingId = slugKey ? existingBatchesMap.get(slugKey) : null;
+
+          if (existingId) {
+            recordsToUpdate.push({ id: existingId, data: batchRecord });
+          } else {
+            recordsToInsert.push(batchRecord);
+          }
         }
 
         if (recordsToInsert.length > 0) {
-          await db.insert(batches).values(recordsToInsert).onConflictDoUpdate({
-            target: batches.slug,
-            set: {
-              name: sql`EXCLUDED.name`,
-              description: sql`EXCLUDED.description`,
-              price: sql`EXCLUDED.price`,
-              status: sql`EXCLUDED.status`,
-              updatedAt: new Date(),
-            },
-          });
+          await db.insert(batches).values(recordsToInsert);
           successCount += recordsToInsert.length;
+        }
+
+        if (recordsToUpdate.length > 0) {
+          for (const item of recordsToUpdate) {
+            await db.update(batches).set({
+              name: item.data.name,
+              description: item.data.description,
+              price: item.data.price,
+              status: item.data.status,
+              updatedAt: new Date(),
+            }).where(eq(batches.id, item.id));
+          }
+          successCount += recordsToUpdate.length;
         }
       } catch (err: any) {
         logger.error(`[MigrationJob] Batches batch insert failed at index ${i}: ${err.message}`);
