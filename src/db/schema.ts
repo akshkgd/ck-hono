@@ -113,7 +113,7 @@ export const batchEnrollments = pgTable('batch_enrollments', {
   metadata: jsonb('metadata').default({}),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-}, (table) => [
+}, (table) => [ 
   index('enrollments_user_id_idx').on(table.userId),
   index('enrollments_batch_id_idx').on(table.batchId),
   index('enrollments_payment_status_idx').on(table.paymentStatus),
