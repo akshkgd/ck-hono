@@ -46,18 +46,38 @@ export class AdminMigrationsService {
       { jobId }
     );
 
-    // Execute direct inline batch insertion immediately (guarantees execution even if worker daemon is paused)
-    processMigrationJob({
-      migrationName: 'BULK_USER_MIGRATION',
-      batchSize,
-      dryRun: input.dryRun,
-      metadata: {
-        jobId,
-        adminId,
-        totalRecords,
-        users: userRecords,
-      },
-    }).catch((err) => console.error(`[InlineMigration] Error processing batch ${jobId}:`, err));
+    // Execute direct inline batch insertion immediately only if no background worker daemon is active
+    try {
+      const workers = await migrationQueue.getWorkers();
+      if (workers.length === 0) {
+        processMigrationJob({
+          migrationName: 'BULK_USER_MIGRATION',
+          batchSize,
+          dryRun: input.dryRun,
+          metadata: {
+            jobId,
+            adminId,
+            totalRecords,
+            users: userRecords,
+          },
+        }).catch((err) => console.error(`[InlineMigration] Error processing batch ${jobId}:`, err));
+      } else {
+        console.log(`[InlineMigration] Background worker detected. Skipping inline execution for ${jobId}.`);
+      }
+    } catch (err) {
+      console.warn(`[InlineMigration] Failed to check worker count, falling back to inline execution for ${jobId}:`, err);
+      processMigrationJob({
+        migrationName: 'BULK_USER_MIGRATION',
+        batchSize,
+        dryRun: input.dryRun,
+        metadata: {
+          jobId,
+          adminId,
+          totalRecords,
+          users: userRecords,
+        },
+      }).catch((err) => console.error(`[InlineMigration] Error processing batch ${jobId}:`, err));
+    }
 
     return {
       jobId,
@@ -107,17 +127,37 @@ export class AdminMigrationsService {
       { jobId }
     );
 
-    processMigrationJob({
-      migrationName: 'BULK_BATCH_MIGRATION',
-      batchSize,
-      dryRun: input.dryRun,
-      metadata: {
-        jobId,
-        adminId,
-        totalRecords,
-        batches: batchRecords,
-      },
-    }).catch((err) => console.error(`[InlineMigration] Error processing batches batch ${jobId}:`, err));
+    try {
+      const workers = await migrationQueue.getWorkers();
+      if (workers.length === 0) {
+        processMigrationJob({
+          migrationName: 'BULK_BATCH_MIGRATION',
+          batchSize,
+          dryRun: input.dryRun,
+          metadata: {
+            jobId,
+            adminId,
+            totalRecords,
+            batches: batchRecords,
+          },
+        }).catch((err) => console.error(`[InlineMigration] Error processing batches batch ${jobId}:`, err));
+      } else {
+        console.log(`[InlineMigration] Background worker detected. Skipping inline execution for ${jobId}.`);
+      }
+    } catch (err) {
+      console.warn(`[InlineMigration] Failed to check worker count, falling back to inline execution for ${jobId}:`, err);
+      processMigrationJob({
+        migrationName: 'BULK_BATCH_MIGRATION',
+        batchSize,
+        dryRun: input.dryRun,
+        metadata: {
+          jobId,
+          adminId,
+          totalRecords,
+          batches: batchRecords,
+        },
+      }).catch((err) => console.error(`[InlineMigration] Error processing batches batch ${jobId}:`, err));
+    }
 
     return {
       jobId,
@@ -167,17 +207,37 @@ export class AdminMigrationsService {
       { jobId }
     );
 
-    processMigrationJob({
-      migrationName: 'BULK_ENROLLMENT_MIGRATION',
-      batchSize,
-      dryRun: input.dryRun,
-      metadata: {
-        jobId,
-        adminId,
-        totalRecords,
-        enrollments: enrollmentRecords,
-      },
-    }).catch((err) => console.error(`[InlineMigration] Error processing enrollments batch ${jobId}:`, err));
+    try {
+      const workers = await migrationQueue.getWorkers();
+      if (workers.length === 0) {
+        processMigrationJob({
+          migrationName: 'BULK_ENROLLMENT_MIGRATION',
+          batchSize,
+          dryRun: input.dryRun,
+          metadata: {
+            jobId,
+            adminId,
+            totalRecords,
+            enrollments: enrollmentRecords,
+          },
+        }).catch((err) => console.error(`[InlineMigration] Error processing enrollments batch ${jobId}:`, err));
+      } else {
+        console.log(`[InlineMigration] Background worker detected. Skipping inline execution for ${jobId}.`);
+      }
+    } catch (err) {
+      console.warn(`[InlineMigration] Failed to check worker count, falling back to inline execution for ${jobId}:`, err);
+      processMigrationJob({
+        migrationName: 'BULK_ENROLLMENT_MIGRATION',
+        batchSize,
+        dryRun: input.dryRun,
+        metadata: {
+          jobId,
+          adminId,
+          totalRecords,
+          enrollments: enrollmentRecords,
+        },
+      }).catch((err) => console.error(`[InlineMigration] Error processing enrollments batch ${jobId}:`, err));
+    }
 
     return {
       jobId,
@@ -227,17 +287,37 @@ export class AdminMigrationsService {
       { jobId }
     );
 
-    processMigrationJob({
-      migrationName: 'BULK_PAYMENT_MIGRATION',
-      batchSize,
-      dryRun: input.dryRun,
-      metadata: {
-        jobId,
-        adminId,
-        totalRecords,
-        payments: paymentRecords,
-      },
-    }).catch((err) => console.error(`[InlineMigration] Error processing payments batch ${jobId}:`, err));
+    try {
+      const workers = await migrationQueue.getWorkers();
+      if (workers.length === 0) {
+        processMigrationJob({
+          migrationName: 'BULK_PAYMENT_MIGRATION',
+          batchSize,
+          dryRun: input.dryRun,
+          metadata: {
+            jobId,
+            adminId,
+            totalRecords,
+            payments: paymentRecords,
+          },
+        }).catch((err) => console.error(`[InlineMigration] Error processing payments batch ${jobId}:`, err));
+      } else {
+        console.log(`[InlineMigration] Background worker detected. Skipping inline execution for ${jobId}.`);
+      }
+    } catch (err) {
+      console.warn(`[InlineMigration] Failed to check worker count, falling back to inline execution for ${jobId}:`, err);
+      processMigrationJob({
+        migrationName: 'BULK_PAYMENT_MIGRATION',
+        batchSize,
+        dryRun: input.dryRun,
+        metadata: {
+          jobId,
+          adminId,
+          totalRecords,
+          payments: paymentRecords,
+        },
+      }).catch((err) => console.error(`[InlineMigration] Error processing payments batch ${jobId}:`, err));
+    }
 
     return {
       jobId,
