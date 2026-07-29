@@ -127,7 +127,7 @@ export const batchEnrollmentPayments = pgTable('batch_enrollment_payments', {
   paidAt: timestamp('paid_at').notNull(),
   paymentMethod: varchar('payment_method', { length: 100 }),
   transactionId: varchar('transaction_id', { length: 255 }).unique(),
-  invoiceId: varchar('invoice_id', { length: 255 }).unique(),
+  invoiceId: varchar('invoice_id', { length: 255 }),
   purpose: varchar('purpose', { length: 50 }).default('enrollment').notNull(),
   isGstApplicable: boolean('is_gst_applicable').default(true).notNull(),
   remarks: text('remarks'),

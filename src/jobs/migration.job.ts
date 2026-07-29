@@ -791,14 +791,33 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
         }
 
         if (recordsToInsert.length > 0) {
-          await db.insert(batchEnrollmentPayments).values(recordsToInsert).onConflictDoUpdate({
-            target: batchEnrollmentPayments.transactionId,
-            set: {
-              amount: sql`EXCLUDED.amount`,
-              paidAt: sql`EXCLUDED.paid_at`,
-              updatedAt: new Date(),
-            },
-          });
+          // Group by transactionId to avoid duplicate conflict keys in the same bulk INSERT statement
+          const uniqueTxnRecords = new Map<string, any>();
+          const nullTxnRecords: any[] = [];
+
+          for (const record of recordsToInsert) {
+            if (record.transactionId) {
+              uniqueTxnRecords.set(record.transactionId, record);
+            } else {
+              nullTxnRecords.push(record);
+            }
+          }
+
+          const deduplicatedRecords = [
+            ...Array.from(uniqueTxnRecords.values()),
+            ...nullTxnRecords
+          ];
+
+          if (deduplicatedRecords.length > 0) {
+            await db.insert(batchEnrollmentPayments).values(deduplicatedRecords).onConflictDoUpdate({
+              target: batchEnrollmentPayments.transactionId,
+              set: {
+                amount: sql`EXCLUDED.amount`,
+                paidAt: sql`EXCLUDED.paid_at`,
+                updatedAt: new Date(),
+              },
+            });
+          }
           successCount += recordsToInsert.length;
         }
       } catch (err: any) {
