@@ -241,17 +241,21 @@ export class AdminPaymentsService {
       )
     ]);
 
-    // Populate trend buckets
-    const totalCollectedTrend = generateTrendBuckets(startDate, endDate, interval);
-    const paymentCountTrend = generateTrendBuckets(startDate, endDate, interval);
-    const amountWithoutGstTrend = generateTrendBuckets(startDate, endDate, interval);
+    // Populate trend buckets with 4 values each
+    const trendBucketsObj = generateTrendBuckets(startDate, endDate, interval);
+    const trendList = trendBucketsObj.buckets.map((b) => ({
+      bucket: b.label,
+      totalCollected: 0,
+      paymentCount: 0,
+      amountWithoutGst: 0
+    }));
 
     for (const row of trendRaw) {
-      const idx = totalCollectedTrend.keyMap.get(row.bucket);
+      const idx = trendBucketsObj.keyMap.get(row.bucket);
       if (idx !== undefined) {
-        totalCollectedTrend.buckets[idx].value = Number(row.totalCollected || 0);
-        paymentCountTrend.buckets[idx].value = Number(row.paymentCount || 0);
-        amountWithoutGstTrend.buckets[idx].value = parseFloat(Number(row.amountWithoutGst || 0).toFixed(2));
+        trendList[idx].totalCollected = Number(row.totalCollected || 0);
+        trendList[idx].paymentCount = Number(row.paymentCount || 0);
+        trendList[idx].amountWithoutGst = parseFloat(Number(row.amountWithoutGst || 0).toFixed(2));
       }
     }
 
@@ -265,23 +269,21 @@ export class AdminPaymentsService {
           current: currentSummary.totalCollected,
           previous: prevSummary.totalCollected,
           percentageChange: totalCollectedChange,
-          direction: getDirection(totalCollectedChange),
-          trend: totalCollectedTrend.buckets
+          direction: getDirection(totalCollectedChange)
         },
         paymentCount: {
           current: currentSummary.paymentCount,
           previous: prevSummary.paymentCount,
           percentageChange: paymentCountChange,
-          direction: getDirection(paymentCountChange),
-          trend: paymentCountTrend.buckets
+          direction: getDirection(paymentCountChange)
         },
         amountWithoutGst: {
           current: currentSummary.amountWithoutGst,
           previous: prevSummary.amountWithoutGst,
           percentageChange: amountWithoutGstChange,
-          direction: getDirection(amountWithoutGstChange),
-          trend: amountWithoutGstTrend.buckets
-        }
+          direction: getDirection(amountWithoutGstChange)
+        },
+        trend: trendList
       },
       transactions,
       pagination: {

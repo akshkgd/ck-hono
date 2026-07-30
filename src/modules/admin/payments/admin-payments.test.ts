@@ -431,10 +431,18 @@ describe('Admin Payments CRUD Module', () => {
       expect(body.data.summary.totalCollected.previous).toBeTypeOf('number');
       expect(body.data.summary.totalCollected.percentageChange).toBeTypeOf('number');
       expect(body.data.summary.totalCollected.direction).toMatch(/^(up|down|flat)$/);
-      expect(body.data.summary.totalCollected.trend).toBeInstanceOf(Array);
+      expect(body.data.summary.trend).toBeInstanceOf(Array);
 
       expect(body.data.summary.paymentCount.current).toBeTypeOf('number');
       expect(body.data.summary.amountWithoutGst.current).toBeTypeOf('number');
+
+      if (body.data.summary.trend.length > 0) {
+        const firstBucket = body.data.summary.trend[0];
+        expect(firstBucket.bucket).toBeTypeOf('string');
+        expect(firstBucket.totalCollected).toBeTypeOf('number');
+        expect(firstBucket.paymentCount).toBeTypeOf('number');
+        expect(firstBucket.amountWithoutGst).toBeTypeOf('number');
+      }
 
       if (body.data.transactions.length > 1) {
         const firstTime = new Date(body.data.transactions[0].paidAt).getTime();
