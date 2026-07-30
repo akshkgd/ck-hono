@@ -115,7 +115,7 @@ function isValidEmail(email: any): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean);
 }
 
-function parseRole(role: any): 'student' | 'admin' | 'user' | 'moderator' {
+function parseRole(role: any): 'student' | 'admin' | 'user' | 'moderator' | 'teacher' {
   if (role === undefined || role === null) return 'student';
   const roleStr = String(role).trim().toLowerCase();
   const roleNum = Number(role);
@@ -125,6 +125,9 @@ function parseRole(role: any): 'student' | 'admin' | 'user' | 'moderator' {
   }
   if (roleStr === 'moderator') {
     return 'moderator';
+  }
+  if (roleStr === 'teacher' || roleStr === 'tutor' || roleStr === 'instructor') {
+    return 'teacher';
   }
   return 'student';
 }

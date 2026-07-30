@@ -68,7 +68,7 @@ export class UserRepository {
     queryText: string,
     limit: number,
     offset: number,
-    role?: 'student' | 'admin' | 'user' | 'moderator',
+    role?: 'student' | 'admin' | 'user' | 'moderator' | 'teacher',
     sortBy: 'createdAt' | 'name' | 'email' | 'xp' | 'lastActiveAt' = 'createdAt',
     sortOrder: 'asc' | 'desc' = 'desc',
     startDate?: Date,
@@ -137,7 +137,7 @@ export class UserRepository {
 
   public async count(
     q?: string,
-    role?: 'student' | 'admin' | 'user' | 'moderator',
+    role?: 'student' | 'admin' | 'user' | 'moderator' | 'teacher',
     startDate?: Date,
     endDate?: Date
   ): Promise<number> {

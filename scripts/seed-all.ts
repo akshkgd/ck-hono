@@ -109,13 +109,15 @@ async function seed() {
         const isStudent = occupation.type === "student";
         const expYears = isStudent ? 0 : (i % 12) + 1;
         
-        let role: 'student' | 'admin' | 'user' | 'moderator' = 'user';
+        let role: 'student' | 'admin' | 'user' | 'moderator' | 'teacher' = 'user';
         if (isStudent) {
           role = 'student';
         } else if (i === 0) {
           role = 'admin';
         } else if (i === 1) {
           role = 'moderator';
+        } else if (i % 8 === 0) {
+          role = 'teacher';
         }
 
         dummyUsers.push({

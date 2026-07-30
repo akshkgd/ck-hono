@@ -362,6 +362,24 @@ export function getDocsHtml(): string {
         </div>
 
         <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Bug Tracking & Support</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#bug-report-student" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Report bug (student)</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#bug-list-admin" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List bugs (admin)</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-yellow-500/10 text-yellow-400 font-mono">PUT</span>
+              <a href="#bug-update-admin" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update bug status (admin)</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
           <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Diagnostics</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
@@ -496,7 +514,7 @@ export function getDocsHtml(): string {
   occupationTitle: string | null;
   organization: string | null;
   experienceYears: number | null;
-  role: 'student' | 'admin' | 'user' | 'moderator'; // Default: 'student'
+  role: 'student' | 'admin' | 'user' | 'moderator' | 'teacher'; // Default: 'student'
   status: 'active' | 'inactive' | 'suspended'; // Default: 'active'
   googleId: string | null;
   emailVerified: boolean; // Default: false
@@ -952,7 +970,7 @@ export interface BatchContent {
                 </thead>
                 <tbody>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">""</td><td class="p-2 text-zinc-400">Prefix filter matching name, email, or mobile.</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">role</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">-</td><td class="p-2 text-zinc-400">Filter by user role: 'student' | 'admin' | 'user' | 'moderator'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">role</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">-</td><td class="p-2 text-zinc-400">Filter by user role: 'student' | 'admin' | 'user' | 'moderator' | 'teacher'</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">sortBy</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">'createdAt'</td><td class="p-2 text-zinc-400">Sort by field: 'createdAt' | 'name' | 'email' | 'xp' | 'lastActiveAt'</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">sortOrder</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">'desc'</td><td class="p-2 text-zinc-400">Sort direction order: 'asc' | 'desc'</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">limit</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">10</td><td class="p-2 text-zinc-400">Max page size (1 to 50).</td></tr>
@@ -3433,6 +3451,164 @@ export interface BatchContent {
       "type": "assignment",
       "assignment": "Write a complete REST API in Hono and deploy to Cloudflare Pages..."
     }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+
+        <!-- -------------------- BUG REPORTING & SUPPORT GROUP -------------------- -->
+
+        <!-- Endpoint: POST /student/bugs -->
+        <div id="bug-report-student" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Bug Tracking & Support</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Report a Bug (Student)</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Allows authenticated students/learners to report a system bug, including severity, the page URL, screenshot URL, and browser/device metadata.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/student/bugs</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Request JSON Body</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">title</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Short bug title (min 3 chars).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">description</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Detailed description of the issue.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">url</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">The page URL where the error occurred.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">severity</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'low' | 'medium' | 'high' | 'critical' (default 'medium')</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">deviceInfo</td><td class="p-2 border-r border-zinc-900 text-zinc-400">object</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">JSON object containing client browser/OS info.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (201 Created)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": "e0b4d47c-f179-4a92-8079-ecd09c4c44f9",
+    "userId": "student-uuid-xxxx",
+    "title": "Navigation Link Broken",
+    "description": "Clicking the settings page button results in a blank page.",
+    "url": "https://app.codekaro.in/settings",
+    "severity": "medium",
+    "status": "pending",
+    "deviceInfo": {
+      "browser": "Chrome 122",
+      "os": "macOS"
+    },
+    "createdAt": "2026-07-30T17:21:40.000Z"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /admin/bugs -->
+        <div id="bug-list-admin" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Bug Tracking & Support</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">List & Search Bugs (Admin)</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Retrieve a paginated, filterable list of all reported bugs on the platform. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/bugs</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "bugs": [
+      {
+        "id": "e0b4d47c-f179-4a92-8079-ecd09c4c44f9",
+        "userId": "student-uuid-xxxx",
+        "title": "Navigation Link Broken",
+        "description": "Clicking the settings page button results in a blank page.",
+        "url": "https://app.codekaro.in/settings",
+        "severity": "medium",
+        "status": "pending",
+        "deviceInfo": {
+          "browser": "Chrome 122"
+        },
+        "createdAt": "2026-07-30T17:21:40.000Z",
+        "user": {
+          "id": "student-uuid-xxxx",
+          "name": "Ananya Verma",
+          "email": "ananya.verma1@example.com"
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 1
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: PUT /admin/bugs/:id -->
+        <div id="bug-update-admin" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Bug Tracking & Support</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Update Bug Status & Remarks (Admin)</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates a bug's status (e.g. mark as resolved, investigating, closed) and appends internal developer remarks. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-yellow-500/10 text-yellow-400 font-bold">PUT</span>
+              <span class="text-zinc-200">/v1/admin/bugs/:id</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Request JSON Body</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">status</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'pending' | 'investigating' | 'resolved' | 'closed'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">severity</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'low' | 'medium' | 'high' | 'critical'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">remarks</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Internal tracking/resolution remarks.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": "e0b4d47c-f179-4a92-8079-ecd09c4c44f9",
+    "status": "resolved",
+    "remarks": "Fixed the navigation link mapping in config.",
+    "updatedAt": "2026-07-30T17:23:00.000Z"
   }
 }</code></pre>
             </div>

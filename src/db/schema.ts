@@ -1,7 +1,7 @@
 import { pgTable, uuid, varchar, text, smallint, boolean, integer, jsonb, timestamp, pgEnum, date, index, uniqueIndex } from 'drizzle-orm/pg-core';
 
 export const occupationTypeEnum = pgEnum('occupation_type', ['student', 'professional', 'academic', 'other']);
-export const roleEnum = pgEnum('role', ['student', 'admin', 'user', 'moderator']);
+export const roleEnum = pgEnum('role', ['student', 'admin', 'user', 'moderator', 'teacher']);
 export const statusEnum = pgEnum('status', ['active', 'inactive', 'suspended']);
 
 export const batchTypeEnum = pgEnum('batch_type', ['cohort', 'live', 'webinar', 'callBooking', 'mentorship']);
@@ -291,3 +291,25 @@ export const verification = pgTable('verification', {
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
+
+export const bugStatusEnum = pgEnum('bug_status', ['pending', 'investigating', 'resolved', 'closed']);
+export const bugSeverityEnum = pgEnum('bug_severity', ['low', 'medium', 'high', 'critical']);
+
+export const reportedBugs = pgTable('reported_bugs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description').notNull(),
+  url: varchar('url', { length: 1024 }),
+  severity: bugSeverityEnum('severity').default('medium').notNull(),
+  status: bugStatusEnum('status').default('pending').notNull(),
+  deviceInfo: jsonb('device_info').default({}),
+  screenshotUrl: varchar('screenshot_url', { length: 255 }),
+  remarks: text('remarks'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('reported_bugs_user_id_idx').on(table.userId),
+  index('reported_bugs_status_idx').on(table.status),
+  index('reported_bugs_created_at_idx').on(table.createdAt),
+]);
