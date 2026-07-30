@@ -120,7 +120,7 @@ function parseRole(role: any): 'student' | 'admin' | 'user' | 'moderator' {
   const roleStr = String(role).trim().toLowerCase();
   const roleNum = Number(role);
 
-  if (roleNum === 100 || roleStr === '100' || roleNum === 1 || roleStr === '1' || roleStr === 'admin' || roleStr === 'superadmin') {
+  if (roleNum === 100 || roleStr === '100' || roleStr === 'admin' || roleStr === 'superadmin') {
     return 'admin';
   }
   if (roleStr === 'moderator') {
@@ -201,6 +201,10 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
             : (u.role_id !== undefined && u.role_id !== null ? u.role_id : u.roleId);
           const roleValue = parseRole(legacyRole);
 
+          if (String(u.role) === '100' || String(u.role_id) === '100' || String(u.roleId) === '100' || roleValue === 'admin') {
+            logger.info(`[MigrationJob] USER DETECTED ADMIN: legacyId=${u.id || 'N/A'}, email=${cleanEmail}, raw u.role=${u.role}, parsed roleValue=${roleValue}`);
+          }
+
           // 2. Robust Status Parsing (0 / "0" / "inactive" -> 'inactive')
           const statusValue = parseStatus(u.status);
 
@@ -254,9 +258,9 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           await db.insert(users).values(recordsToInsert).onConflictDoUpdate({
             target: users.email,
             set: {
-              role: sql`EXCLUDED.role`,
-              status: sql`EXCLUDED.status`,
-              name: sql`EXCLUDED.name`,
+              role: sql`excluded.role`,
+              status: sql`excluded.status`,
+              name: sql`excluded.name`,
               updatedAt: new Date(),
             },
           });
