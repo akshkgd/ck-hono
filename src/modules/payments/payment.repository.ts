@@ -1,7 +1,7 @@
 import { db } from '../../db/index.js';
 import { batchEnrollmentPayments, batchEnrollments, users, batches } from '../../db/schema.js';
 import { eq, or, ilike, sql, and, gte, lte, asc, desc, inArray } from 'drizzle-orm';
-
+import { type GroupInterval } from '../../utils/date-range.js';
 export type Payment = typeof batchEnrollmentPayments.$inferSelect;
 export type NewPayment = typeof batchEnrollmentPayments.$inferInsert;
 
@@ -368,4 +368,76 @@ export class PaymentRepository {
       amountWithoutGst
     };
   }
+
+  public async getTransactionsTrend(
+    queryText: string,
+    startDate: Date,
+    endDate: Date,
+    interval: GroupInterval,
+    isGstApplicable?: boolean | null,
+    type?: 'all' | 'course' | 'webinar'
+  ) {
+    const { trunc, format } = getSqlFormatAndTrunc(interval);
+    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, ${batchEnrollmentPayments.paidAt}), ${sql.raw(`'${format}'`)})`;
+
+    let query = db
+      .select({
+        bucket: bucketExpr,
+        totalCollected: sql<number>`coalesce(sum(${batchEnrollmentPayments.amount}), 0)`,
+        paymentCount: sql<number>`count(*)`,
+        amountWithoutGst: sql<number>`coalesce(sum(CASE WHEN ${batchEnrollmentPayments.isGstApplicable} = true THEN ${batchEnrollmentPayments.amount} / 1.18 ELSE ${batchEnrollmentPayments.amount} END), 0)`
+      })
+      .from(batchEnrollmentPayments)
+      .leftJoin(batchEnrollments, eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollments.id))
+      .leftJoin(users, eq(batchEnrollments.userId, users.id))
+      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id));
+
+    const conditions = [];
+    conditions.push(gte(batchEnrollmentPayments.paidAt, startDate));
+    conditions.push(lte(batchEnrollmentPayments.paidAt, endDate));
+
+    if (queryText) {
+      const searchPattern = `%${queryText}%`;
+      conditions.push(
+        or(
+          ilike(users.name, searchPattern),
+          ilike(users.email, searchPattern),
+          ilike(batches.name, searchPattern),
+          ilike(batchEnrollmentPayments.transactionId, searchPattern),
+          ilike(batchEnrollmentPayments.invoiceId, searchPattern)
+        )
+      );
+    }
+    if (isGstApplicable !== undefined && isGstApplicable !== null) {
+      conditions.push(eq(batchEnrollmentPayments.isGstApplicable, isGstApplicable));
+    }
+    if (type === 'course') {
+      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship']));
+    } else if (type === 'webinar') {
+      conditions.push(inArray(batches.type, ['webinar', 'callBooking']));
+    }
+
+    query = query.where(and(...conditions)).groupBy(bucketExpr) as any;
+
+    return query;
+  }
+}
+
+function getSqlFormatAndTrunc(interval: GroupInterval) {
+  if (interval === 'hour') {
+    return {
+      trunc: 'hour',
+      format: 'YYYY-MM-DD HH24:mi'
+    };
+  }
+  if (interval === 'day') {
+    return {
+      trunc: 'day',
+      format: 'YYYY-MM-DD'
+    };
+  }
+  return {
+    trunc: 'month',
+    format: 'YYYY-MM'
+  };
 }

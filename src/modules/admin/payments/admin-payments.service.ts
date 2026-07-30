@@ -6,7 +6,7 @@ import type {
   PaymentSearchQueryInput,
   TransactionSearchQueryInput
 } from '../../payments/payment.validation.js';
-import { calculateDateRange } from '../../../utils/date-range.js';
+import { calculateDateRange, calculatePreviousDateRange, getGroupInterval, generateTrendBuckets } from '../../../utils/date-range.js';
 
 function sanitizeString(val: string | null | undefined): string | null {
   if (!val) return null;
@@ -188,10 +188,18 @@ export class AdminPaymentsService {
       input.startDate || undefined,
       input.endDate || undefined
     );
+    const prevRange = calculatePreviousDateRange(input.timeRange || 'this_month', { from: startDate, to: endDate });
+    const interval = getGroupInterval(input.timeRange || 'this_month', startDate, endDate);
 
     const offset = (input.page - 1) * input.limit;
 
-    const [transactions, total, summary] = await Promise.all([
+    const [
+      transactions,
+      total,
+      currentSummary,
+      prevSummary,
+      trendRaw
+    ] = await Promise.all([
       this.paymentRepository.searchTransactions(
         input.q,
         input.limit,
@@ -215,11 +223,66 @@ export class AdminPaymentsService {
         endDate,
         input.isGstApplicable,
         input.type
+      ),
+      this.paymentRepository.getTransactionsSummary(
+        input.q,
+        prevRange.from,
+        prevRange.to,
+        input.isGstApplicable,
+        input.type
+      ),
+      this.paymentRepository.getTransactionsTrend(
+        input.q,
+        startDate,
+        endDate,
+        interval,
+        input.isGstApplicable,
+        input.type
       )
     ]);
 
+    // Populate trend buckets
+    const totalCollectedTrend = generateTrendBuckets(startDate, endDate, interval);
+    const paymentCountTrend = generateTrendBuckets(startDate, endDate, interval);
+    const amountWithoutGstTrend = generateTrendBuckets(startDate, endDate, interval);
+
+    for (const row of trendRaw) {
+      const idx = totalCollectedTrend.keyMap.get(row.bucket);
+      if (idx !== undefined) {
+        totalCollectedTrend.buckets[idx].value = Number(row.totalCollected || 0);
+        paymentCountTrend.buckets[idx].value = Number(row.paymentCount || 0);
+        amountWithoutGstTrend.buckets[idx].value = parseFloat(Number(row.amountWithoutGst || 0).toFixed(2));
+      }
+    }
+
+    const totalCollectedChange = calculatePercentageChange(currentSummary.totalCollected, prevSummary.totalCollected);
+    const paymentCountChange = calculatePercentageChange(currentSummary.paymentCount, prevSummary.paymentCount);
+    const amountWithoutGstChange = calculatePercentageChange(currentSummary.amountWithoutGst, prevSummary.amountWithoutGst);
+
     return {
-      summary,
+      summary: {
+        totalCollected: {
+          current: currentSummary.totalCollected,
+          previous: prevSummary.totalCollected,
+          percentageChange: totalCollectedChange,
+          direction: getDirection(totalCollectedChange),
+          trend: totalCollectedTrend.buckets
+        },
+        paymentCount: {
+          current: currentSummary.paymentCount,
+          previous: prevSummary.paymentCount,
+          percentageChange: paymentCountChange,
+          direction: getDirection(paymentCountChange),
+          trend: paymentCountTrend.buckets
+        },
+        amountWithoutGst: {
+          current: currentSummary.amountWithoutGst,
+          previous: prevSummary.amountWithoutGst,
+          percentageChange: amountWithoutGstChange,
+          direction: getDirection(amountWithoutGstChange),
+          trend: amountWithoutGstTrend.buckets
+        }
+      },
       transactions,
       pagination: {
         page: input.page,
@@ -228,4 +291,19 @@ export class AdminPaymentsService {
       }
     };
   }
+}
+
+function calculatePercentageChange(current: number, previous: number): number {
+  if (previous === 0) {
+    if (current === 0) return 0;
+    return 100;
+  }
+  const change = ((current - previous) / previous) * 100;
+  return parseFloat(change.toFixed(2));
+}
+
+function getDirection(change: number): 'up' | 'down' | 'flat' {
+  if (change > 0) return 'up';
+  if (change < 0) return 'down';
+  return 'flat';
 }

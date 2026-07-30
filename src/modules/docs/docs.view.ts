@@ -2765,9 +2765,36 @@ export interface BatchContent {
   "status": "success",
   "data": {
     "summary": {
-      "totalCollected": 4999,
-      "paymentCount": 1,
-      "amountWithoutGst": 4236.44
+      "totalCollected": {
+        "current": 4999,
+        "previous": 4000,
+        "percentageChange": 24.98,
+        "direction": "up",
+        "trend": [
+          { "bucket": "2026-07-24", "value": 1000 },
+          { "bucket": "2026-07-25", "value": 3999 }
+        ]
+      },
+      "paymentCount": {
+        "current": 1,
+        "previous": 1,
+        "percentageChange": 0,
+        "direction": "flat",
+        "trend": [
+          { "bucket": "2026-07-24", "value": 0 },
+          { "bucket": "2026-07-25", "value": 1 }
+        ]
+      },
+      "amountWithoutGst": {
+        "current": 4236.44,
+        "previous": 3390,
+        "percentageChange": 24.97,
+        "direction": "up",
+        "trend": [
+          { "bucket": "2026-07-24", "value": 847.46 },
+          { "bucket": "2026-07-25", "value": 3388.98 }
+        ]
+      }
     },
     "transactions": [
       {
