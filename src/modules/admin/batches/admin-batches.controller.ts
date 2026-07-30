@@ -111,4 +111,24 @@ export class AdminBatchesController {
       }, 400);
     }
   };
+
+  public preview = async (c: Context) => {
+    try {
+      const id = c.req.param('id') || '';
+      if (!id) {
+        throw new Error('Invalid batch ID');
+      }
+
+      const result = await this.adminBatchesService.getBatchPreview(id);
+      return c.json({
+        status: 'success',
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to get batch preview',
+      }, 400);
+    }
+  };
 }

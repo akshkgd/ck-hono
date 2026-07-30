@@ -13,6 +13,7 @@ adminBatchesRouter.use('*', authMiddleware(), adminMiddleware());
 
 adminBatchesRouter.get('/', controller.search);
 adminBatchesRouter.get('/:id', controller.get);
+adminBatchesRouter.get('/:id/preview', controller.preview);
 adminBatchesRouter.post('/', zValidator('json', createBatchSchema), controller.create);
 adminBatchesRouter.put('/:id', zValidator('json', updateBatchSchema), controller.edit);
 adminBatchesRouter.delete('/:id', controller.delete);

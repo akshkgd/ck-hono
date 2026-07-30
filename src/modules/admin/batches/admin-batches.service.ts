@@ -84,4 +84,40 @@ export class AdminBatchesService {
     await this.batchRepository.delete(id);
     return true;
   }
+
+  public async getBatchPreview(id: string) {
+    const batch = await this.batchRepository.findById(id);
+    if (!batch) {
+      throw new Error('Batch not found');
+    }
+
+    const { sections, contents } = await this.batchRepository.getBatchCurriculum(id);
+
+    // Group contents by section ID
+    const sectionsMap = new Map<string, any[]>();
+    for (const section of sections) {
+      sectionsMap.set(section.id, []);
+    }
+    const unassignedContents: any[] = [];
+
+    for (const item of contents) {
+      const sId = item.sectionId;
+      if (sId && sectionsMap.has(sId)) {
+        sectionsMap.get(sId)!.push(item);
+      } else {
+        unassignedContents.push(item);
+      }
+    }
+
+    const sectionsWithContents = sections.map(section => ({
+      ...section,
+      contents: sectionsMap.get(section.id) || [],
+    }));
+
+    return {
+      batch,
+      sections: sectionsWithContents,
+      unassignedContents
+    };
+  }
 }

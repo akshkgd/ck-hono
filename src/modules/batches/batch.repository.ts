@@ -1,5 +1,5 @@
 import { db } from '../../db/index.js';
-import { batches, batchEnrollments } from '../../db/schema.js';
+import { batches, batchEnrollments, batchSections, batchContent, contentLibrary } from '../../db/schema.js';
 import { eq, or, ilike, sql, and, desc } from 'drizzle-orm';
 
 export type Batch = typeof batches.$inferSelect;
@@ -138,5 +138,39 @@ export class BatchRepository {
 
     const results = await query;
     return Number(results[0]?.count || 0);
+  }
+
+  public async getBatchCurriculum(batchId: string) {
+    const sections = await db
+      .select()
+      .from(batchSections)
+      .where(eq(batchSections.batchId, batchId))
+      .orderBy(sql`order ASC NULLS LAST`);
+
+    const contents = await db
+      .select({
+        id: batchContent.id,
+        contentId: batchContent.contentId,
+        sectionId: batchContent.sectionId,
+        order: batchContent.order,
+        accessOn: batchContent.accessOn,
+        accessTill: batchContent.accessTill,
+        accessOnDate: batchContent.accessOnDate,
+        accessTillDate: batchContent.accessTillDate,
+        canSubmitAssignment: batchContent.canSubmitAssignment,
+        content: {
+          title: contentLibrary.title,
+          type: contentLibrary.type,
+          contentType: contentLibrary.contentType,
+          videoDuration: contentLibrary.videoDuration,
+          xp: contentLibrary.xp,
+        }
+      })
+      .from(batchContent)
+      .leftJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
+      .where(eq(batchContent.batchId, batchId))
+      .orderBy(sql`order ASC NULLS LAST`);
+
+    return { sections, contents };
   }
 }
