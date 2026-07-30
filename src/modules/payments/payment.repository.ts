@@ -306,4 +306,66 @@ export class PaymentRepository {
     const results = await query;
     return Number(results[0]?.count || 0);
   }
+
+  public async getTransactionsSummary(
+    queryText: string,
+    startDate?: Date,
+    endDate?: Date,
+    isGstApplicable?: boolean | null,
+    type?: 'all' | 'course' | 'webinar'
+  ): Promise<{ totalCollected: number; paymentCount: number; amountWithoutGst: number }> {
+    let query = db
+      .select({
+        totalCollected: sql<number>`coalesce(sum(${batchEnrollmentPayments.amount}), 0)`,
+        paymentCount: sql<number>`count(*)`,
+        amountWithoutGst: sql<number>`coalesce(sum(CASE WHEN ${batchEnrollmentPayments.isGstApplicable} = true THEN ${batchEnrollmentPayments.amount} / 1.18 ELSE ${batchEnrollmentPayments.amount} END), 0)`
+      })
+      .from(batchEnrollmentPayments)
+      .leftJoin(batchEnrollments, eq(batchEnrollmentPayments.batchEnrollmentId, batchEnrollments.id))
+      .leftJoin(users, eq(batchEnrollments.userId, users.id))
+      .leftJoin(batches, eq(batchEnrollments.batchId, batches.id));
+
+    const conditions = [];
+    if (queryText) {
+      const searchPattern = `%${queryText}%`;
+      conditions.push(
+        or(
+          ilike(users.name, searchPattern),
+          ilike(users.email, searchPattern),
+          ilike(batches.name, searchPattern),
+          ilike(batchEnrollmentPayments.transactionId, searchPattern),
+          ilike(batchEnrollmentPayments.invoiceId, searchPattern)
+        )
+      );
+    }
+    if (startDate) {
+      conditions.push(gte(batchEnrollmentPayments.paidAt, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(batchEnrollmentPayments.paidAt, endDate));
+    }
+    if (isGstApplicable !== undefined && isGstApplicable !== null) {
+      conditions.push(eq(batchEnrollmentPayments.isGstApplicable, isGstApplicable));
+    }
+    if (type === 'course') {
+      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship']));
+    } else if (type === 'webinar') {
+      conditions.push(inArray(batches.type, ['webinar', 'callBooking']));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+
+    const results = await query;
+    const totalCollected = Number(results[0]?.totalCollected || 0);
+    const paymentCount = Number(results[0]?.paymentCount || 0);
+    const amountWithoutGst = parseFloat(Number(results[0]?.amountWithoutGst || 0).toFixed(2));
+
+    return {
+      totalCollected,
+      paymentCount,
+      amountWithoutGst
+    };
+  }
 }

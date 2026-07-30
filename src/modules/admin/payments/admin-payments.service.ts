@@ -191,7 +191,7 @@ export class AdminPaymentsService {
 
     const offset = (input.page - 1) * input.limit;
 
-    const [transactions, total] = await Promise.all([
+    const [transactions, total, summary] = await Promise.all([
       this.paymentRepository.searchTransactions(
         input.q,
         input.limit,
@@ -208,10 +208,18 @@ export class AdminPaymentsService {
         endDate,
         input.isGstApplicable,
         input.type
+      ),
+      this.paymentRepository.getTransactionsSummary(
+        input.q,
+        startDate,
+        endDate,
+        input.isGstApplicable,
+        input.type
       )
     ]);
 
     return {
+      summary,
       transactions,
       pagination: {
         page: input.page,

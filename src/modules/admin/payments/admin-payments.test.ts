@@ -425,6 +425,10 @@ describe('Admin Payments CRUD Module', () => {
       expect(body.status).toBe('success');
       expect(body.data.transactions).toBeInstanceOf(Array);
       expect(body.data.pagination.total).toBeTypeOf('number');
+      expect(body.data.summary).toBeDefined();
+      expect(body.data.summary.totalCollected).toBeTypeOf('number');
+      expect(body.data.summary.paymentCount).toBeTypeOf('number');
+      expect(body.data.summary.amountWithoutGst).toBeTypeOf('number');
 
       if (body.data.transactions.length > 1) {
         const firstTime = new Date(body.data.transactions[0].paidAt).getTime();

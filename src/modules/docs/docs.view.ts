@@ -2764,10 +2764,15 @@ export interface BatchContent {
               <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
   "status": "success",
   "data": {
+    "summary": {
+      "totalCollected": 4999,
+      "paymentCount": 1,
+      "amountWithoutGst": 4236.44
+    },
     "transactions": [
       {
-        "id": 142,
-        "batchEnrollmentId": 248,
+        "id": "142",
+        "batchEnrollmentId": "248",
         "amount": 4999,
         "paidAt": "2026-07-18T10:00:00.000Z",
         "paymentMethod": "upi",
