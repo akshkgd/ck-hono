@@ -140,6 +140,10 @@ export function getDocsHtml(): string {
               <a href="#batches-get" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get batch</a>
             </li>
             <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#batches-preview" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Preview curriculum</a>
+            </li>
+            <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
               <a href="#batches-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update batch</a>
             </li>
@@ -220,6 +224,10 @@ export function getDocsHtml(): string {
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
               <a href="#batch-content-bulk-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Bulk Associate content</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#batch-content-import" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Import batch content</a>
             </li>
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
@@ -1308,6 +1316,80 @@ export interface BatchContent {
 
         <hr class="border-zinc-900" />
 
+        <!-- Endpoint: GET /admin/batches/:id/preview -->
+        <div id="batches-preview" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batches</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Preview curriculum hierarchy</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Retrieves the complete curriculum tree structure of a single batch, listing all sections and their nested content library links in correct sorted order. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/batches/:id/preview</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">id</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">The unique database UUID of the batch.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches/34349c15-0294-4d47-b7c5-c7c68079bc4c/preview', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "batch": {
+      "id": "34349c15-0294-4d47-b7c5-c7c68079bc4c",
+      "name": "Full Stack Web Development - Batch 4"
+    },
+    "sections": [
+      {
+        "id": "intro-section-uuid",
+        "title": "Introduction to Web Development",
+        "order": 1,
+        "contents": [
+          {
+            "id": "content-linkage-uuid",
+            "contentId": "library-item-uuid",
+            "sectionId": "intro-section-uuid",
+            "order": 1,
+            "content": {
+              "title": "Welcome and Set Up Guide",
+              "type": "video",
+              "contentType": "primary"
+            }
+          }
+        ]
+      }
+    ],
+    "unassignedContents": []
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
         <!-- Endpoint: PUT /admin/batches/:id -->
         <div id="batches-update" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
           <div class="xl:col-span-3 space-y-4">
@@ -2042,6 +2124,7 @@ export interface BatchContent {
 });</code></pre>
             </div>
 
+          <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
               <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
@@ -2051,6 +2134,65 @@ export interface BatchContent {
     { "id": 102, "batchId": 2, "sectionId": 12, "contentId": 7, "order": 2, "accessOn": 0, "accessTill": 365 },
     { "id": 103, "batchId": 2, "sectionId": 12, "contentId": 9, "order": 3, "accessOn": 0, "accessTill": 365 }
   ]
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /v1/admin/batch-content/import -->
+        <div id="batch-content-import" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batch Content</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Import Batch Content (Clone)</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Clones all sections and content linkages from a source batch into a target batch, preserving their exact hierarchy, metadata, access rules, and sort order. Executes atomically inside a single transaction. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/batch-content/import</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">sourceBatchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">UUID of the source batch to copy content from.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">targetBatchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">UUID of the target batch to copy content into.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batch-content/import', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    sourceBatchId: '34349c15-0294-4d47-b7c5-c7c68079bc4c',
+    targetBatchId: '51a89815-e2ba-45da-a0ad-cdbf2a8407d9'
+  })
+});</code></pre>
+            </div>
+
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Batch content imported successfully",
+  "data": {
+    "sectionsCopied": 5,
+    "contentCopied": 32
+  }
 }</code></pre>
             </div>
           </div>
