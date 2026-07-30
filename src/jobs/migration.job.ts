@@ -258,7 +258,7 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           await db.insert(users).values(recordsToInsert).onConflictDoUpdate({
             target: users.email,
             set: {
-              role: sql`excluded.role`,
+              role: sql`CASE WHEN users.role = 'admin' THEN users.role ELSE excluded.role END`,
               status: sql`excluded.status`,
               name: sql`excluded.name`,
               updatedAt: new Date(),
