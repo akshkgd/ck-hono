@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import argon2 from 'argon2';
 import { db } from '../src/db/index.js';
-import { users, batches, batchEnrollments, batchEnrollmentPayments } from '../src/db/schema.js';
+import { users, batches, batchEnrollments, batchEnrollmentPayments, batchSections, contentLibrary, batchContent } from '../src/db/schema.js';
 import { eq } from 'drizzle-orm';
 
 const firstNames = [
@@ -170,6 +170,152 @@ async function seed() {
     } else {
       seededBatchesList = await db.select().from(batches);
       console.log(`Found ${seededBatchesList.length} existing batches. Skipping batch seeding.`);
+    }
+
+    // 2.5 Seed Content Library & Batch curriculum (sections and content associations)
+    let existingContent = await db.select().from(contentLibrary).limit(5);
+    let seededContentList: any[] = [];
+
+    if (existingContent.length === 0) {
+      console.log("Seeding Content Library items...");
+      const dummyContent = [
+        {
+          title: "Introduction to HTML & CSS",
+          desc: "Learn the absolute basics of building web pages with semantic HTML elements and modern CSS layout properties.",
+          type: "video" as const,
+          contentType: "primary" as const,
+          videoLink: "https://youtube.com/watch?v=html-css-basics",
+          videoDuration: 1200,
+          xp: 100,
+          metadata: { category: "Frontend" }
+        },
+        {
+          title: "Advanced Tailwind Responsive Design",
+          desc: "Understand how to implement fluid layouts using Tailwind CSS breakpoints, container queries, and responsive grid layouts.",
+          type: "video" as const,
+          contentType: "primary" as const,
+          videoLink: "https://youtube.com/watch?v=tailwind-responsive",
+          videoDuration: 1800,
+          xp: 150,
+          metadata: { category: "CSS" }
+        },
+        {
+          title: "Building a Flexbox Navigation Bar",
+          desc: "A hands-on coding lab where you build a pixel-perfect, interactive navigation bar using Flexbox alignment rules.",
+          type: "coding lab" as const,
+          contentType: "primary" as const,
+          solutionCode: "nav { display: flex; justify-content: space-between; align-items: center; }",
+          xp: 200,
+          metadata: { category: "Labs" }
+        },
+        {
+          title: "DOM Manipulation & Event Listeners",
+          desc: "Learn how to dynamically change page contents and respond to user clicks, keyboard inputs, and scroll actions.",
+          type: "video" as const,
+          contentType: "primary" as const,
+          videoLink: "https://youtube.com/watch?v=dom-events",
+          videoDuration: 2400,
+          xp: 120,
+          metadata: { category: "JavaScript" }
+        },
+        {
+          title: "Create an Interactive To-Do List Application",
+          desc: "Complete assignment: Build a functional To-Do list with Add, Edit, Delete and LocalStorage persistence functionality.",
+          type: "assignment" as const,
+          contentType: "primary" as const,
+          assignment: "Build a To-Do list application matching the mockup in index.html.",
+          xp: 300,
+          metadata: { category: "Assignment" }
+        },
+        {
+          title: "Understanding CSS Backdrops and Glassmorphism",
+          desc: "An article exploring the properties of backdrop-filter, opacity, and blur to create modern Glassmorphism visual layouts.",
+          type: "article" as const,
+          contentType: "secondary" as const,
+          xp: 50,
+          metadata: { category: "Design" }
+        },
+        {
+          title: "Asynchronous Javascript: Promises & Async/Await",
+          desc: "Master async patterns, HTTP calls using fetch, and error handling using try-catch blocks.",
+          type: "video" as const,
+          contentType: "primary" as const,
+          videoLink: "https://youtube.com/watch?v=async-js",
+          videoDuration: 3000,
+          xp: 180,
+          metadata: { category: "JavaScript" }
+        },
+        {
+          title: "Node.js Basics and File System Modules",
+          desc: "Learn to read and write local files, manage paths, and run backend scripts using Node.",
+          type: "video" as const,
+          contentType: "primary" as const,
+          videoLink: "https://youtube.com/watch?v=node-fs",
+          videoDuration: 1500,
+          xp: 110,
+          metadata: { category: "Node" }
+        }
+      ];
+
+      seededContentList = await db.insert(contentLibrary).values(dummyContent).returning();
+      console.log(`Successfully seeded ${seededContentList.length} Content Library items!`);
+
+      // Seed curriculum sections and associate contents for each batch
+      if (seededBatchesList.length > 0) {
+        console.log("Seeding curriculum sections and associating contents for each batch...");
+        const sectionsData = [];
+        for (const batch of seededBatchesList) {
+          sectionsData.push(
+            {
+              title: "Module 1: Foundations & Architecture",
+              batchId: batch.id,
+              order: 1
+            },
+            {
+              title: "Module 2: Core Engineering Practice",
+              batchId: batch.id,
+              order: 2
+            }
+          );
+        }
+
+        const seededSections = await db.insert(batchSections).values(sectionsData).returning();
+        console.log(`Successfully seeded ${seededSections.length} batch sections!`);
+
+        // Associate contents: for each section, map some content items
+        const batchContentData = [];
+        for (let i = 0; i < seededSections.length; i++) {
+          const section = seededSections[i];
+          // Pick two contents from the library
+          const content1 = seededContentList[i % seededContentList.length];
+          const content2 = seededContentList[(i + 1) % seededContentList.length];
+
+          batchContentData.push(
+            {
+              batchId: section.batchId,
+              sectionId: section.id,
+              contentId: content1.id,
+              order: 1,
+              accessOn: 0, // Instant access
+              canSubmitAssignment: content1.type === "assignment"
+            },
+            {
+              batchId: section.batchId,
+              sectionId: section.id,
+              contentId: content2.id,
+              order: 2,
+              accessOn: 1, // Access on day 1
+              canSubmitAssignment: content2.type === "assignment"
+            }
+          );
+        }
+
+        await db.insert(batchContent).values(batchContentData);
+        console.log("Successfully linked curriculum content items to batch sections!");
+      }
+    } else {
+      seededContentList = await db.select().from(contentLibrary);
+      console.log(`Found ${seededContentList.length} existing Content Library items. Skipping content seeding.`);
     }
 
     // 3. Seed Enrollments & Payments (if empty)
