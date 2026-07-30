@@ -109,6 +109,7 @@ export class PaymentRepository {
         transactionId: batchEnrollmentPayments.transactionId,
         invoiceId: batchEnrollmentPayments.invoiceId,
         purpose: batchEnrollmentPayments.purpose,
+        isGstApplicable: batchEnrollmentPayments.isGstApplicable,
         user: {
           name: users.name,
           email: users.email,
