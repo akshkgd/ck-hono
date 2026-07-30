@@ -198,12 +198,16 @@ export class AdminPaymentsService {
         offset,
         input.sortOrder,
         startDate,
-        endDate
+        endDate,
+        input.isGstApplicable,
+        input.type
       ),
       this.paymentRepository.countTransactions(
         input.q,
         startDate,
-        endDate
+        endDate,
+        input.isGstApplicable,
+        input.type
       )
     ]);
 

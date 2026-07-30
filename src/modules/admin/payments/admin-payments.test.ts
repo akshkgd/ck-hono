@@ -427,8 +427,8 @@ describe('Admin Payments CRUD Module', () => {
       expect(body.data.pagination.total).toBeTypeOf('number');
 
       if (body.data.transactions.length > 1) {
-        const firstTime = new Date(body.data.transactions[0].createdAt).getTime();
-        const secondTime = new Date(body.data.transactions[1].createdAt).getTime();
+        const firstTime = new Date(body.data.transactions[0].paidAt).getTime();
+        const secondTime = new Date(body.data.transactions[1].paidAt).getTime();
         expect(firstTime).toBeGreaterThanOrEqual(secondTime); // desc order
       }
     });
@@ -444,10 +444,22 @@ describe('Admin Payments CRUD Module', () => {
       expect(body.status).toBe('success');
 
       if (body.data.transactions.length > 1) {
-        const firstTime = new Date(body.data.transactions[0].createdAt).getTime();
-        const secondTime = new Date(body.data.transactions[1].createdAt).getTime();
+        const firstTime = new Date(body.data.transactions[0].paidAt).getTime();
+        const secondTime = new Date(body.data.transactions[1].paidAt).getTime();
         expect(firstTime).toBeLessThanOrEqual(secondTime); // asc order
       }
+    });
+
+    it('should support filtering by isGstApplicable and type', async () => {
+      const res = await app.request('/v1/admin/enrollment-payments/transactions?isGstApplicable=true&type=course&limit=10&page=1', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.transactions).toBeInstanceOf(Array);
     });
   });
 });

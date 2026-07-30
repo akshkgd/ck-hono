@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batchEnrollmentPayments, batchEnrollments, users, batches } from '../../db/schema.js';
-import { eq, or, ilike, sql, and, gte, lte, asc, desc } from 'drizzle-orm';
+import { eq, or, ilike, sql, and, gte, lte, asc, desc, inArray } from 'drizzle-orm';
 
 export type Payment = typeof batchEnrollmentPayments.$inferSelect;
 export type NewPayment = typeof batchEnrollmentPayments.$inferInsert;
@@ -187,7 +187,9 @@ export class PaymentRepository {
     offset: number,
     sortOrder: 'asc' | 'desc' = 'desc',
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
+    isGstApplicable?: boolean | null,
+    type?: 'all' | 'course' | 'webinar'
   ) {
     let query = db
       .select({
@@ -231,10 +233,18 @@ export class PaymentRepository {
       );
     }
     if (startDate) {
-      conditions.push(gte(batchEnrollmentPayments.createdAt, startDate));
+      conditions.push(gte(batchEnrollmentPayments.paidAt, startDate));
     }
     if (endDate) {
-      conditions.push(lte(batchEnrollmentPayments.createdAt, endDate));
+      conditions.push(lte(batchEnrollmentPayments.paidAt, endDate));
+    }
+    if (isGstApplicable !== undefined && isGstApplicable !== null) {
+      conditions.push(eq(batchEnrollmentPayments.isGstApplicable, isGstApplicable));
+    }
+    if (type === 'course') {
+      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship']));
+    } else if (type === 'webinar') {
+      conditions.push(inArray(batches.type, ['webinar', 'callBooking']));
     }
 
     if (conditions.length > 0) {
@@ -242,7 +252,7 @@ export class PaymentRepository {
     }
 
     const sortFn = sortOrder === 'asc' ? asc : desc;
-    query = query.orderBy(sortFn(batchEnrollmentPayments.createdAt)) as any;
+    query = query.orderBy(sortFn(batchEnrollmentPayments.paidAt)) as any;
 
     return query.limit(limit).offset(offset);
   }
@@ -250,7 +260,9 @@ export class PaymentRepository {
   public async countTransactions(
     queryText: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
+    isGstApplicable?: boolean | null,
+    type?: 'all' | 'course' | 'webinar'
   ): Promise<number> {
     let query = db
       .select({ count: sql<number>`count(*)` })
@@ -273,10 +285,18 @@ export class PaymentRepository {
       );
     }
     if (startDate) {
-      conditions.push(gte(batchEnrollmentPayments.createdAt, startDate));
+      conditions.push(gte(batchEnrollmentPayments.paidAt, startDate));
     }
     if (endDate) {
-      conditions.push(lte(batchEnrollmentPayments.createdAt, endDate));
+      conditions.push(lte(batchEnrollmentPayments.paidAt, endDate));
+    }
+    if (isGstApplicable !== undefined && isGstApplicable !== null) {
+      conditions.push(eq(batchEnrollmentPayments.isGstApplicable, isGstApplicable));
+    }
+    if (type === 'course') {
+      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship']));
+    } else if (type === 'webinar') {
+      conditions.push(inArray(batches.type, ['webinar', 'callBooking']));
     }
 
     if (conditions.length > 0) {

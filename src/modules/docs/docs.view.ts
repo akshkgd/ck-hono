@@ -2749,7 +2749,9 @@ export interface BatchContent {
                 <li><code>q</code>: string (Optional) - Fuzzy search text matching user name, email, batch title, transaction ID, or invoice ID.</li>
                 <li><code>timeRange</code>: enum (Optional, defaults to <code>"this_month"</code>) - Choose from <code>"today" | "yesterday" | "this_week" | "last_week" | "this_month" | "last_month" | "custom"</code>.</li>
                 <li><code>startDate</code> &amp; <code>endDate</code>: string (Required only if timeRange is "custom") - Format: <code>YYYY-MM-DD</code>.</li>
-                <li><code>sortOrder</code>: enum (Optional, defaults to <code>"desc"</code>) - Choose from <code>"asc" | "desc"</code> to sort by transaction creation time.</li>
+                <li><code>sortOrder</code>: enum (Optional, defaults to <code>"desc"</code>) - Choose from <code>"asc" | "desc"</code> to sort by transaction payment time (paidAt).</li>
+                <li><code>isGstApplicable</code>: boolean (Optional) - Filter by GST applicability (<code>"true" | "false"</code>).</li>
+                <li><code>type</code>: enum (Optional, defaults to <code>"all"</code>) - Category filter: <code>"all" | "course"</code> (cohort, live, mentorship) <code>| "webinar"</code> (webinar, callBooking).</li>
                 <li><code>limit</code>: number (Optional, defaults to 20) - Page size limit (max 100).</li>
                 <li><code>page</code>: number (Optional, defaults to 1) - Results pagination page index.</li>
               </ul>

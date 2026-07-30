@@ -38,6 +38,12 @@ export const transactionSearchQuerySchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
+  isGstApplicable: z.preprocess((val) => {
+    if (val === 'true' || val === true) return true;
+    if (val === 'false' || val === false) return false;
+    return undefined;
+  }, z.boolean().optional().nullable()),
+  type: z.enum(['all', 'course', 'webinar']).optional().default('all'),
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
   limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(100).default(20)),
 }).refine((data) => {
