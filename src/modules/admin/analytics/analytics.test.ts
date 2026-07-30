@@ -96,6 +96,13 @@ describe('Admin Analytics Module', () => {
       expect(body.data.metrics.revenue.direction).toMatch(/^(up|down|flat)$/);
       expect(body.data.metrics.revenue.trend).toBeInstanceOf(Array);
 
+      expect(body.data.metrics.learningTime).toBeDefined();
+      expect(body.data.metrics.learningTime.current).toBeTypeOf('number');
+      expect(body.data.metrics.learningTime.previous).toBeTypeOf('number');
+      expect(body.data.metrics.learningTime.percentageChange).toBeTypeOf('number');
+      expect(body.data.metrics.learningTime.direction).toMatch(/^(up|down|flat)$/);
+      expect(body.data.metrics.learningTime.trend).toBeInstanceOf(Array);
+
       expect(body.data.comparisonTimeframe).toBeDefined();
       expect(body.data.comparisonTimeframe.from).toBeTypeOf('string');
       expect(body.data.comparisonTimeframe.to).toBeTypeOf('string');

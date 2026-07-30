@@ -1,5 +1,5 @@
 import { db } from '../../../db/index.js';
-import { users, batchEnrollments, batchEnrollmentPayments, batches } from '../../../db/schema.js';
+import { users, batchEnrollments, batchEnrollmentPayments, batches, courseProgress } from '../../../db/schema.js';
 import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
 import { type GroupInterval } from '../../../utils/date-range.js';
 
@@ -205,6 +205,34 @@ export class AnalyticsRepository {
       .where(and(
         gte(batchEnrollmentPayments.paidAt, from),
         lte(batchEnrollmentPayments.paidAt, to)
+      ))
+      .groupBy(bucketExpr);
+  }
+
+  public async calculateLearningTime(from: Date, to: Date): Promise<number> {
+    const results = await db
+      .select({ sum: sql<number>`coalesce(sum(${courseProgress.timeSpent}), 0)` })
+      .from(courseProgress)
+      .where(and(
+        gte(courseProgress.updatedAt, from),
+        lte(courseProgress.updatedAt, to)
+      ));
+    return Number(results[0]?.sum || 0);
+  }
+
+  public async getLearningTimeTrend(from: Date, to: Date, interval: GroupInterval) {
+    const { trunc, format } = getSqlFormatAndTrunc(interval);
+    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, ${courseProgress.updatedAt}), ${sql.raw(`'${format}'`)})`;
+    
+    return db
+      .select({
+        bucket: bucketExpr,
+        sum: sql<number>`cast(coalesce(sum(${courseProgress.timeSpent}), 0) as integer)`
+      })
+      .from(courseProgress)
+      .where(and(
+        gte(courseProgress.updatedAt, from),
+        lte(courseProgress.updatedAt, to)
       ))
       .groupBy(bucketExpr);
   }

@@ -23,9 +23,12 @@ export class AnalyticsService {
       prevEnrollments,
       currentRevenue,
       prevRevenue,
+      currentLearningTime,
+      prevLearningTime,
       signupTrendRaw,
       enrollmentTrendRaw,
       revenueTrendRaw,
+      learningTimeTrendRaw,
       enrollments,
       totalEnrollments
     ] = await Promise.all([
@@ -35,9 +38,12 @@ export class AnalyticsService {
       this.analyticsRepository.countEnrollments(prevRange.from, prevRange.to),
       this.analyticsRepository.calculateRevenue(from, to),
       this.analyticsRepository.calculateRevenue(prevRange.from, prevRange.to),
+      this.analyticsRepository.calculateLearningTime(from, to),
+      this.analyticsRepository.calculateLearningTime(prevRange.from, prevRange.to),
       this.analyticsRepository.getSignupTrend(from, to, interval),
       this.analyticsRepository.getEnrollmentTrend(from, to, interval),
       this.analyticsRepository.getRevenueTrend(from, to, interval),
+      this.analyticsRepository.getLearningTimeTrend(from, to, interval),
       this.analyticsRepository.listEnrollments(from, to, input.limit, offset),
       this.analyticsRepository.countEnrollmentsTotal(from, to),
     ]);
@@ -69,9 +75,19 @@ export class AnalyticsService {
       }
     }
 
+    // Populate learning time trend
+    const learningTimeTrendObj = generateTrendBuckets(from, to, interval);
+    for (const row of learningTimeTrendRaw) {
+      const idx = learningTimeTrendObj.keyMap.get(row.bucket);
+      if (idx !== undefined) {
+        learningTimeTrendObj.buckets[idx].value = Number(row.sum || 0);
+      }
+    }
+
     const signupChange = calculatePercentageChange(currentSignups, prevSignups);
     const enrollmentChange = calculatePercentageChange(currentEnrollments, prevEnrollments);
     const revenueChange = calculatePercentageChange(currentRevenue, prevRevenue);
+    const learningTimeChange = calculatePercentageChange(currentLearningTime, prevLearningTime);
 
     return {
       metrics: {
@@ -95,6 +111,13 @@ export class AnalyticsService {
           percentageChange: revenueChange,
           direction: getDirection(revenueChange),
           trend: revenueTrendObj.buckets
+        },
+        learningTime: {
+          current: currentLearningTime,
+          previous: prevLearningTime,
+          percentageChange: learningTimeChange,
+          direction: getDirection(learningTimeChange),
+          trend: learningTimeTrendObj.buckets
         },
       },
       list: enrollments,

@@ -2891,24 +2891,62 @@ export interface BatchContent {
   "status": "success",
   "data": {
     "metrics": {
-      "usersSignedUp": 25,
-      "coursesEnrolled": 18,
-      "revenue": 145000
+      "usersSignedUp": {
+        "current": 25,
+        "previous": 20,
+        "percentageChange": 25,
+        "direction": "up",
+        "trend": [
+          { "bucket": "2026-07-24", "value": 5 },
+          { "bucket": "2026-07-25", "value": 10 }
+        ]
+      },
+      "coursesEnrolled": {
+        "current": 18,
+        "previous": 15,
+        "percentageChange": 20,
+        "direction": "up",
+        "trend": [
+          { "bucket": "2026-07-24", "value": 2 },
+          { "bucket": "2026-07-25", "value": 4 }
+        ]
+      },
+      "revenue": {
+        "current": 1450,
+        "previous": 1200,
+        "percentageChange": 20.83,
+        "direction": "up",
+        "trend": [
+          { "bucket": "2026-07-24", "value": 199 },
+          { "bucket": "2026-07-25", "value": 398 }
+        ]
+      },
+      "learningTime": {
+        "current": 18000,
+        "previous": 15000,
+        "percentageChange": 20,
+        "direction": "up",
+        "trend": [
+          { "bucket": "2026-07-24", "value": 3600 },
+          { "bucket": "2026-07-25", "value": 7200 }
+        ]
+      }
     },
     "list": [
       {
-        "id": 12,
+        "id": "12",
         "userId": "d3b07384-d113-49cd-a5d6-897d9bc2132e",
-        "batchId": 4,
+        "batchId": "4",
         "amountPayable": 8500,
         "enrollmentType": "oneTime",
-        "status": 1,
+        "status": "active",
         "progress": 20,
         "paymentStatus": "captured",
         "createdAt": "2026-06-25T14:32:00.000Z",
         "user": {
           "name": "Jane Doe",
-          "email": "jane@example.com"
+          "email": "jane@example.com",
+          "mobile": "9876543210"
         },
         "batch": {
           "name": "Full Stack Development"
