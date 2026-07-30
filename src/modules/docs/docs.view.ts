@@ -2124,7 +2124,6 @@ export interface BatchContent {
 });</code></pre>
             </div>
 
-          <div class="xl:col-span-2 space-y-6">
             <div class="space-y-1">
               <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
               <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
