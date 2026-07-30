@@ -120,7 +120,7 @@ function parseRole(role: any): 'student' | 'admin' | 'user' | 'moderator' {
   const roleStr = String(role).trim().toLowerCase();
   const roleNum = Number(role);
 
-  if (roleNum === 100 || roleStr === '100' || roleStr === 'admin') {
+  if (roleNum === 100 || roleStr === '100' || roleNum === 1 || roleStr === '1' || roleStr === 'admin' || roleStr === 'superadmin') {
     return 'admin';
   }
   if (roleStr === 'moderator') {
