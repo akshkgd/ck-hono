@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js';
 import { batches, batchEnrollments, batchSections, batchContent, contentLibrary } from '../../db/schema.js';
-import { eq, or, ilike, sql, and, desc } from 'drizzle-orm';
+import { eq, or, ilike, sql, and, desc, asc } from 'drizzle-orm';
 
 export type Batch = typeof batches.$inferSelect;
 export type NewBatch = typeof batches.$inferInsert;
@@ -145,7 +145,7 @@ export class BatchRepository {
       .select()
       .from(batchSections)
       .where(eq(batchSections.batchId, batchId))
-      .orderBy(sql`order ASC NULLS LAST`);
+      .orderBy(asc(batchSections.order));
 
     const contents = await db
       .select({
@@ -169,7 +169,7 @@ export class BatchRepository {
       .from(batchContent)
       .leftJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
       .where(eq(batchContent.batchId, batchId))
-      .orderBy(sql`order ASC NULLS LAST`);
+      .orderBy(asc(batchContent.order));
 
     return { sections, contents };
   }
