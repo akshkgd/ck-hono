@@ -298,7 +298,6 @@ export const bugSeverityEnum = pgEnum('bug_severity', ['low', 'medium', 'high', 
 export const reportedBugs = pgTable('reported_bugs', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
-  title: varchar('title', { length: 255 }).notNull(),
   description: text('description').notNull(),
   url: varchar('url', { length: 1024 }),
   severity: bugSeverityEnum('severity').default('medium').notNull(),

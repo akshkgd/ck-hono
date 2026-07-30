@@ -43,7 +43,6 @@ describe('Reported Bugs Feature Module', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: 'Unauthenticated bug title',
           description: 'This bug should be rejected.'
         })
       });
@@ -58,7 +57,6 @@ describe('Reported Bugs Feature Module', () => {
           'Authorization': `Bearer ${studentToken}`
         },
         body: JSON.stringify({
-          title: 'Navigation Link Broken',
           description: 'Clicking the settings page button results in a blank page.',
           severity: 'medium',
           url: 'https://app.codekaro.in/settings',
@@ -70,13 +68,12 @@ describe('Reported Bugs Feature Module', () => {
       const body = await res.json();
       expect(body.status).toBe('success');
       expect(body.data.id).toBeDefined();
-      expect(body.data.title).toBe('Navigation Link Broken');
       expect(body.data.url).toBe('https://app.codekaro.in/settings');
       expect(body.data.status).toBe('pending');
       testBugId = body.data.id;
     });
 
-    it('should fail validation when title is too short', async () => {
+    it('should fail validation when description is too short', async () => {
       const res = await app.request('/v1/student/bugs', {
         method: 'POST',
         headers: {
@@ -84,8 +81,7 @@ describe('Reported Bugs Feature Module', () => {
           'Authorization': `Bearer ${studentToken}`
         },
         body: JSON.stringify({
-          title: 'No',
-          description: 'Valid long description.'
+          description: 'No'
         })
       });
 

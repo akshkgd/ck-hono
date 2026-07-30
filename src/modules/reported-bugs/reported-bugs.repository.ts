@@ -4,7 +4,6 @@ import { eq, or, ilike, and, desc, asc, sql } from 'drizzle-orm';
 
 export class ReportedBugsRepository {
   public async create(userId: string, data: {
-    title: string;
     description: string;
     url?: string | null;
     severity?: 'low' | 'medium' | 'high' | 'critical';
@@ -15,7 +14,6 @@ export class ReportedBugsRepository {
       .insert(reportedBugs)
       .values({
         userId,
-        title: data.title,
         description: data.description,
         url: data.url || null,
         severity: data.severity || 'medium',
@@ -32,7 +30,6 @@ export class ReportedBugsRepository {
       .select({
         id: reportedBugs.id,
         userId: reportedBugs.userId,
-        title: reportedBugs.title,
         description: reportedBugs.description,
         url: reportedBugs.url,
         severity: reportedBugs.severity,
@@ -68,7 +65,6 @@ export class ReportedBugsRepository {
       .select({
         id: reportedBugs.id,
         userId: reportedBugs.userId,
-        title: reportedBugs.title,
         description: reportedBugs.description,
         url: reportedBugs.url,
         severity: reportedBugs.severity,
@@ -93,7 +89,6 @@ export class ReportedBugsRepository {
       const pattern = `%${q}%`;
       conditions.push(
         or(
-          ilike(reportedBugs.title, pattern),
           ilike(reportedBugs.description, pattern),
           ilike(users.name, pattern),
           ilike(users.email, pattern)
@@ -135,7 +130,6 @@ export class ReportedBugsRepository {
       const pattern = `%${q}%`;
       conditions.push(
         or(
-          ilike(reportedBugs.title, pattern),
           ilike(reportedBugs.description, pattern),
           ilike(users.name, pattern),
           ilike(users.email, pattern)

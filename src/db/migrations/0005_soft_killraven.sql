@@ -1,0 +1,1 @@
+ALTER TABLE "reported_bugs" DROP COLUMN "title";

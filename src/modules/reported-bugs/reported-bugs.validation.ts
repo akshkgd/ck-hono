@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 export const createBugSchema = z.object({
-  title: z.string().min(3, "Title must be at least 3 characters").max(255),
   description: z.string().min(5, "Description must be at least 5 characters"),
   severity: z.enum(['low', 'medium', 'high', 'critical']).default('medium').optional(),
   url: z.string().max(1024).url({ message: "Must be a valid URL" }).or(z.string().length(0)).nullable().optional(),

@@ -36,6 +36,13 @@
       "when": 1785432691704,
       "tag": "0004_plain_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1785433160611,
+      "tag": "0005_soft_killraven",
+      "breakpoints": true
     }
   ]
 }

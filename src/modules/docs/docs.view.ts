@@ -3482,7 +3482,6 @@ export interface BatchContent {
                   <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
                 </thead>
                 <tbody>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">title</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Short bug title (min 3 chars).</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">description</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Detailed description of the issue.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">url</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">The page URL where the error occurred.</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">severity</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'low' | 'medium' | 'high' | 'critical' (default 'medium')</td></tr>
@@ -3500,7 +3499,6 @@ export interface BatchContent {
   "data": {
     "id": "e0b4d47c-f179-4a92-8079-ecd09c4c44f9",
     "userId": "student-uuid-xxxx",
-    "title": "Navigation Link Broken",
     "description": "Clicking the settings page button results in a blank page.",
     "url": "https://app.codekaro.in/settings",
     "severity": "medium",
@@ -3542,7 +3540,6 @@ export interface BatchContent {
       {
         "id": "e0b4d47c-f179-4a92-8079-ecd09c4c44f9",
         "userId": "student-uuid-xxxx",
-        "title": "Navigation Link Broken",
         "description": "Clicking the settings page button results in a blank page.",
         "url": "https://app.codekaro.in/settings",
         "severity": "medium",
