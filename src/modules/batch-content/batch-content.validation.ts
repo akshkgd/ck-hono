@@ -50,3 +50,10 @@ export const createBulkBatchContentSchema = z.object({
 });
 
 export type CreateBulkBatchContentInput = z.infer<typeof createBulkBatchContentSchema>;
+
+export const importBatchContentSchema = z.object({
+  sourceBatchId: z.string().uuid(),
+  targetBatchId: z.string().uuid(),
+});
+
+export type ImportBatchContentInput = z.infer<typeof importBatchContentSchema>;

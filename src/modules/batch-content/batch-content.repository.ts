@@ -207,4 +207,70 @@ export class BatchContentRepository {
       return inserted;
     });
   }
+
+  public async importFromBatch(sourceBatchId: string, targetBatchId: string): Promise<{ sectionsCopied: number; contentCopied: number }> {
+    return db.transaction(async (tx) => {
+      // 1. Get all sections from the source batch
+      const sourceSections = await tx
+        .select()
+        .from(batchSections)
+        .where(eq(batchSections.batchId, sourceBatchId))
+        .orderBy(batchSections.order);
+
+      let sectionsCopied = 0;
+      let contentCopied = 0;
+
+      // Map to keep track of new section IDs (sourceSectionId -> targetSectionId)
+      const sectionIdMap = new Map<string, string>();
+
+      // 2. Clone sections to target batch
+      for (const section of sourceSections) {
+        const [newSection] = await tx
+          .insert(batchSections)
+          .values({
+            title: section.title,
+            batchId: targetBatchId,
+            order: section.order,
+          })
+          .returning();
+
+        sectionIdMap.set(section.id, newSection.id);
+        sectionsCopied++;
+      }
+
+      // 3. Get all content items from the source batch
+      const sourceContents = await tx
+        .select()
+        .from(batchContent)
+        .where(eq(batchContent.batchId, sourceBatchId))
+        .orderBy(batchContent.order);
+
+      // 4. Clone content items to target batch
+      for (const content of sourceContents) {
+        const targetSectionId = sectionIdMap.get(content.sectionId);
+        if (!targetSectionId) {
+          continue;
+        }
+
+        await tx
+          .insert(batchContent)
+          .values({
+            batchId: targetBatchId,
+            contentId: content.contentId,
+            sectionId: targetSectionId,
+            order: content.order,
+            accessOn: content.accessOn,
+            accessTill: content.accessTill,
+            accessOnDate: content.accessOnDate,
+            accessTillDate: content.accessTillDate,
+            canSubmitAssignment: content.canSubmitAssignment,
+            metadata: content.metadata || {},
+          });
+
+        contentCopied++;
+      }
+
+      return { sectionsCopied, contentCopied };
+    });
+  }
 }

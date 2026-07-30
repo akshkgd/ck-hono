@@ -6,7 +6,8 @@ import type {
   CreateBatchContentInput,
   UpdateBatchContentInput,
   BatchContentSearchQueryInput,
-  CreateBulkBatchContentInput
+  CreateBulkBatchContentInput,
+  ImportBatchContentInput
 } from '../../batch-content/batch-content.validation.js';
 
 export class AdminBatchContentService {
@@ -167,5 +168,19 @@ export class AdminBatchContentService {
   public async reorderBatchContents(orders: { id: string; order: number }[]) {
     await this.batchContentRepository.updateOrders(orders);
     return true;
+  }
+
+  public async importBatchContent(input: ImportBatchContentInput) {
+    const sourceBatch = await this.batchRepository.findById(input.sourceBatchId);
+    if (!sourceBatch) {
+      throw new Error('Source batch not found');
+    }
+
+    const targetBatch = await this.batchRepository.findById(input.targetBatchId);
+    if (!targetBatch) {
+      throw new Error('Target batch not found');
+    }
+
+    return this.batchContentRepository.importFromBatch(input.sourceBatchId, input.targetBatchId);
   }
 }

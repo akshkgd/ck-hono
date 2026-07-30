@@ -5,7 +5,8 @@ import {
   updateBatchContentSchema,
   batchContentSearchQuerySchema,
   batchContentReorderSchema,
-  createBulkBatchContentSchema
+  createBulkBatchContentSchema,
+  importBatchContentSchema
 } from '../../batch-content/batch-content.validation.js';
 
 export class AdminBatchContentController {
@@ -147,6 +148,25 @@ export class AdminBatchContentController {
       return c.json({
         status: 'error',
         message: err.message || 'Failed to reorder batch contents',
+      }, 400);
+    }
+  };
+
+  public importContent = async (c: Context) => {
+    try {
+      const rawBody = await c.req.json();
+      const body = importBatchContentSchema.parse(rawBody);
+
+      const result = await this.adminBatchContentService.importBatchContent(body);
+      return c.json({
+        status: 'success',
+        message: 'Batch content imported successfully',
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to import batch content',
       }, 400);
     }
   };
