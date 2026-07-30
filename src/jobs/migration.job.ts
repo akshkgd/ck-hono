@@ -196,7 +196,10 @@ export async function processMigrationJob(data: MigrationJobData, job?: Job): Pr
           const cleanEmail = String(u.email).toLowerCase().trim();
 
           // 1. Robust Role Parsing (100 / "100" / "admin" -> 'admin')
-          const roleValue = parseRole(u.role);
+          const legacyRole = u.role !== undefined && u.role !== null
+            ? u.role
+            : (u.role_id !== undefined && u.role_id !== null ? u.role_id : u.roleId);
+          const roleValue = parseRole(legacyRole);
 
           // 2. Robust Status Parsing (0 / "0" / "inactive" -> 'inactive')
           const statusValue = parseStatus(u.status);

@@ -12,6 +12,8 @@ export const legacyUserItemSchema = z.object({
   googleId: z.string().optional().nullable(),
   is_verified: z.union([z.number(), z.boolean()]).optional().nullable(),
   role: z.union([z.number(), z.string()]).optional().nullable(),
+  role_id: z.union([z.number(), z.string()]).optional().nullable(),
+  roleId: z.union([z.number(), z.string()]).optional().nullable(),
   status: z.union([z.number(), z.string()]).optional().nullable(),
   college: z.string().optional().nullable(),
   course: z.string().optional().nullable(),
