@@ -298,7 +298,8 @@ export class StudentService {
       input.status,
       details.videoDuration,
       details.canSubmitAssignment,
-      input.lastWatchedPosition
+      input.lastWatchedPosition,
+      details.xp
     );
 
     // 3. Count all contents in the batch

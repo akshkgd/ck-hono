@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import app from '../../../app.js';
 import { db } from '../../../db/index.js';
-import { courseProgress } from '../../../db/schema.js';
-import { isNotNull } from 'drizzle-orm';
+import { courseProgress, users } from '../../../db/schema.js';
+import { isNotNull, eq } from 'drizzle-orm';
 
 describe('Admin Assignments Manager Module', () => {
   let adminToken = '';
@@ -153,5 +153,50 @@ describe('Admin Assignments Manager Module', () => {
     const body = await res.json();
     expect(body.status).toBe('error');
     expect(body.message).toContain('Assignment submission not found');
+  });
+
+  it('should successfully grade submission as approved and award XP to student', async () => {
+    // Find an assignment progress record in the database
+    const existingProgress = await db
+      .select()
+      .from(courseProgress)
+      .where(isNotNull(courseProgress.assignmentStatus))
+      .limit(1)
+      .then((res) => res[0] || null);
+
+    if (existingProgress) {
+      // Fetch current student XP
+      const studentBefore = await db
+        .select({ xp: users.xp })
+        .from(users)
+        .where(eq(users.id, existingProgress.userId))
+        .then((res) => res[0]);
+
+      const res = await app.request(`/v1/admin/assignments/${existingProgress.id}/grade`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          assignmentStatus: 'approved',
+          teacherRemark: 'Excellent work!',
+          codeSubmittedStatus: 'Accepted'
+        })
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+
+      // Verify student gained XP
+      const studentAfter = await db
+        .select({ xp: users.xp })
+        .from(users)
+        .where(eq(users.id, existingProgress.userId))
+        .then((res) => res[0]);
+
+      expect(studentAfter.xp).toBeGreaterThan(studentBefore.xp);
+    }
   });
 });

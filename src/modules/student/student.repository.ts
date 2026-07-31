@@ -142,6 +142,7 @@ export class StudentRepository {
         accessTillDate: batchContent.accessTillDate,
         canSubmitAssignment: batchContent.canSubmitAssignment,
         videoDuration: contentLibrary.videoDuration,
+        xp: contentLibrary.xp,
         assignmentStatus: courseProgress.assignmentStatus,
         enrollment: {
           id: batchEnrollments.id,
@@ -187,10 +188,11 @@ export class StudentRepository {
     status: 'not_started' | 'learning' | 'completed',
     videoDuration?: number | null,
     canSubmitAssignment?: boolean | null,
-    lastWatchedPosition?: number
+    lastWatchedPosition?: number,
+    xp?: number | null
   ) {
     const existing = await db
-      .select({ id: courseProgress.id })
+      .select({ id: courseProgress.id, status: courseProgress.status })
       .from(courseProgress)
       .where(and(
         eq(courseProgress.enrollmentId, enrollmentId),
@@ -198,6 +200,7 @@ export class StudentRepository {
       ))
       .limit(1);
 
+    const wasCompleted = existing.length > 0 && existing[0].status === 'completed';
     const hasRecord = existing.length > 0;
 
     if (!hasRecord && timeSpentDelta < 60 && status !== 'completed' && progress < 100) {
@@ -256,7 +259,18 @@ export class StudentRepository {
         }
       })
       .returning();
-    return results[0];
+
+    const progressRecord = results[0];
+
+    // Award XP on transition to completed
+    if (progressRecord && !wasCompleted && progressRecord.status === 'completed' && xp) {
+      await db
+        .update(users)
+        .set({ xp: sql`${users.xp} + ${xp}` })
+        .where(eq(users.id, userId));
+    }
+
+    return progressRecord;
   }
 
   public async countBatchContents(batchId: string): Promise<number> {
@@ -293,6 +307,21 @@ export class StudentRepository {
       codeSubmitted?: string | null;
     }
   ) {
+    const existing = await db
+      .select({ id: courseProgress.id, assignmentStatus: courseProgress.assignmentStatus })
+      .from(courseProgress)
+      .where(and(
+        eq(courseProgress.enrollmentId, enrollmentId),
+        eq(courseProgress.batchContentId, batchContentId)
+      ))
+      .limit(1);
+
+    const wasSubmitted = existing.length > 0 && 
+      (existing[0].assignmentStatus === 'submitted' || 
+       existing[0].assignmentStatus === 'under review' || 
+       existing[0].assignmentStatus === 'approved' || 
+       existing[0].assignmentStatus === 'rejected');
+
     const results = await db
       .insert(courseProgress)
       .values({
@@ -322,6 +351,15 @@ export class StudentRepository {
         }
       })
       .returning();
+
+    // Award 20 XP on initial assignment submission
+    if (!wasSubmitted) {
+      await db
+        .update(users)
+        .set({ xp: sql`${users.xp} + 20` })
+        .where(eq(users.id, userId));
+    }
+
     return results[0];
   }
 

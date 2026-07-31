@@ -1,6 +1,9 @@
 import { AdminAssignmentsRepository } from './admin-assignments.repository.js';
 import type { AssignmentsQueryInput, GradeAssignmentInput } from './admin-assignments.validation.js';
 import { calculateDateRange } from '../../../utils/date-range.js';
+import { db } from '../../../db/index.js';
+import { users } from '../../../db/schema.js';
+import { eq, sql } from 'drizzle-orm';
 
 export class AdminAssignmentsService {
   private repository: AdminAssignmentsRepository;
@@ -51,10 +54,12 @@ export class AdminAssignmentsService {
   }
 
   public async gradeSubmission(progressId: string, input: GradeAssignmentInput) {
-    const progress = await this.repository.findProgressById(progressId);
-    if (!progress) {
+    const result = await this.repository.findProgressById(progressId);
+    if (!result) {
       throw new Error('Progress record not found');
     }
+
+    const { progress, xp } = result;
 
     if (!progress.assignmentStatus) {
       throw new Error('Cannot grade a record that is not an assignment submission');
@@ -66,6 +71,14 @@ export class AdminAssignmentsService {
       videoFeedback: input.videoFeedback,
       codeSubmittedStatus: input.codeSubmittedStatus,
     });
+
+    if (progress.assignmentStatus !== 'approved' && input.assignmentStatus === 'approved') {
+      const xpToAward = xp || 50; // Fallback to 50 XP if not specified on the assignment content
+      await db
+        .update(users)
+        .set({ xp: sql`${users.xp} + ${xpToAward}` })
+        .where(eq(users.id, progress.userId));
+    }
 
     return updated;
   }

@@ -135,8 +135,13 @@ export class AdminAssignmentsRepository {
 
   public async findProgressById(progressId: string) {
     const results = await db
-      .select()
+      .select({
+        progress: courseProgress,
+        xp: contentLibrary.xp,
+      })
       .from(courseProgress)
+      .innerJoin(batchContent, eq(courseProgress.batchContentId, batchContent.id))
+      .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
       .where(eq(courseProgress.id, progressId))
       .limit(1);
     return results[0] || null;
