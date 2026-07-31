@@ -162,14 +162,28 @@ export function getImplementDocsHtml(): string {
       <div class="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono font-semibold border border-emerald-500/20">Student Endpoints</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono font-semibold border border-emerald-500/20">Student & Learner Endpoints</span>
           </div>
+          <span class="text-xs text-zinc-500 font-mono">Requires Authorization Cookie</span>
         </div>
 
-        <div class="space-y-3">
-          <h3 class="text-sm font-semibold text-white">1. Fetch Live Sessions list with Attendance Logs</h3>
-          <p class="text-zinc-400 text-xs font-mono">GET /v1/student/batches/:batchId/live-sessions</p>
-          <p class="text-xs text-zinc-400">Fetches all scheduled sessions, automatically merging student participation records to show if they attended, along with duration metrics.</p>
+        <div class="space-y-4">
+          <div class="space-y-1">
+            <h3 class="text-sm font-bold text-white">1. Course Details & Curriculum API (Automatic Inline Embedding)</h3>
+            <p class="text-zinc-400 text-xs font-mono">GET /v1/student/courses/:batchId</p>
+            <p class="text-xs text-zinc-300 leading-relaxed">
+              <strong>No Frontend Changes Required:</strong> The main learner API already fetches all live sessions for the course and automatically merges them directly into the respective curriculum sections. 
+            </p>
+            <p class="text-xs text-zinc-400 leading-relaxed mt-1">
+              Inside each section's <code class="text-indigo-300 font-mono">contents</code> array, they appear with <code class="text-emerald-400 font-mono">"type": "live_session"</code> and are sorted by order. The live session details (topic, desc, time, recording links) are populated in the <code class="text-indigo-300 font-mono">content</code> sub-object.
+            </p>
+          </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">2. Fetch Dedicated Live Sessions list with Attendance Logs</h3>
+            <p class="text-zinc-400 text-xs font-mono">GET /v1/student/batches/:batchId/live-sessions</p>
+            <p class="text-xs text-zinc-400">Fetches all scheduled sessions, automatically merging student participation records to show if they attended, along with duration metrics.</p>
+          </div>
         </div>
       </div>
 
@@ -183,19 +197,22 @@ export function getImplementDocsHtml(): string {
 
         <div class="space-y-4">
           <div class="space-y-1">
-            <h3 class="text-sm font-semibold text-white">1. Create a Live Session</h3>
+            <h3 class="text-sm font-semibold text-white">1. Create a Live Session (Linked to Batch Section)</h3>
             <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/batches/:batchId/live-sessions</p>
+            <p class="text-xs text-zinc-300">
+              To place a live session inside a specific curriculum section, provide the section's UUID in the <code class="text-indigo-400 font-mono">sectionId</code> field. If omitted, the session is placed in the unassigned content area.
+            </p>
             <div>
               <span class="text-[11px] text-zinc-500 font-mono block mb-1">JSON Payload:</span>
               <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
   "topic": "Introduction to Hono and Router Architecture",
   "desc": "Deep dive into web request handling and route patterns.",
   "time": "2026-08-01T15:00:00.000Z", // Scheduled ISO date/time string
-  "sectionId": "a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d", // Optional Section link
+  "sectionId": "a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d", // Links the live session to this specific section ID
   "screenHlsVideo": null,
   "faceHlsVideo": null,
   "recordingHls": null,
-  "order": 1
+  "order": 1 // Determines placement order within the section
 }</code></pre>
             </div>
           </div>
