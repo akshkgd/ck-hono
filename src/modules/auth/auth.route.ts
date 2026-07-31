@@ -27,9 +27,19 @@ const getSessionHandler = async (c: any) => {
     const user = sessionData.user as any;
     const session = sessionData.session as any;
 
-    // Fetch latest user details from DB to bypass cookie cache for streak/xp
+    // Fetch latest user details from DB to bypass cookie cache for profile details/streak/xp
     const dbUserList = await db
       .select({
+        name: users.name,
+        avatarUrl: users.avatarUrl,
+        mobile: users.mobile,
+        bio: users.bio,
+        linkedinUrl: users.linkedinUrl,
+        githubUrl: users.githubUrl,
+        occupationType: users.occupationType,
+        occupationTitle: users.occupationTitle,
+        organization: users.organization,
+        experienceYears: users.experienceYears,
         xp: users.xp,
         currentStreak: users.currentStreak,
         longestStreak: users.longestStreak,
@@ -44,10 +54,17 @@ const getSessionHandler = async (c: any) => {
     const formattedUser = {
       id: user.id,
       email: user.email,
-      name: user.name || null,
+      name: dbUser.name || user.name || null,
       role: user.role || 'student',
-      avatarUrl: user.avatarUrl || user.avatar_url || null,
-      mobile: user.mobile || null,
+      avatarUrl: dbUser.avatarUrl || user.avatarUrl || user.avatar_url || null,
+      mobile: dbUser.mobile || user.mobile || null,
+      bio: dbUser.bio || null,
+      linkedinUrl: dbUser.linkedinUrl || null,
+      githubUrl: dbUser.githubUrl || null,
+      occupationType: dbUser.occupationType || 'other',
+      occupationTitle: dbUser.occupationTitle || null,
+      organization: dbUser.organization || null,
+      experienceYears: dbUser.experienceYears || null,
       xp: dbUser.xp ?? 0,
       currentStreak: dbUser.currentStreak ?? 0,
       longestStreak: dbUser.longestStreak ?? 0,
@@ -78,9 +95,19 @@ authRouter.get('/me', authMiddleware(), async (c) => {
   const user = c.get('user' as any);
   const session = c.get('session' as any);
 
-  // Fetch latest user details from DB to bypass cookie cache for streak/xp
+  // Fetch latest user details from DB to bypass cookie cache for profile details/streak/xp
   const dbUserList = await db
     .select({
+      name: users.name,
+      avatarUrl: users.avatarUrl,
+      mobile: users.mobile,
+      bio: users.bio,
+      linkedinUrl: users.linkedinUrl,
+      githubUrl: users.githubUrl,
+      occupationType: users.occupationType,
+      occupationTitle: users.occupationTitle,
+      organization: users.organization,
+      experienceYears: users.experienceYears,
       xp: users.xp,
       currentStreak: users.currentStreak,
       longestStreak: users.longestStreak,
@@ -97,6 +124,16 @@ authRouter.get('/me', authMiddleware(), async (c) => {
     data: {
       user: {
         ...user,
+        name: dbUser.name || user.name || null,
+        avatarUrl: dbUser.avatarUrl || user.avatarUrl || user.avatar_url || null,
+        mobile: dbUser.mobile || user.mobile || null,
+        bio: dbUser.bio || null,
+        linkedinUrl: dbUser.linkedinUrl || null,
+        githubUrl: dbUser.githubUrl || null,
+        occupationType: dbUser.occupationType || 'other',
+        occupationTitle: dbUser.occupationTitle || null,
+        organization: dbUser.organization || null,
+        experienceYears: dbUser.experienceYears || null,
         xp: dbUser.xp ?? 0,
         currentStreak: dbUser.currentStreak ?? 0,
         longestStreak: dbUser.longestStreak ?? 0,
