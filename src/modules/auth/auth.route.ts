@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { auth } from '../../lib/auth.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { db } from '../../db/index.js';
-import { users } from '../../db/schema.js';
+import { users, session } from '../../db/schema.js';
 import { eq } from 'drizzle-orm';
 
 const authRouter = new Hono();
@@ -149,6 +149,23 @@ authRouter.get('/me', authMiddleware(), async (c) => {
       session,
     },
   });
+});
+
+authRouter.get('/debug-sessions', authMiddleware(), async (c) => {
+  try {
+    const user = c.get('user' as any);
+    const dbUsers = await db.select().from(users).where(eq(users.id, user.id));
+    const allSessions = await db.select().from(session);
+    return c.json({
+      status: 'success',
+      userContextId: user.id,
+      dbUser: dbUsers[0] || null,
+      totalSessionsInDb: allSessions.length,
+      allSessionsInDb: allSessions,
+    }, 200);
+  } catch (err: any) {
+    return c.json({ status: 'error', message: err.message }, 500);
+  }
 });
 
 // Primary Better Auth Handler with path normalization (/v1/auth -> /api/auth)
