@@ -152,22 +152,7 @@ authRouter.get('/me', authMiddleware(), async (c) => {
   });
 });
 
-authRouter.get('/debug-sessions', authMiddleware(), async (c) => {
-  try {
-    const user = c.get('user' as any);
-    const dbUsers = await db.select().from(users).where(eq(users.id, user.id));
-    const allSessions = await db.select().from(session);
-    return c.json({
-      status: 'success',
-      userContextId: user.id,
-      dbUser: dbUsers[0] || null,
-      totalSessionsInDb: allSessions.length,
-      allSessionsInDb: allSessions,
-    }, 200);
-  } catch (err: any) {
-    return c.json({ status: 'error', message: err.message }, 500);
-  }
-});
+
 
 // Primary Better Auth Handler with path normalization (/v1/auth -> /api/auth)
 authRouter.on(['GET', 'POST', 'PUT', 'DELETE'], '/*', async (c) => {
