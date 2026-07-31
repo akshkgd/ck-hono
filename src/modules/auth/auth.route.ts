@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { getConnInfo } from '@hono/node-server/conninfo';
 import { auth } from '../../lib/auth.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
 import { db } from '../../db/index.js';
@@ -174,18 +175,31 @@ authRouter.on(['GET', 'POST', 'PUT', 'DELETE'], '/*', async (c) => {
     const rawReq = c.req.raw;
     const url = new URL(rawReq.url);
 
-    // If request route is prefixed with /v1/auth, create normalized Request for Better Auth
-    if (url.pathname.includes('/v1/auth')) {
-      url.pathname = url.pathname.replace('/v1/auth', '/api/auth');
-      const normalizedReq = new Request(url.toString(), {
-        method: rawReq.method,
-        headers: rawReq.headers,
-        body: ['GET', 'HEAD'].includes(rawReq.method) ? undefined : await rawReq.clone().blob(),
-      });
-      return await auth.handler(normalizedReq);
+    // Copy headers and inject client IP if missing from incoming request headers
+    const headers = new Headers(rawReq.headers);
+    try {
+      const conn = getConnInfo(c);
+      const clientIp = conn.remote.address;
+      if (clientIp && !headers.has('x-forwarded-for') && !headers.has('x-real-ip')) {
+        headers.set('x-forwarded-for', clientIp);
+      }
+    } catch (connErr) {
+      console.warn('[BetterAuth] Failed to get connection info for IP logging:', connErr);
     }
 
-    return await auth.handler(rawReq);
+    // Path normalization (/v1/auth -> /api/auth)
+    const isV1Auth = url.pathname.includes('/v1/auth');
+    if (isV1Auth) {
+      url.pathname = url.pathname.replace('/v1/auth', '/api/auth');
+    }
+
+    const normalizedReq = new Request(url.toString(), {
+      method: rawReq.method,
+      headers: headers,
+      body: ['GET', 'HEAD'].includes(rawReq.method) ? undefined : await rawReq.clone().blob(),
+    });
+
+    return await auth.handler(normalizedReq);
   } catch (err: any) {
     console.error('[BetterAuth] Handler caught error:', err?.message || err);
     if (c.req.path.includes('session')) {
