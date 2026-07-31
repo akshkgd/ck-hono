@@ -4,7 +4,7 @@ export const occupationTypeEnum = pgEnum('occupation_type', ['student', 'profess
 export const roleEnum = pgEnum('role', ['student', 'admin', 'user', 'moderator', 'teacher']);
 export const statusEnum = pgEnum('status', ['active', 'inactive', 'suspended']);
 
-export const batchTypeEnum = pgEnum('batch_type', ['cohort', 'live', 'webinar', 'callBooking', 'mentorship']);
+export const batchTypeEnum = pgEnum('batch_type', ['cohort', 'live', 'webinar', 'callBooking', 'mentorship', 'recorded']);
 export const batchStatusEnum = pgEnum('batch_status', ['active', 'private', 'completed']);
 
 export const users = pgTable('users', {
@@ -202,8 +202,10 @@ export const courseProgress = pgTable('course_progress', {
   id: uuid('id').defaultRandom().primaryKey(),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   enrollmentId: uuid('enrollment_id').references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
-  batchContentId: uuid('batch_content_id').references(() => batchContent.id, { onDelete: 'cascade' }).notNull(),
+  batchContentId: uuid('batch_content_id').references(() => batchContent.id, { onDelete: 'cascade' }),
+  batchLiveSessionId: uuid('batch_live_session_id').references(() => batchLiveSessions.id, { onDelete: 'cascade' }),
   timeSpent: integer('time_spent').default(0).notNull(),
+  liveSessionTimeSpent: integer('live_session_time_spent').default(0).notNull(),
   progress: integer('progress').default(0).notNull(),
   status: userStatusEnum('status').default('not_started').notNull(),
   githubLink: varchar('github_link', { length: 255 }),
@@ -219,7 +221,9 @@ export const courseProgress = pgTable('course_progress', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   index('course_progress_batch_content_id_idx').on(table.batchContentId),
+  index('course_progress_batch_live_session_id_idx').on(table.batchLiveSessionId),
   uniqueIndex('course_progress_enrollment_content_uniq_idx').on(table.enrollmentId, table.batchContentId),
+  uniqueIndex('course_progress_enrollment_live_session_uniq_idx').on(table.enrollmentId, table.batchLiveSessionId),
   index('course_progress_user_id_idx').on(table.userId),
   index('course_progress_assignment_status_updated_at_idx').on(table.assignmentStatus, table.updatedAt),
 ]);
@@ -312,3 +316,22 @@ export const reportedBugs = pgTable('reported_bugs', {
   index('reported_bugs_status_idx').on(table.status),
   index('reported_bugs_created_at_idx').on(table.createdAt),
 ]);
+
+export const batchLiveSessions = pgTable('batch_live_sessions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  batchId: uuid('batch_id').references(() => batches.id, { onDelete: 'cascade' }).notNull(),
+  sectionId: uuid('section_id').references(() => batchSections.id, { onDelete: 'cascade' }),
+  topic: varchar('topic', { length: 255 }).notNull(),
+  desc: text('desc'),
+  time: timestamp('time').notNull(),
+  screenHlsVideo: varchar('screen_hls_video', { length: 255 }),
+  faceHlsVideo: varchar('face_hls_video', { length: 255 }),
+  recordingHls: varchar('recording_hls', { length: 255 }),
+  order: integer('order').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('batch_live_sessions_batch_id_idx').on(table.batchId),
+  index('batch_live_sessions_section_id_idx').on(table.sectionId),
+]);
+

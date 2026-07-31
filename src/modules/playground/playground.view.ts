@@ -1601,7 +1601,7 @@ export function getDocsHtml(): string {
                 <tr>
                   <td class="py-2 text-indigo-400 font-mono">type</td>
                   <td class="py-2">string</td>
-                  <td class="py-2">Optional. Filter by batch type (cohort, live, webinar, callBooking, mentorship).</td>
+                  <td class="py-2">Optional. Filter by batch type (cohort, live, webinar, callBooking, mentorship, recorded).</td>
                 </tr>
                 <tr>
                   <td class="py-2 text-indigo-400 font-mono">status</td>
@@ -1638,6 +1638,7 @@ export function getDocsHtml(): string {
                   <option value="webinar">Webinar</option>
                   <option value="callBooking">Call Booking</option>
                   <option value="mentorship">Mentorship</option>
+                  <option value="recorded">Recorded</option>
                 </select>
               </div>
               <div>
@@ -1792,6 +1793,7 @@ export function getDocsHtml(): string {
                   <option value="webinar">webinar</option>
                   <option value="callBooking">callBooking</option>
                   <option value="mentorship">mentorship</option>
+                  <option value="recorded">recorded</option>
                 </select>
               </div>
               <div>

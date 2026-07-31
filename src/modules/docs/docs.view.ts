@@ -543,7 +543,7 @@ export interface Batch {
   img: string | null;
   association: string | null;
   logo: string | null;
-  type: 'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship'; // Default: 'cohort'
+  type: 'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship' | 'recorded'; // Default: 'cohort'
   startDate: string;
   endDate: string;
   whatsAppLink: string | null;
@@ -1201,7 +1201,7 @@ export interface BatchContent {
                 </thead>
                 <tbody>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">q</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 text-zinc-400">Filter matches name, topic, or slug.</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">type</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 text-zinc-400">'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship'</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">type</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 text-zinc-400">'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship' | 'recorded'</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">status</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 text-zinc-400">'active' | 'private' | 'completed'</td></tr>
                 </tbody>
               </table>
@@ -1253,8 +1253,8 @@ export interface BatchContent {
                     <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">price</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Base pricing amount.</td></tr>
                     <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">certificateFee</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Certificate pricing (Default 0).</td></tr>
                     <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">limit</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Registration limit (Default 0).</td></tr>
-                    <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">type</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship' (Default 'cohort')</td></tr>
-                    <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">whatsAppLink</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">WhatsApp invite link.</td></tr>
+                    <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">type</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship' | 'recorded' (Default 'cohort')</td></tr>
+                    <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">whatsAppLink</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-WhatsApp invite link.</td></tr>
                     <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">telegramLink</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Telegram group link.</td></tr>
                     <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">telegramBroadcast</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Telegram channel link.</td></tr>
                     <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">teacherId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Teacher user UUID.</td></tr>

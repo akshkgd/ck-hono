@@ -1,5 +1,5 @@
 import { db } from '../../db/index.js';
-import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress, batchEnrollmentPayments, users } from '../../db/schema.js';
+import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress, batchEnrollmentPayments, users, batchLiveSessions } from '../../db/schema.js';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
 
 export class StudentRepository {
@@ -50,6 +50,7 @@ export class StudentRepository {
         amountPayable: batchEnrollments.amountPayable,
         amountPaid: batchEnrollments.amountPaid,
         courseStartDate: batches.startDate,
+        batchType: batches.type,
         sequentialLearning: batchEnrollments.sequentialLearning,
         sequentialLearningWithAssignments: batchEnrollments.sequentialLearningWithAssignments,
       })
@@ -129,6 +130,40 @@ export class StudentRepository {
       )
       .where(eq(batchContent.batchId, batchId))
       .orderBy(asc(batchSections.order), asc(batchContent.order));
+  }
+
+  public async getBatchLiveSessionsWithProgress(batchId: string, userId: string, enrollmentId: string) {
+    return db
+      .select({
+        id: batchLiveSessions.id,
+        batchId: batchLiveSessions.batchId,
+        sectionId: batchLiveSessions.sectionId,
+        topic: batchLiveSessions.topic,
+        desc: batchLiveSessions.desc,
+        time: batchLiveSessions.time,
+        screenHlsVideo: batchLiveSessions.screenHlsVideo,
+        faceHlsVideo: batchLiveSessions.faceHlsVideo,
+        recordingHls: batchLiveSessions.recordingHls,
+        order: batchLiveSessions.order,
+        progress: {
+          status: courseProgress.status,
+          timeSpent: courseProgress.timeSpent,
+          liveSessionTimeSpent: courseProgress.liveSessionTimeSpent,
+          progress: courseProgress.progress,
+          updatedAt: courseProgress.updatedAt,
+        }
+      })
+      .from(batchLiveSessions)
+      .leftJoin(
+        courseProgress,
+        and(
+          eq(courseProgress.batchLiveSessionId, batchLiveSessions.id),
+          eq(courseProgress.userId, userId),
+          eq(courseProgress.enrollmentId, enrollmentId)
+        )
+      )
+      .where(eq(batchLiveSessions.batchId, batchId))
+      .orderBy(asc(batchLiveSessions.order));
   }
 
   public async getBatchContentAccessDetails(batchContentId: string, userId: string) {

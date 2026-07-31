@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const batchTypeEnumSchema = z.enum(['cohort', 'live', 'webinar', 'callBooking', 'mentorship']);
+export const batchTypeEnumSchema = z.enum(['cohort', 'live', 'webinar', 'callBooking', 'mentorship', 'recorded']);
 export const batchStatusEnumSchema = z.enum(['active', 'private', 'completed']);
 
 const baseBatchSchema = z.object({

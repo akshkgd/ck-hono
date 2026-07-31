@@ -35,7 +35,10 @@ import { adminEmailSettingsRouter } from './modules/admin/email-settings/admin-e
 import adminMigrationsRouter from './modules/admin/migrations/admin-migrations.route.js';
 import studentBugsRouter from './modules/reported-bugs/student-bugs.route.js';
 import adminBugsRouter from './modules/reported-bugs/admin-bugs.route.js';
+import adminLiveSessionsRouter from './modules/admin/live-sessions/admin-live-sessions.route.js';
+import studentLiveSessionsRouter from './modules/student/live-sessions/student-live-sessions.route.js';
 import { getMigrationProgressHtml } from './modules/admin/migrations/migration-view.js';
+
 import { activityMiddleware } from './middleware/activity.middleware.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
@@ -111,8 +114,11 @@ v1.route('/admin/migrations', adminMigrationsRouter);
 v1.route('/migration', adminMigrationsRouter);
 v1.route('/course-progress', courseProgressRouter);
 v1.route('/student', studentRouter);
+v1.route('/student', studentLiveSessionsRouter);
+v1.route('/admin', adminLiveSessionsRouter);
 v1.route('/student/bugs', studentBugsRouter);
 v1.route('/admin/bugs', adminBugsRouter);
+
 v1.route('/payments/razorpay', razorpayRouter);
 v1.route('/batches', publicBatchesRouter);
 v1.route('/emails', emailRouter);

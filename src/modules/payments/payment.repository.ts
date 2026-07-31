@@ -242,7 +242,7 @@ export class PaymentRepository {
       conditions.push(eq(batchEnrollmentPayments.isGstApplicable, isGstApplicable));
     }
     if (type === 'course') {
-      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship']));
+      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship', 'recorded']));
     } else if (type === 'webinar') {
       conditions.push(inArray(batches.type, ['webinar', 'callBooking']));
     }
@@ -294,7 +294,7 @@ export class PaymentRepository {
       conditions.push(eq(batchEnrollmentPayments.isGstApplicable, isGstApplicable));
     }
     if (type === 'course') {
-      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship']));
+      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship', 'recorded']));
     } else if (type === 'webinar') {
       conditions.push(inArray(batches.type, ['webinar', 'callBooking']));
     }
@@ -348,7 +348,7 @@ export class PaymentRepository {
       conditions.push(eq(batchEnrollmentPayments.isGstApplicable, isGstApplicable));
     }
     if (type === 'course') {
-      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship']));
+      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship', 'recorded']));
     } else if (type === 'webinar') {
       conditions.push(inArray(batches.type, ['webinar', 'callBooking']));
     }
@@ -412,7 +412,7 @@ export class PaymentRepository {
       conditions.push(eq(batchEnrollmentPayments.isGstApplicable, isGstApplicable));
     }
     if (type === 'course') {
-      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship']));
+      conditions.push(inArray(batches.type, ['cohort', 'live', 'mentorship', 'recorded']));
     } else if (type === 'webinar') {
       conditions.push(inArray(batches.type, ['webinar', 'callBooking']));
     }

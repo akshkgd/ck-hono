@@ -15,7 +15,7 @@ function parseBatchStatus(status: any): 'active' | 'private' | 'completed' {
   return 'private';
 }
 
-function parseBatchType(type: any): 'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship' {
+function parseBatchType(type: any): 'cohort' | 'live' | 'webinar' | 'callBooking' | 'mentorship' | 'recorded' {
   if (type === undefined || type === null) return 'cohort';
   const tStr = String(type).trim().toLowerCase();
   const tNum = Number(type);
@@ -24,6 +24,7 @@ function parseBatchType(type: any): 'cohort' | 'live' | 'webinar' | 'callBooking
   if (tStr === 'live') return 'live';
   if (tStr === 'callbooking') return 'callBooking';
   if (tStr === 'mentorship') return 'mentorship';
+  if (tStr === 'recorded') return 'recorded';
   return 'cohort';
 }
 

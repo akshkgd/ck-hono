@@ -43,6 +43,27 @@
       "when": 1785433160611,
       "tag": "0005_soft_killraven",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785499055708,
+      "tag": "0006_overrated_centennial",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1785500469586,
+      "tag": "0007_stale_quasimodo",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785508782098,
+      "tag": "0008_shallow_hydra",
+      "breakpoints": true
     }
   ]
 }

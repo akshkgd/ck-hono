@@ -1,12 +1,16 @@
 import { BatchRepository, type NewBatch } from '../../batches/batch.repository.js';
 import type { CreateBatchInput, UpdateBatchInput, BatchSearchQueryInput } from '../../batches/batch.validation.js';
+import { AdminLiveSessionsRepository } from '../live-sessions/admin-live-sessions.repository.js';
 
 export class AdminBatchesService {
   private batchRepository: BatchRepository;
+  private liveSessionsRepository: AdminLiveSessionsRepository;
 
   constructor() {
     this.batchRepository = new BatchRepository();
+    this.liveSessionsRepository = new AdminLiveSessionsRepository();
   }
+
 
   public async createBatch(input: CreateBatchInput) {
     if (input.slug) {
@@ -91,7 +95,12 @@ export class AdminBatchesService {
       throw new Error('Batch not found');
     }
 
-    const { sections, contents } = await this.batchRepository.getBatchCurriculum(id);
+    const [curriculum, liveSessions] = await Promise.all([
+      this.batchRepository.getBatchCurriculum(id),
+      this.liveSessionsRepository.findByBatchId(id)
+    ]);
+
+    const { sections, contents } = curriculum;
 
     // Group contents by section ID
     const sectionsMap = new Map<string, any[]>();
@@ -102,12 +111,48 @@ export class AdminBatchesService {
 
     for (const item of contents) {
       const sId = item.sectionId;
+      const contentMapped = {
+        ...item,
+        type: 'content_library'
+      };
       if (sId && sectionsMap.has(sId)) {
-        sectionsMap.get(sId)!.push(item);
+        sectionsMap.get(sId)!.push(contentMapped);
       } else {
-        unassignedContents.push(item);
+        unassignedContents.push(contentMapped);
       }
     }
+
+    for (const sessionItem of liveSessions) {
+      const sId = sessionItem.sectionId;
+      const liveSessionMapped = {
+        id: sessionItem.id,
+        sectionId: sessionItem.sectionId,
+        order: sessionItem.order,
+        type: 'live_session',
+        content: {
+          title: sessionItem.topic,
+          type: 'video', // for frontend representation
+          contentType: 'live_session',
+          desc: sessionItem.desc,
+          time: sessionItem.time,
+          screenHlsVideo: sessionItem.screenHlsVideo,
+          faceHlsVideo: sessionItem.faceHlsVideo,
+          recordingHls: sessionItem.recordingHls,
+          xp: 0
+        }
+      };
+      if (sId && sectionsMap.has(sId)) {
+        sectionsMap.get(sId)!.push(liveSessionMapped);
+      } else {
+        unassignedContents.push(liveSessionMapped);
+      }
+    }
+
+    // Sort items inside each section by their 'order' property
+    for (const [_, items] of sectionsMap.entries()) {
+      items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+    unassignedContents.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     const sectionsWithContents = sections.map(section => ({
       ...section,

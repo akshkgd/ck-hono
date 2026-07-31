@@ -1,15 +1,19 @@
 import { StudentRepository } from './student.repository.js';
 import { UserRepository } from '../users/user.repository.js';
 import type { StudentProgressInput, StudentAssignmentInput, UpdateProfileInput } from './student.validation.js';
+import { AdminLiveSessionsRepository } from '../admin/live-sessions/admin-live-sessions.repository.js';
 
 export class StudentService {
   private studentRepository: StudentRepository;
   private userRepository: UserRepository;
+  private liveSessionsRepository: AdminLiveSessionsRepository;
 
   constructor() {
     this.studentRepository = new StudentRepository();
     this.userRepository = new UserRepository();
+    this.liveSessionsRepository = new AdminLiveSessionsRepository();
   }
+
 
   public async getEnrolledCourses(userId: string) {
     const courses = await this.studentRepository.findEnrolledCourses(userId);
@@ -61,10 +65,15 @@ export class StudentService {
     const endDateMidnight = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
     const isAccessActive = todayMidnight.getTime() <= endDateMidnight.getTime();
 
-    // Fetch sections and content in parallel
-    const [sections, contents] = await Promise.all([
+    const isLiveOrCohort = enrollment.batchType === 'live' || enrollment.batchType === 'cohort';
+
+    // Fetch sections, content, and live sessions in parallel
+    const [sections, contents, liveSessions] = await Promise.all([
       this.studentRepository.getBatchSections(batchId),
       this.studentRepository.getBatchContentWithProgress(batchId, userId, enrollment.id),
+      isLiveOrCohort
+        ? this.studentRepository.getBatchLiveSessionsWithProgress(batchId, userId, enrollment.id)
+        : Promise.resolve([]),
     ]);
 
     // Map content items to their corresponding sections
@@ -109,6 +118,7 @@ export class StudentService {
         accessTillDate: item.accessTillDate,
         canSubmitAssignment: item.canSubmitAssignment,
         isSequentiallyLocked,
+        type: 'content_library',
         content: item.content,
         progress: {
           status: progressStatus,
@@ -132,10 +142,58 @@ export class StudentService {
       }
     }
 
+    for (const sessionItem of liveSessions) {
+      const itemMapped = {
+        id: sessionItem.id,
+        sectionId: sessionItem.sectionId,
+        order: sessionItem.order,
+        isSequentiallyLocked: false,
+        type: 'live_session',
+        content: {
+          title: sessionItem.topic,
+          type: 'video',
+          contentType: 'live_session',
+          desc: sessionItem.desc,
+          time: sessionItem.time,
+          screenHlsVideo: sessionItem.screenHlsVideo,
+          faceHlsVideo: sessionItem.faceHlsVideo,
+          recordingHls: sessionItem.recordingHls,
+          xp: 0
+        },
+        progress: {
+          status: sessionItem.progress?.status || 'not_started',
+          timeSpent: sessionItem.progress?.liveSessionTimeSpent || 0,
+          liveSessionTimeSpent: sessionItem.progress?.liveSessionTimeSpent || 0,
+          progress: sessionItem.progress?.progress || 0,
+          lastWatchedPosition: 0,
+          githubLink: null,
+          deployedLink: null,
+          DeployedLink: null,
+          assignmentStatus: null,
+          teacherRemark: null,
+          videoFeedback: null,
+        }
+      };
+
+      const sId = sessionItem.sectionId ? String(sessionItem.sectionId) : null;
+      if (sId !== null && sectionsMap.has(sId)) {
+        sectionsMap.get(sId)!.push(itemMapped);
+      } else {
+        unassignedContents.push(itemMapped);
+      }
+    }
+
+    // Sort items inside each section by their 'order' property
+    for (const [_, items] of sectionsMap.entries()) {
+      items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+    unassignedContents.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
     const sectionsWithContents = sections.map(section => ({
       ...section,
       contents: sectionsMap.get(String(section.id)) || [],
     }));
+
 
     return {
       enrollment: {
