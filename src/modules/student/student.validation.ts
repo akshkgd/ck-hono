@@ -24,6 +24,7 @@ export type StudentAssignmentInput = z.infer<typeof studentAssignmentSchema>;
 export const updateProfileSchema = z.object({
   name: z.string().max(255).optional().nullable(),
   mobile: z.string().max(20).optional().nullable(),
+  avatarUrl: z.string().url('Must be a valid URL').or(z.string().length(0)).optional().nullable(),
   bio: z.string().optional().nullable(),
   linkedinUrl: z.string().url('Must be a valid URL').or(z.string().length(0)).optional().nullable(),
   githubUrl: z.string().url('Must be a valid URL').or(z.string().length(0)).optional().nullable(),
