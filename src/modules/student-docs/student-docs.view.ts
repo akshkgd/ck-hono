@@ -389,7 +389,11 @@ export function getStudentDocsHtml(): string {
       "email": "student@example.com",
       "name": "Jane Doe",
       "role": "student",
-      "status": "active"
+      "status": "active",
+      "xp": 150,
+      "currentStreak": 3,
+      "longestStreak": 12,
+      "lastActiveAt": "2026-07-31T11:00:00.000Z"
     }
   }
 }</code></pre>
