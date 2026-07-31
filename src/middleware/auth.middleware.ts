@@ -30,10 +30,6 @@ export const authMiddleware = (): MiddlewareHandler => {
         return c.json({ status: 'error', message: 'Unauthorized: User does not exist' }, 401);
       }
 
-      if (dbUser.status === 'suspended' || dbUser.status === 'inactive') {
-        return c.json({ status: 'error', message: 'Unauthorized: User is suspended or inactive' }, 401);
-      }
-
       // Merge latest DB role and status into the user context object
       const mergedUser = {
         ...sessionData.user,

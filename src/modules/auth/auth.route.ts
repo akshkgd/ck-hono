@@ -53,11 +53,6 @@ const getSessionHandler = async (c: any) => {
 
     const dbUser = dbUserList[0] || {};
 
-    // Reject immediately if user is suspended/inactive
-    if (dbUser.status === 'suspended' || dbUser.status === 'inactive') {
-      return c.json({ user: null, session: null }, 200);
-    }
-
     const formattedUser = {
       id: user.id,
       email: user.email,
@@ -128,11 +123,6 @@ authRouter.get('/me', authMiddleware(), async (c) => {
     .limit(1);
 
   const dbUser = dbUserList[0] || {};
-
-  // Reject immediately if user is suspended/inactive
-  if (dbUser.status === 'suspended' || dbUser.status === 'inactive') {
-    return c.json({ status: 'error', message: 'Unauthorized: User is suspended or inactive' }, 401);
-  }
 
   return c.json({
     status: 'success',
