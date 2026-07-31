@@ -172,7 +172,7 @@ export function getImplementDocsHtml(): string {
             <h3 class="text-sm font-bold text-white">1. Course Details & Curriculum API (Automatic Inline Embedding)</h3>
             <p class="text-zinc-400 text-xs font-mono">GET /v1/student/courses/:batchId</p>
             <p class="text-xs text-zinc-300 leading-relaxed">
-              <strong>No Frontend Changes Required:</strong> The main learner API already fetches all live sessions for the course and automatically merges them directly into the respective curriculum sections. 
+              <strong>No Frontend Changes Required:</strong> For <code class="text-indigo-400 font-mono">live</code> and <code class="text-indigo-400 font-mono">cohort</code> course types, the main learner API fetches all live sessions for the course and automatically merges them directly into the respective curriculum sections.
             </p>
             <p class="text-xs text-zinc-400 leading-relaxed mt-1">
               Inside each section's <code class="text-indigo-300 font-mono">contents</code> array, they appear with <code class="text-emerald-400 font-mono">"type": "live_session"</code> and are sorted by order. The live session details (topic, desc, time, recording links) are populated in the <code class="text-indigo-300 font-mono">content</code> sub-object.

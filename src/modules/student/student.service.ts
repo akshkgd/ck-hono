@@ -65,11 +65,15 @@ export class StudentService {
     const endDateMidnight = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
     const isAccessActive = todayMidnight.getTime() <= endDateMidnight.getTime();
 
+    const isLiveOrCohort = enrollment.batchType === 'live' || enrollment.batchType === 'cohort';
+
     // Fetch sections, content, and live sessions in parallel
     const [sections, contents, liveSessions] = await Promise.all([
       this.studentRepository.getBatchSections(batchId),
       this.studentRepository.getBatchContentWithProgress(batchId, userId, enrollment.id),
-      this.studentRepository.getBatchLiveSessionsWithProgress(batchId, userId, enrollment.id),
+      isLiveOrCohort
+        ? this.studentRepository.getBatchLiveSessionsWithProgress(batchId, userId, enrollment.id)
+        : Promise.resolve([]),
     ]);
 
     // Map content items to their corresponding sections
