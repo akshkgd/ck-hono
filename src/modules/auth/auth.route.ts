@@ -1,6 +1,9 @@
 import { Hono } from 'hono';
 import { auth } from '../../lib/auth.js';
 import { authMiddleware } from '../../middleware/auth.middleware.js';
+import { db } from '../../db/index.js';
+import { users } from '../../db/schema.js';
+import { eq } from 'drizzle-orm';
 
 const authRouter = new Hono();
 
@@ -24,6 +27,20 @@ const getSessionHandler = async (c: any) => {
     const user = sessionData.user as any;
     const session = sessionData.session as any;
 
+    // Fetch latest user details from DB to bypass cookie cache for streak/xp
+    const dbUserList = await db
+      .select({
+        xp: users.xp,
+        currentStreak: users.currentStreak,
+        longestStreak: users.longestStreak,
+        lastActiveAt: users.lastActiveAt,
+      })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1);
+
+    const dbUser = dbUserList[0] || {};
+
     const formattedUser = {
       id: user.id,
       email: user.email,
@@ -31,6 +48,10 @@ const getSessionHandler = async (c: any) => {
       role: user.role || 'student',
       avatarUrl: user.avatarUrl || user.avatar_url || null,
       mobile: user.mobile || null,
+      xp: dbUser.xp ?? 0,
+      currentStreak: dbUser.currentStreak ?? 0,
+      longestStreak: dbUser.longestStreak ?? 0,
+      lastActiveAt: dbUser.lastActiveAt ?? null,
     };
 
     const formattedSession = {
@@ -53,12 +74,36 @@ authRouter.get('/get-session', getSessionHandler);
 authRouter.get('/session', getSessionHandler);
 
 // Profile endpoint
-authRouter.get('/me', authMiddleware(), (c) => {
+authRouter.get('/me', authMiddleware(), async (c) => {
   const user = c.get('user' as any);
   const session = c.get('session' as any);
+
+  // Fetch latest user details from DB to bypass cookie cache for streak/xp
+  const dbUserList = await db
+    .select({
+      xp: users.xp,
+      currentStreak: users.currentStreak,
+      longestStreak: users.longestStreak,
+      lastActiveAt: users.lastActiveAt,
+    })
+    .from(users)
+    .where(eq(users.id, user.id))
+    .limit(1);
+
+  const dbUser = dbUserList[0] || {};
+
   return c.json({
     status: 'success',
-    data: { user, session },
+    data: {
+      user: {
+        ...user,
+        xp: dbUser.xp ?? 0,
+        currentStreak: dbUser.currentStreak ?? 0,
+        longestStreak: dbUser.longestStreak ?? 0,
+        lastActiveAt: dbUser.lastActiveAt ?? null,
+      },
+      session,
+    },
   });
 });
 
