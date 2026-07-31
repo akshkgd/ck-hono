@@ -120,4 +120,12 @@ export class AdminBatchesService {
       unassignedContents
     };
   }
+
+  public async unlockAssignments(batchId: string): Promise<number> {
+    const batch = await this.batchRepository.findById(batchId);
+    if (!batch) {
+      throw new Error('Batch not found');
+    }
+    return await this.batchRepository.unlockBatchAssignments(batchId);
+  }
 }

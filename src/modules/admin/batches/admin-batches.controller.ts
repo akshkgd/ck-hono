@@ -131,4 +131,25 @@ export class AdminBatchesController {
       }, 400);
     }
   };
+
+  public unlockAssignments = async (c: Context) => {
+    try {
+      const id = c.req.param('id') || '';
+      if (!id) {
+        throw new Error('Invalid batch ID');
+      }
+
+      const count = await this.adminBatchesService.unlockAssignments(id);
+      return c.json({
+        status: 'success',
+        message: `Successfully unlocked all assignments for existing learners in this batch (Updated/created ${count} progress records)`,
+        data: { unlockedCount: count },
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to unlock assignments',
+      }, 400);
+    }
+  };
 }

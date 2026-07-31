@@ -189,6 +189,20 @@ describe('Admin Batches CRUD Module', () => {
       expect(body.data.type).toBe('live');
     });
 
+    it('should allow admin to unlock assignments for all enrolled users in the batch', async () => {
+      const res = await app.request(`/v1/admin/batches/${createdBatchId}/unlock-assignments`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.message).toContain('Successfully unlocked all assignments');
+      expect(body.data).toHaveProperty('unlockedCount');
+      expect(typeof body.data.unlockedCount).toBe('number');
+    });
+
     it('should allow admin to delete a batch', async () => {
       const res = await app.request(`/v1/admin/batches/${createdBatchId}`, {
         method: 'DELETE',

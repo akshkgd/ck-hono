@@ -173,4 +173,43 @@ export class BatchRepository {
 
     return { sections, contents };
   }
+
+  public async unlockBatchAssignments(batchId: string): Promise<number> {
+    const query = sql`
+      INSERT INTO course_progress (
+        id, 
+        user_id, 
+        enrollment_id, 
+        batch_content_id, 
+        time_spent, 
+        progress, 
+        status, 
+        assignment_status, 
+        last_watched_position,
+        created_at, 
+        updated_at
+      )
+      SELECT 
+        gen_random_uuid() AS id,
+        be.user_id, 
+        be.id AS enrollment_id, 
+        bc.id AS batch_content_id, 
+        0 AS time_spent, 
+        0 AS progress, 
+        'not_started'::user_status AS status, 
+        'pending'::assignment_status AS assignment_status,
+        0 AS last_watched_position,
+        NOW() AS created_at,
+        NOW() AS updated_at
+      FROM batch_enrollments be
+      JOIN batch_content bc ON bc.batch_id = be.batch_id
+      WHERE bc.can_submit_assignment = true
+        AND be.batch_id = ${batchId}
+      ON CONFLICT (enrollment_id, batch_content_id) DO UPDATE 
+      SET assignment_status = 'pending' 
+      WHERE course_progress.assignment_status IS NULL;
+    `;
+    const result = await db.execute(query);
+    return result.rowCount || 0;
+  }
 }

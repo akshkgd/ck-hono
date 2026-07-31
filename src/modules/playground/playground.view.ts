@@ -468,12 +468,12 @@ export function getDocsHtml(): string {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <ul class="space-y-1.5 pl-1 hidden transition-all duration-200">
             <li><a href="#admin-batch-search" class="block text-xs text-neutral-400 hover:text-indigo-400 transition font-medium font-mono">GET /admin/batches</a></li>
             <li><a href="#admin-batch-get" class="block text-xs text-neutral-400 hover:text-indigo-400 transition font-medium font-mono">GET /admin/batches/:id</a></li>
             <li><a href="#admin-batch-create" class="block text-xs text-neutral-400 hover:text-indigo-400 transition font-medium font-mono">POST /admin/batches</a></li>
             <li><a href="#admin-batch-update" class="block text-xs text-neutral-400 hover:text-indigo-400 transition font-medium font-mono">PUT /admin/batches/:id</a></li>
             <li><a href="#admin-batch-delete" class="block text-xs text-neutral-400 hover:text-indigo-400 transition font-medium font-mono">DELETE /admin/batches/:id</a></li>
+            <li><a href="#admin-batch-unlock-assignments" class="block text-xs text-neutral-400 hover:text-indigo-400 transition font-medium font-mono">POST /admin/batches/:id/unlock-assignments</a></li>
           </ul>
         </div>
 
@@ -1908,11 +1908,48 @@ export function getDocsHtml(): string {
           </div>
         </div>
 
+          <pre class="bg-neutral-900 border border-neutral-800/80 rounded p-4 text-xs"><code class="language-json">{
+  "status": "success",
+  "message": "Batch deleted successfully"
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Admin Unlock Batch Assignments -->
+    <section id="admin-batch-unlock-assignments" class="scroll-mt-20 space-y-5">
+      <div class="border-b border-neutral-900 pb-3">
+        <div class="flex items-center space-x-2.5">
+          <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-[10px] font-semibold uppercase font-mono">POST</span>
+          <h2 class="text-lg font-semibold text-neutral-50 font-mono">/v1/admin/batches/:id/unlock-assignments</h2>
+        </div>
+        <p class="text-neutral-400 mt-1 text-xs">Unlock all assignments for enrolled students in this batch. <span class="text-indigo-400 font-medium">Requires Admin role.</span></p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="space-y-5">
+          <div class="bg-neutral-900/60 border border-neutral-850 rounded p-5 space-y-3.5">
+            <h4 class="text-xs font-semibold text-neutral-300 uppercase tracking-wider">Playground</h4>
+            <div>
+              <label class="block text-[10px] text-neutral-400 mb-1">Batch ID (UUID)</label>
+              <input id="batchUnlockId" type="text" placeholder="e.g. 34349c15-0294-4d47-b7c5-c7c68079bc4c" class="w-full bg-neutral-950 border border-neutral-800 rounded px-2.5 py-1 text-xs text-neutral-200 focus:outline-none focus:border-indigo-500 font-mono">
+            </div>
+            <button onclick="runBatchUnlockAssignments()" class="px-3.5 py-1.5 bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-200 border border-indigo-900/50 rounded text-xs font-medium transition shadow-sm">Unlock Assignments</button>
+            <div id="batchUnlockResponseWrapper" class="hidden space-y-1.5">
+              <span class="text-[11px] text-neutral-500 font-medium">Response Status: <span id="batchUnlockResponseCode" class="font-mono">200</span></span>
+              <pre class="bg-neutral-950 p-3 rounded border border-neutral-855 max-h-52 overflow-y-auto text-xs font-mono"><code class="language-json text-neutral-300" id="batchUnlockResponseJson"></code></pre>
+            </div>
+          </div>
+        </div>
+
         <div class="space-y-3">
           <h3 class="text-xs font-semibold uppercase text-neutral-400 tracking-wider">Response Example</h3>
           <pre class="bg-neutral-900 border border-neutral-800/80 rounded p-4 text-xs"><code class="language-json">{
   "status": "success",
-  "message": "Batch deleted successfully"
+  "message": "Successfully unlocked all assignments for existing learners in this batch (Updated/created 15 progress records)",
+  "data": {
+    "unlockedCount": 15
+  }
 }</code></pre>
         </div>
       </div>
@@ -3891,6 +3928,32 @@ export function getDocsHtml(): string {
       } catch (err) {
         document.getElementById('batchDeleteResponseCode').innerText = 'Failed';
         document.getElementById('batchDeleteResponseJson').innerText = err.message;
+      }
+    }
+
+    // POST /v1/admin/batches/:id/unlock-assignments
+    async function runBatchUnlockAssignments() {
+      var token = localStorage.getItem('jwt_token');
+      var id = document.getElementById('batchUnlockId').value;
+
+      if (!token || !id) {
+        alert('Admin token and Batch ID are required!');
+        return;
+      }
+
+      document.getElementById('batchUnlockResponseWrapper').classList.remove('hidden');
+      document.getElementById('batchUnlockResponseJson').innerText = 'Unlocking assignments...';
+
+      try {
+        var res = await fetch('/v1/admin/batches/' + id + '/unlock-assignments', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        var data = await res.json();
+        displayResponse('batchUnlockResponseWrapper', 'batchUnlockResponseCode', 'batchUnlockResponseJson', res, data);
+      } catch (err) {
+        document.getElementById('batchUnlockResponseCode').innerText = 'Failed';
+        document.getElementById('batchUnlockResponseJson').innerText = err.message;
       }
     }
 

@@ -144,6 +144,10 @@ export function getDocsHtml(): string {
               <a href="#batches-preview" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Preview curriculum</a>
             </li>
             <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#batches-unlock-assignments" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Unlock assignments bulk</a>
+            </li>
+            <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PUT</span>
               <a href="#batches-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update batch</a>
             </li>
@@ -1400,6 +1404,57 @@ export interface BatchContent {
       }
     ],
     "unassignedContents": []
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /admin/batches/:id/unlock-assignments -->
+        <div id="batches-unlock-assignments" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Admin: Batches</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Unlock assignments bulk</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Unlocks all assignment submission forms for all existing enrolled users of a specific batch in one shot. This is primarily used as a post-migration hook to allow legacy students to skip watch time verification requirements for past content. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/batches/:id/unlock-assignments</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Param</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">id</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">The unique database UUID of the batch.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches/34349c15-0294-4d47-b7c5-c7c68079bc4c/unlock-assignments', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Successfully unlocked all assignments for existing learners in this batch (Updated/created 15 progress records)",
+  "data": {
+    "unlockedCount": 15
   }
 }</code></pre>
             </div>
