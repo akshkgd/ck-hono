@@ -46,6 +46,26 @@ export const auth = betterAuth({
         required: false,
         fieldName: 'mobile',
       },
+      xp: {
+        type: 'number',
+        defaultValue: 0,
+        fieldName: 'xp',
+      },
+      currentStreak: {
+        type: 'number',
+        defaultValue: 0,
+        fieldName: 'current_streak',
+      },
+      longestStreak: {
+        type: 'number',
+        defaultValue: 0,
+        fieldName: 'longest_streak',
+      },
+      lastActiveAt: {
+        type: 'date',
+        required: false,
+        fieldName: 'last_active_at',
+      },
     },
   },
   emailAndPassword: {
