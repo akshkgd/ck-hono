@@ -76,12 +76,7 @@ export const auth = betterAuth({
     max: 10, // Max 10 requests per minute per IP
     storage: 'memory', // Fast in-memory rate limiting without DB overhead
   },
-  advanced: {
-    generateId: () => randomUUID(),
-    ipAddress: {
-      ipAddressHeaders: ['x-forwarded-for'],
-    },
-  },
+
   session: {
     expiresIn: 60 * 60 * 24 * 30, // 30 Days in seconds (2,592,000s)
     updateAge: 60 * 60 * 24, // Update session activity daily
