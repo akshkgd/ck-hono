@@ -32,6 +32,7 @@ export interface GenericTemplatePayload {
   message: string;
   actionText?: string;
   actionUrl?: string;
+  greeting?: string;
 }
 
 /**
@@ -282,14 +283,16 @@ export function generateGenericEmail(payload: GenericTemplatePayload): { subject
     message,
     actionText,
     actionUrl,
+    greeting = 'Hello!',
   } = payload;
 
   const subject = title;
+  const greetingHtml = greeting ? `<p>${greeting}</p>` : '';
 
   const html = renderBaseLayout(
     subject,
     `
-    <p>Hello!</p>
+    ${greetingHtml}
 
     <p style="white-space: pre-line;">${message}</p>
 
@@ -301,9 +304,8 @@ export function generateGenericEmail(payload: GenericTemplatePayload): { subject
     `
   );
 
-  const text = `Hello!
-
-${message}
+  const greetingText = greeting ? `${greeting}\n\n` : '';
+  const text = `${greetingText}${message}
 
 ${actionText && actionUrl ? `${actionText}: ${actionUrl}` : ''}
 

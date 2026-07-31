@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { emailOTP } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import * as schema from '../db/schema.js';
 import { queueGenericEmail } from '../queues/index.js';
@@ -78,10 +79,28 @@ export const auth = betterAuth({
       },
       async sendVerificationOTP({ email, otp, type }: { email: string; otp: string; type: string }) {
         try {
-          const studentName = email.split('@')[0];
+          // Look up user name
+          const userRecord = await db
+            .select({ name: schema.users.name })
+            .from(schema.users)
+            .where(eq(schema.users.email, email))
+            .limit(1)
+            .then(res => res[0]);
+
+          let studentName = '';
+          if (userRecord && userRecord.name) {
+            // Get only the first name
+            studentName = userRecord.name.trim().split(/\s+/)[0];
+          } else {
+            // Fallback: Split email prefix and capitalize first letter
+            const prefix = email.split('@')[0];
+            studentName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+          }
+
           await queueGenericEmail(email, {
             title: `${otp} is your Codekaro Verification Code`,
-            message: `Hello ${studentName},\n\nYour one-time login code is: ${otp}\n\nValid for 10 minutes. Do not share this code with anyone for security.`,
+            message: `Your one-time login code is: ${otp}\n\nValid for 10 minutes. Do not share this code with anyone for security.`,
+            greeting: `Hello ${studentName},`,
             actionText: 'Sign In to Codekaro',
             actionUrl: `${activeFrontendUrl}/login`,
           });
