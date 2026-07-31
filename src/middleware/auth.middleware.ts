@@ -1,5 +1,8 @@
 import type { MiddlewareHandler } from 'hono';
 import { auth } from '../lib/auth.js';
+import { db } from '../db/index.js';
+import { users } from '../db/schema.js';
+import { eq } from 'drizzle-orm';
 
 export const authMiddleware = (): MiddlewareHandler => {
   return async (c, next) => {
@@ -12,7 +15,33 @@ export const authMiddleware = (): MiddlewareHandler => {
         return c.json({ status: 'error', message: 'Unauthorized: Session missing or expired' }, 401);
       }
 
-      c.set('user', sessionData.user);
+      // Query latest role and status directly from the database to bypass cookie cache
+      const dbUserList = await db
+        .select({
+          role: users.role,
+          status: users.status,
+        })
+        .from(users)
+        .where(eq(users.id, sessionData.user.id))
+        .limit(1);
+
+      const dbUser = dbUserList[0];
+      if (!dbUser) {
+        return c.json({ status: 'error', message: 'Unauthorized: User does not exist' }, 401);
+      }
+
+      if (dbUser.status === 'suspended' || dbUser.status === 'inactive') {
+        return c.json({ status: 'error', message: 'Unauthorized: User is suspended or inactive' }, 401);
+      }
+
+      // Merge latest DB role and status into the user context object
+      const mergedUser = {
+        ...sessionData.user,
+        role: dbUser.role,
+        status: dbUser.status,
+      };
+
+      c.set('user', mergedUser);
       c.set('session', sessionData.session);
       return await next();
     } catch (err: any) {

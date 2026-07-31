@@ -31,6 +31,8 @@ const getSessionHandler = async (c: any) => {
     const dbUserList = await db
       .select({
         name: users.name,
+        role: users.role,
+        status: users.status,
         avatarUrl: users.avatarUrl,
         mobile: users.mobile,
         bio: users.bio,
@@ -51,11 +53,17 @@ const getSessionHandler = async (c: any) => {
 
     const dbUser = dbUserList[0] || {};
 
+    // Reject immediately if user is suspended/inactive
+    if (dbUser.status === 'suspended' || dbUser.status === 'inactive') {
+      return c.json({ user: null, session: null }, 200);
+    }
+
     const formattedUser = {
       id: user.id,
       email: user.email,
       name: dbUser.name || user.name || null,
-      role: user.role || 'student',
+      role: dbUser.role || user.role || 'student',
+      status: dbUser.status || user.status || 'active',
       avatarUrl: dbUser.avatarUrl || user.avatarUrl || user.avatar_url || null,
       mobile: dbUser.mobile || user.mobile || null,
       bio: dbUser.bio || null,
@@ -99,6 +107,8 @@ authRouter.get('/me', authMiddleware(), async (c) => {
   const dbUserList = await db
     .select({
       name: users.name,
+      role: users.role,
+      status: users.status,
       avatarUrl: users.avatarUrl,
       mobile: users.mobile,
       bio: users.bio,
@@ -119,12 +129,19 @@ authRouter.get('/me', authMiddleware(), async (c) => {
 
   const dbUser = dbUserList[0] || {};
 
+  // Reject immediately if user is suspended/inactive
+  if (dbUser.status === 'suspended' || dbUser.status === 'inactive') {
+    return c.json({ status: 'error', message: 'Unauthorized: User is suspended or inactive' }, 401);
+  }
+
   return c.json({
     status: 'success',
     data: {
       user: {
         ...user,
         name: dbUser.name || user.name || null,
+        role: dbUser.role || user.role || 'student',
+        status: dbUser.status || user.status || 'active',
         avatarUrl: dbUser.avatarUrl || user.avatarUrl || user.avatar_url || null,
         mobile: dbUser.mobile || user.mobile || null,
         bio: dbUser.bio || null,
