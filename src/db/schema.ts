@@ -328,6 +328,7 @@ export const batchLiveSessions = pgTable('batch_live_sessions', {
   faceHlsVideo: varchar('face_hls_video', { length: 255 }),
   recordingHls: varchar('recording_hls', { length: 255 }),
   order: integer('order').default(0).notNull(),
+  dummyCount: integer('dummy_count'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [

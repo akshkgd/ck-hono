@@ -1,0 +1,1 @@
+ALTER TABLE "batch_live_sessions" ADD COLUMN "dummy_count" integer;

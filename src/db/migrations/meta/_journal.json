@@ -8,6 +8,13 @@
       "when": 1785581891143,
       "tag": "0000_free_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785583961990,
+      "tag": "0001_melted_ultimates",
+      "breakpoints": true
     }
   ]
 }
