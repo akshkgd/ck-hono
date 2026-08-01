@@ -78,28 +78,28 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 ALTER TABLE "batch_enrollment_payments" DROP CONSTRAINT "batch_enrollment_payments_invoice_id_unique";--> statement-breakpoint
-ALTER TABLE "batch_content" ALTER COLUMN "id" SET DATA TYPE uuid USING "id"::uuid;--> statement-breakpoint
+ALTER TABLE "batch_content" ALTER COLUMN "id" SET DATA TYPE uuid USING lpad("id"::text, 32, '0')::uuid;--> statement-breakpoint
 ALTER TABLE "batch_content" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();--> statement-breakpoint
-ALTER TABLE "batch_content" ALTER COLUMN "batch_id" SET DATA TYPE uuid USING "batch_id"::uuid;--> statement-breakpoint
-ALTER TABLE "batch_content" ALTER COLUMN "content_id" SET DATA TYPE uuid USING "content_id"::uuid;--> statement-breakpoint
-ALTER TABLE "batch_content" ALTER COLUMN "section_id" SET DATA TYPE uuid USING "section_id"::uuid;--> statement-breakpoint
-ALTER TABLE "batch_enrollment_payments" ALTER COLUMN "id" SET DATA TYPE uuid USING "id"::uuid;--> statement-breakpoint
+ALTER TABLE "batch_content" ALTER COLUMN "batch_id" SET DATA TYPE uuid USING lpad("batch_id"::text, 32, '0')::uuid;--> statement-breakpoint
+ALTER TABLE "batch_content" ALTER COLUMN "content_id" SET DATA TYPE uuid USING lpad("content_id"::text, 32, '0')::uuid;--> statement-breakpoint
+ALTER TABLE "batch_content" ALTER COLUMN "section_id" SET DATA TYPE uuid USING lpad("section_id"::text, 32, '0')::uuid;--> statement-breakpoint
+ALTER TABLE "batch_enrollment_payments" ALTER COLUMN "id" SET DATA TYPE uuid USING lpad("id"::text, 32, '0')::uuid;--> statement-breakpoint
 ALTER TABLE "batch_enrollment_payments" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();--> statement-breakpoint
-ALTER TABLE "batch_enrollment_payments" ALTER COLUMN "batch_enrollment_id" SET DATA TYPE uuid USING "batch_enrollment_id"::uuid;--> statement-breakpoint
-ALTER TABLE "batch_enrollments" ALTER COLUMN "id" SET DATA TYPE uuid USING "id"::uuid;--> statement-breakpoint
+ALTER TABLE "batch_enrollment_payments" ALTER COLUMN "batch_enrollment_id" SET DATA TYPE uuid USING lpad("batch_enrollment_id"::text, 32, '0')::uuid;--> statement-breakpoint
+ALTER TABLE "batch_enrollments" ALTER COLUMN "id" SET DATA TYPE uuid USING lpad("id"::text, 32, '0')::uuid;--> statement-breakpoint
 ALTER TABLE "batch_enrollments" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();--> statement-breakpoint
-ALTER TABLE "batch_enrollments" ALTER COLUMN "batch_id" SET DATA TYPE uuid USING "batch_id"::uuid;--> statement-breakpoint
-ALTER TABLE "batch_sections" ALTER COLUMN "id" SET DATA TYPE uuid USING "id"::uuid;--> statement-breakpoint
+ALTER TABLE "batch_enrollments" ALTER COLUMN "batch_id" SET DATA TYPE uuid USING lpad("batch_id"::text, 32, '0')::uuid;--> statement-breakpoint
+ALTER TABLE "batch_sections" ALTER COLUMN "id" SET DATA TYPE uuid USING lpad("id"::text, 32, '0')::uuid;--> statement-breakpoint
 ALTER TABLE "batch_sections" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();--> statement-breakpoint
-ALTER TABLE "batch_sections" ALTER COLUMN "batch_id" SET DATA TYPE uuid USING "batch_id"::uuid;--> statement-breakpoint
-ALTER TABLE "batches" ALTER COLUMN "id" SET DATA TYPE uuid USING "id"::uuid;--> statement-breakpoint
+ALTER TABLE "batch_sections" ALTER COLUMN "batch_id" SET DATA TYPE uuid USING lpad("batch_id"::text, 32, '0')::uuid;--> statement-breakpoint
+ALTER TABLE "batches" ALTER COLUMN "id" SET DATA TYPE uuid USING lpad("id"::text, 32, '0')::uuid;--> statement-breakpoint
 ALTER TABLE "batches" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();--> statement-breakpoint
-ALTER TABLE "content_library" ALTER COLUMN "id" SET DATA TYPE uuid USING "id"::uuid;--> statement-breakpoint
+ALTER TABLE "content_library" ALTER COLUMN "id" SET DATA TYPE uuid USING lpad("id"::text, 32, '0')::uuid;--> statement-breakpoint
 ALTER TABLE "content_library" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();--> statement-breakpoint
-ALTER TABLE "course_progress" ALTER COLUMN "id" SET DATA TYPE uuid USING "id"::uuid;--> statement-breakpoint
+ALTER TABLE "course_progress" ALTER COLUMN "id" SET DATA TYPE uuid USING lpad("id"::text, 32, '0')::uuid;--> statement-breakpoint
 ALTER TABLE "course_progress" ALTER COLUMN "id" SET DEFAULT gen_random_uuid();--> statement-breakpoint
-ALTER TABLE "course_progress" ALTER COLUMN "enrollment_id" SET DATA TYPE uuid USING "enrollment_id"::uuid;--> statement-breakpoint
-ALTER TABLE "course_progress" ALTER COLUMN "batch_content_id" SET DATA TYPE uuid USING "batch_content_id"::uuid;--> statement-breakpoint
+ALTER TABLE "course_progress" ALTER COLUMN "enrollment_id" SET DATA TYPE uuid USING lpad("enrollment_id"::text, 32, '0')::uuid;--> statement-breakpoint
+ALTER TABLE "course_progress" ALTER COLUMN "batch_content_id" SET DATA TYPE uuid USING lpad("batch_content_id"::text, 32, '0')::uuid;--> statement-breakpoint
 ALTER TABLE "users" ALTER COLUMN "password" DROP NOT NULL;--> statement-breakpoint
 ALTER TABLE "batch_content" ADD COLUMN "can_submit_assignment" boolean;--> statement-breakpoint
 ALTER TABLE "batch_enrollments" ADD COLUMN "sequential_learning" boolean;--> statement-breakpoint
