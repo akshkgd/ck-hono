@@ -3,7 +3,7 @@ import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 
-function getSslConfig(): boolean | pg.ConnectionOptions['ssl'] {
+function getSslConfig(): boolean | pg.PoolConfig['ssl'] {
   const dbUrl = process.env.DATABASE_URL || '';
   if (dbUrl.includes('sslmode=disable')) {
     return false;
