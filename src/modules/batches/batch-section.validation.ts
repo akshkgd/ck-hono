@@ -11,7 +11,7 @@ export const updateBatchSectionSchema = createBatchSectionSchema.partial();
 export const batchSectionSearchQuerySchema = z.object({
   q: z.string().default(''),
   batchId: z.string().optional(),
-  limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(50).default(10)),
+  limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(100).default(50)),
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
 });
 
