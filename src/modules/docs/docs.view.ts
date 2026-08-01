@@ -3046,7 +3046,7 @@ export interface BatchContent {
         "id": "12",
         "userId": "d3b07384-d113-49cd-a5d6-897d9bc2132e",
         "batchId": "4",
-        "amountPayable": 8500,
+        "amountPaid": 8500,
         "enrollmentType": "oneTime",
         "status": "active",
         "progress": 20,
