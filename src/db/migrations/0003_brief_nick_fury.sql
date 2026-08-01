@@ -1,3 +1,4 @@
+CREATE EXTENSION IF NOT EXISTS "pg_trgm";--> statement-breakpoint
 CREATE TYPE "public"."assignment_status" AS ENUM('pending', 'submitted', 'under review', 'approved', 'rejected');--> statement-breakpoint
 CREATE TYPE "public"."bug_severity" AS ENUM('low', 'medium', 'high', 'critical');--> statement-breakpoint
 CREATE TYPE "public"."bug_status" AS ENUM('pending', 'investigating', 'resolved', 'closed');--> statement-breakpoint
