@@ -9,7 +9,10 @@ async function resetDb() {
   }
 
   console.log("Connecting to PostgreSQL to reset public schema...");
-  const pool = new pg.Pool({ connectionString: dbUrl });
+  const ssl = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1') || dbUrl.includes('sslmode=disable')
+    ? false
+    : { rejectUnauthorized: false };
+  const pool = new pg.Pool({ connectionString: dbUrl, ssl });
 
   try {
     const client = await pool.connect();

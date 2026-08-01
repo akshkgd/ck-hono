@@ -5,7 +5,12 @@ import path from 'path';
 
 function getSslConfig(): boolean | pg.PoolConfig['ssl'] {
   const dbUrl = process.env.DATABASE_URL || '';
-  if (dbUrl.includes('sslmode=disable')) {
+  if (
+    dbUrl.includes('sslmode=disable') ||
+    process.env.DB_SSL === 'false' ||
+    dbUrl.includes('localhost') ||
+    dbUrl.includes('127.0.0.1')
+  ) {
     return false;
   }
 

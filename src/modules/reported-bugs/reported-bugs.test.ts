@@ -13,8 +13,8 @@ describe('Reported Bugs Feature Module', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'aarav.sharma0@example.com',
-        password: 'Password123!'
+        email: 'rohan@gmail.com',
+        password: 'rohan123'
       })
     });
     if (adminRes.status === 200) {
@@ -27,7 +27,7 @@ describe('Reported Bugs Feature Module', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'ananya.verma1@example.com',
+        email: 'aarav.sharma0@example.com',
         password: 'Password123!'
       })
     });
