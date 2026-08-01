@@ -340,6 +340,10 @@ export function getDocsHtml(): string {
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
               <a href="#user-batch-progress" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">User Batch Progress</a>
             </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#course-progress-reset-submitted" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Reset Submissions</a>
+            </li>
           </ul>
         </div>
 
@@ -3272,6 +3276,46 @@ export interface BatchContent {
         ]
       }
     ]
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Endpoint: POST /v1/admin/course-progress/assignments/reset-submitted -->
+        <div id="course-progress-reset-submitted" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Course Progress</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Reset Submitted Assignments</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates the assignment status of all course progress records from 'submitted' to 'pending'. This can optionally be restricted to a single batch. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/course-progress/assignments/reset-submitted</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Request JSON Body</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Optional batch UUID to restrict the reset filter.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Successfully changed status of 12 assignments from submitted to pending",
+  "data": {
+    "count": 12
   }
 }</code></pre>
             </div>

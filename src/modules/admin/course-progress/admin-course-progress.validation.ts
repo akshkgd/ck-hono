@@ -40,3 +40,10 @@ export const enrollmentProgressParamsSchema = z.object({
 });
 
 export type EnrollmentProgressParamsInput = z.infer<typeof enrollmentProgressParamsSchema>;
+
+export const resetAssignmentsSchema = z.object({
+  batchId: z.string().uuid('Invalid batchId format').optional().nullable(),
+});
+
+export type ResetAssignmentsInput = z.infer<typeof resetAssignmentsSchema>;
+

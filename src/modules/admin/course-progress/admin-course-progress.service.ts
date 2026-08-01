@@ -142,4 +142,8 @@ export class AdminCourseProgressService {
       ...(unassignedContents.length > 0 ? { unassignedContents } : {}),
     };
   }
+
+  public async resetSubmittedAssignmentsToPending(batchId?: string) {
+    return this.repository.resetSubmittedAssignmentsToPending(batchId);
+  }
 }

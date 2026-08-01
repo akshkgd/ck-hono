@@ -42,4 +42,22 @@ export class AdminCourseProgressController {
       }, 400);
     }
   };
+
+  public resetSubmittedAssignments = async (c: Context) => {
+    try {
+      const { batchId } = (c.req as any).valid('json');
+      const count = await this.progressService.resetSubmittedAssignmentsToPending(batchId || undefined);
+
+      return c.json({
+        status: 'success',
+        message: `Successfully changed status of ${count} assignments from submitted to pending`,
+        data: { count },
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to reset assignment statuses',
+      }, 400);
+    }
+  };
 }

@@ -113,4 +113,40 @@ describe('Admin Course Progress Analytics Module', () => {
     expect(body.status).toBe('error');
     expect(body.message).toContain('Enrollment not found');
   });
+
+  it('should reject unauthenticated request with 401 on POST /v1/admin/course-progress/assignments/reset-submitted', async () => {
+    const res = await app.request('/v1/admin/course-progress/assignments/reset-submitted', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it('should reject non-admin request with 403 on POST /v1/admin/course-progress/assignments/reset-submitted', async () => {
+    const res = await app.request('/v1/admin/course-progress/assignments/reset-submitted', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${userToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({})
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it('should allow resetting submitted assignments to pending for admin', async () => {
+    const res = await app.request('/v1/admin/course-progress/assignments/reset-submitted', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({})
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe('success');
+    expect(body.data).toHaveProperty('count');
+  });
 });

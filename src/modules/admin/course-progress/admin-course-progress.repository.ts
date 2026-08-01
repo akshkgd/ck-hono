@@ -1,6 +1,6 @@
 import { db } from '../../../db/index.js';
 import { courseProgress, users, batchContent, batches, contentLibrary, batchEnrollments, batchSections } from '../../../db/schema.js';
-import { eq, and, desc, asc, sql, ilike } from 'drizzle-orm';
+import { eq, and, desc, asc, sql, ilike, inArray } from 'drizzle-orm';
 import { APP_TIMEZONE } from '../../../utils/date-range.js';
 
 export class AdminCourseProgressRepository {
@@ -280,5 +280,41 @@ export class AdminCourseProgressRepository {
       )
       .where(eq(batchContent.batchId, batchId))
       .orderBy(asc(batchSections.order), asc(batchContent.order));
+  }
+
+  public async resetSubmittedAssignmentsToPending(batchId?: string): Promise<number> {
+    if (batchId) {
+      const batchContentSubquery = db
+        .select({ id: batchContent.id })
+        .from(batchContent)
+        .where(eq(batchContent.batchId, batchId));
+
+      const result = await db
+        .update(courseProgress)
+        .set({
+          assignmentStatus: 'pending',
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(courseProgress.assignmentStatus, 'submitted'),
+            inArray(courseProgress.batchContentId, batchContentSubquery)
+          )
+        )
+        .returning();
+
+      return result.length;
+    } else {
+      const result = await db
+        .update(courseProgress)
+        .set({
+          assignmentStatus: 'pending',
+          updatedAt: new Date(),
+        })
+        .where(eq(courseProgress.assignmentStatus, 'submitted'))
+        .returning();
+
+      return result.length;
+    }
   }
 }
