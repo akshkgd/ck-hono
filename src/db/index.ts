@@ -34,9 +34,15 @@ function getSslConfig(): boolean | pg.PoolConfig['ssl'] {
   return { rejectUnauthorized: false };
 }
 
+function getConnectionString(): string {
+  const dbUrl = process.env.DATABASE_URL || '';
+  // Strip sslmode query parameter so pg-connection-string doesn't override pool SSL options with verify-full (rejectUnauthorized: true)
+  return dbUrl.replace(/([?&])sslmode=[^&]*&?/, '$1').replace(/[?&]$/, '');
+}
+
 // For Node-postgres pool setup
 const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: getConnectionString(),
   ssl: getSslConfig(),
 });
 
