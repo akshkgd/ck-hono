@@ -5,64 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1782795049855,
-      "tag": "0000_adorable_puma",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1783318027238,
-      "tag": "0001_medical_songbird",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1783357123304,
-      "tag": "0002_nebulous_true_believers",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1785432003605,
-      "tag": "0003_brief_nick_fury",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1785432691704,
-      "tag": "0004_plain_tempest",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1785433160611,
-      "tag": "0005_soft_killraven",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1785499055708,
-      "tag": "0006_overrated_centennial",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1785500469586,
-      "tag": "0007_stale_quasimodo",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1785508782098,
-      "tag": "0008_shallow_hydra",
+      "when": 1785579545410,
+      "tag": "0000_sharp_krista_starr",
       "breakpoints": true
     }
   ]

@@ -1,1 +1,0 @@
-ALTER TYPE "public"."batch_type" ADD VALUE 'recorded';

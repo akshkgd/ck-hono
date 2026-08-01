@@ -20,6 +20,7 @@ async function resetDb() {
     await client.query("DROP SCHEMA public CASCADE;");
     console.log("Re-creating fresh public schema...");
     await client.query("CREATE SCHEMA public;");
+    await client.query("GRANT ALL ON SCHEMA public TO public;");
     console.log("Enabling required PostgreSQL extensions (pg_trgm, uuid-ossp)...");
     await client.query('CREATE EXTENSION IF NOT EXISTS "pg_trgm";');
     await client.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";');
