@@ -9,10 +9,13 @@ function getSslConfig(): boolean | pg.PoolConfig['ssl'] {
     return false;
   }
 
+  // Allow overriding strict unauthorized check via env (defaults to false for managed DB compatibility)
+  const rejectUnauthorized = process.env.DB_REJECT_UNAUTHORIZED === 'true';
+
   // 1. Check if CA Certificate contents are in environment variable DB_CA_CERT
   if (process.env.DB_CA_CERT) {
     return {
-      rejectUnauthorized: true,
+      rejectUnauthorized,
       ca: process.env.DB_CA_CERT,
     };
   }
@@ -21,7 +24,7 @@ function getSslConfig(): boolean | pg.PoolConfig['ssl'] {
   const certPath = process.env.DB_CERT_PATH || path.join(process.cwd(), 'ca-certificate.crt');
   if (fs.existsSync(certPath)) {
     return {
-      rejectUnauthorized: true,
+      rejectUnauthorized,
       ca: fs.readFileSync(certPath, 'utf8'),
     };
   }
