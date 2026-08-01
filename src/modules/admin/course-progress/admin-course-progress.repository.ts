@@ -160,7 +160,7 @@ export class AdminCourseProgressRepository {
       whereConditions.push(ilike(users.name, `%${name}%`));
     }
 
-    const dayExpr = sql`(${courseProgress.updatedAt} AT TIME ZONE 'UTC') AT TIME ZONE ${APP_TIMEZONE}`;
+    const dayExpr = sql`(${courseProgress.updatedAt} AT TIME ZONE 'UTC') AT TIME ZONE ${sql.raw(`'${APP_TIMEZONE}'`)}`;
     const dateExpr = sql<string>`to_char(date_trunc('day', ${dayExpr}), 'YYYY-MM-DD')`;
     const groupExpr = sql`date_trunc('day', ${dayExpr})`;
 

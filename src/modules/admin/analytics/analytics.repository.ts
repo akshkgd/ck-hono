@@ -159,7 +159,7 @@ export class AnalyticsRepository {
 
   public async getSignupTrend(from: Date, to: Date, interval: GroupInterval) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${users.createdAt} AT TIME ZONE 'UTC') AT TIME ZONE ${APP_TIMEZONE}), ${sql.raw(`'${format}'`)})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${users.createdAt} AT TIME ZONE 'UTC') AT TIME ZONE ${sql.raw(`'${APP_TIMEZONE}'`)}), ${sql.raw(`'${format}'`)})`;
     
     return db
       .select({
@@ -176,7 +176,7 @@ export class AnalyticsRepository {
 
   public async getEnrollmentTrend(from: Date, to: Date, interval: GroupInterval) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${batchEnrollments.createdAt} AT TIME ZONE 'UTC') AT TIME ZONE ${APP_TIMEZONE}), ${sql.raw(`'${format}'`)})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${batchEnrollments.createdAt} AT TIME ZONE 'UTC') AT TIME ZONE ${sql.raw(`'${APP_TIMEZONE}'`)}), ${sql.raw(`'${format}'`)})`;
     
     return db
       .select({
@@ -194,7 +194,7 @@ export class AnalyticsRepository {
 
   public async getRevenueTrend(from: Date, to: Date, interval: GroupInterval) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${batchEnrollmentPayments.paidAt} AT TIME ZONE 'UTC') AT TIME ZONE ${APP_TIMEZONE}), ${sql.raw(`'${format}'`)})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${batchEnrollmentPayments.paidAt} AT TIME ZONE 'UTC') AT TIME ZONE ${sql.raw(`'${APP_TIMEZONE}'`)}), ${sql.raw(`'${format}'`)})`;
     
     return db
       .select({
@@ -222,7 +222,7 @@ export class AnalyticsRepository {
 
   public async getLearningTimeTrend(from: Date, to: Date, interval: GroupInterval) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${courseProgress.updatedAt} AT TIME ZONE 'UTC') AT TIME ZONE ${APP_TIMEZONE}), ${sql.raw(`'${format}'`)})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${courseProgress.updatedAt} AT TIME ZONE 'UTC') AT TIME ZONE ${sql.raw(`'${APP_TIMEZONE}'`)}), ${sql.raw(`'${format}'`)})`;
     
     return db
       .select({

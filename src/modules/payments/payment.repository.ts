@@ -378,7 +378,7 @@ export class PaymentRepository {
     type?: 'all' | 'course' | 'webinar'
   ) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${batchEnrollmentPayments.paidAt} AT TIME ZONE 'UTC') AT TIME ZONE ${APP_TIMEZONE}), ${sql.raw(`'${format}'`)})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${batchEnrollmentPayments.paidAt} AT TIME ZONE 'UTC') AT TIME ZONE ${sql.raw(`'${APP_TIMEZONE}'`)}), ${sql.raw(`'${format}'`)})`;
 
     let query = db
       .select({
