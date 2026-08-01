@@ -23,7 +23,7 @@ export const contentLibrarySearchQuerySchema = z.object({
   q: z.string().default(''),
   type: contentLibraryTypeSchema.optional(),
   contentType: contentTypeClassSchema.optional(),
-  limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(200).default(10)),
+  limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(200).default(100)),
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
 });
 
