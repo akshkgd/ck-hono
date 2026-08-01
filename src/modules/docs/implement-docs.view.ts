@@ -239,6 +239,24 @@ export function getImplementDocsHtml(): string {
 }</code></pre>
             </div>
           </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">3. Unlock All Assignments of a Batch</h3>
+            <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/batches/:id/unlock-assignments</p>
+            <p class="text-xs text-zinc-400 mb-2">
+              Unlocks all assignment submission forms for all existing enrolled students of a specific batch in one shot. This is primarily used as a utility to allow legacy/cohort students to skip watch time verification requirements for past content.
+            </p>
+            <div>
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Response JSON:</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Successfully unlocked all assignments for existing learners in this batch (Updated/created 15 progress records)",
+  "data": {
+    "unlockedCount": 15
+  }
+}</code></pre>
+            </div>
+          </div>
         </div>
       </div>
     </section>
