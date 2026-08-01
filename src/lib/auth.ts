@@ -30,6 +30,9 @@ export const auth = betterAuth({
     schema: schema,
   }),
   advanced: {
+    database: {
+      generateId: 'uuid',
+    },
     ipAddress: {
       ipAddressHeaders: ['x-forwarded-for', 'cf-connecting-ip', 'x-real-ip'],
     },
