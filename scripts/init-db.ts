@@ -1,6 +1,10 @@
 import pg from 'pg';
 import 'dotenv/config';
 
+function getConnectionString(rawUrl: string): string {
+  return rawUrl.replace(/([?&])sslmode=[^&]*&?/, '$1').replace(/[?&]$/, '');
+}
+
 async function main() {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) {
@@ -8,7 +12,7 @@ async function main() {
     process.exit(1);
   }
 
-  const match = dbUrl.match(/\/([^/]+)$/);
+  const match = dbUrl.match(/\/([^/?]+)/);
   if (!match) {
     console.error("Could not parse database name from DATABASE_URL");
     process.exit(1);
@@ -17,7 +21,13 @@ async function main() {
   const defaultDbUrl = dbUrl.substring(0, dbUrl.lastIndexOf('/')) + '/postgres';
 
   console.log(`Connecting to default database to verify/create '${dbName}'...`);
-  const pool = new pg.Pool({ connectionString: defaultDbUrl });
+  const isLocal = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1') || dbUrl.includes('sslmode=disable');
+  const ssl = isLocal ? false : { rejectUnauthorized: false };
+
+  const pool = new pg.Pool({ 
+    connectionString: getConnectionString(defaultDbUrl),
+    ssl 
+  });
 
   try {
     const client = await pool.connect();

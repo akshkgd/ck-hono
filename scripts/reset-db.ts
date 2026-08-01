@@ -1,6 +1,10 @@
 import pg from 'pg';
 import 'dotenv/config';
 
+function getConnectionString(rawUrl: string): string {
+  return rawUrl.replace(/([?&])sslmode=[^&]*&?/, '$1').replace(/[?&]$/, '');
+}
+
 async function resetDb() {
   const dbUrl = process.env.DATABASE_URL;
   if (!dbUrl) {
@@ -9,10 +13,13 @@ async function resetDb() {
   }
 
   console.log("Connecting to PostgreSQL to reset public schema...");
-  const ssl = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1') || dbUrl.includes('sslmode=disable')
-    ? false
-    : { rejectUnauthorized: false };
-  const pool = new pg.Pool({ connectionString: dbUrl, ssl });
+  const isLocal = dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1') || dbUrl.includes('sslmode=disable');
+  const ssl = isLocal ? false : { rejectUnauthorized: false };
+  
+  const pool = new pg.Pool({ 
+    connectionString: getConnectionString(dbUrl), 
+    ssl 
+  });
 
   try {
     const client = await pool.connect();
