@@ -1,7 +1,7 @@
 import { db } from '../../db/index.js';
 import { batchEnrollmentPayments, batchEnrollments, users, batches } from '../../db/schema.js';
 import { eq, or, ilike, sql, and, gte, lte, asc, desc, inArray } from 'drizzle-orm';
-import { type GroupInterval } from '../../utils/date-range.js';
+import { type GroupInterval, APP_TIMEZONE } from '../../utils/date-range.js';
 export type Payment = typeof batchEnrollmentPayments.$inferSelect;
 export type NewPayment = typeof batchEnrollmentPayments.$inferInsert;
 
@@ -378,7 +378,7 @@ export class PaymentRepository {
     type?: 'all' | 'course' | 'webinar'
   ) {
     const { trunc, format } = getSqlFormatAndTrunc(interval);
-    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, ${batchEnrollmentPayments.paidAt}), ${sql.raw(`'${format}'`)})`;
+    const bucketExpr = sql<string>`to_char(date_trunc(${sql.raw(`'${trunc}'`)}, (${batchEnrollmentPayments.paidAt} AT TIME ZONE 'UTC') AT TIME ZONE ${APP_TIMEZONE}), ${sql.raw(`'${format}'`)})`;
 
     let query = db
       .select({

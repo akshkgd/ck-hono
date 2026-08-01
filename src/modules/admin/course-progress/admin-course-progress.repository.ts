@@ -1,6 +1,7 @@
 import { db } from '../../../db/index.js';
 import { courseProgress, users, batchContent, batches, contentLibrary, batchEnrollments, batchSections } from '../../../db/schema.js';
 import { eq, and, desc, asc, sql, ilike } from 'drizzle-orm';
+import { APP_TIMEZONE } from '../../../utils/date-range.js';
 
 export class AdminCourseProgressRepository {
   public async getProgressList(
@@ -159,9 +160,13 @@ export class AdminCourseProgressRepository {
       whereConditions.push(ilike(users.name, `%${name}%`));
     }
 
+    const dayExpr = sql`(${courseProgress.updatedAt} AT TIME ZONE 'UTC') AT TIME ZONE ${APP_TIMEZONE}`;
+    const dateExpr = sql<string>`to_char(date_trunc('day', ${dayExpr}), 'YYYY-MM-DD')`;
+    const groupExpr = sql`date_trunc('day', ${dayExpr})`;
+
     return db
       .select({
-        date: sql<string>`to_char(date_trunc('day', ${courseProgress.updatedAt}), 'YYYY-MM-DD')`,
+        date: dateExpr,
         usersCount: sql<number>`cast(count(distinct ${courseProgress.userId}) as integer)`,
         timeSpentSeconds: sql<number>`cast(sum(${courseProgress.timeSpent}) as integer)`,
         viewsCount: sql<number>`cast(count(${courseProgress.id}) as integer)`,
@@ -170,8 +175,8 @@ export class AdminCourseProgressRepository {
       .innerJoin(users, eq(courseProgress.userId, users.id))
       .innerJoin(batchContent, eq(courseProgress.batchContentId, batchContent.id))
       .where(and(...whereConditions))
-      .groupBy(sql`date_trunc('day', ${courseProgress.updatedAt})`)
-      .orderBy(sql`date_trunc('day', ${courseProgress.updatedAt})`);
+      .groupBy(groupExpr)
+      .orderBy(groupExpr);
   }
 
   public async getEnrollmentDetails(enrollmentId: string) {
