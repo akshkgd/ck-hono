@@ -29,42 +29,40 @@ export const auth = betterAuth({
     provider: 'pg',
     schema: schema,
   }),
+  advanced: {
+    ipAddress: {
+      ipAddressHeaders: ['x-forwarded-for', 'cf-connecting-ip', 'x-real-ip'],
+    },
+  },
   user: {
     additionalFields: {
       role: {
         type: 'string',
         defaultValue: 'student',
-        fieldName: 'role',
       },
       avatarUrl: {
         type: 'string',
         required: false,
-        fieldName: 'avatar_url',
       },
       mobile: {
         type: 'string',
         required: false,
-        fieldName: 'mobile',
       },
       xp: {
         type: 'number',
         defaultValue: 0,
-        fieldName: 'xp',
       },
       currentStreak: {
         type: 'number',
         defaultValue: 0,
-        fieldName: 'current_streak',
       },
       longestStreak: {
         type: 'number',
         defaultValue: 0,
-        fieldName: 'longest_streak',
       },
       lastActiveAt: {
         type: 'date',
         required: false,
-        fieldName: 'last_active_at',
       },
     },
   },
