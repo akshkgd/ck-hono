@@ -9,27 +9,28 @@ function getSslConfig(): boolean | pg.PoolConfig['ssl'] {
     return false;
   }
 
-  // Allow overriding strict unauthorized check via env (defaults to false for managed DB compatibility)
   const rejectUnauthorized = process.env.DB_REJECT_UNAUTHORIZED === 'true';
 
-  // 1. Check if CA Certificate contents are in environment variable DB_CA_CERT
-  if (process.env.DB_CA_CERT) {
-    return {
-      rejectUnauthorized,
-      ca: process.env.DB_CA_CERT,
-    };
+  // If strict validation is explicitly requested via env, supply the CA certificate
+  if (rejectUnauthorized) {
+    if (process.env.DB_CA_CERT) {
+      return {
+        rejectUnauthorized: true,
+        ca: process.env.DB_CA_CERT,
+      };
+    }
+
+    const certPath = process.env.DB_CERT_PATH || path.join(process.cwd(), 'ca-certificate.crt');
+    if (fs.existsSync(certPath)) {
+      return {
+        rejectUnauthorized: true,
+        ca: fs.readFileSync(certPath, 'utf8'),
+      };
+    }
   }
 
-  // 2. Check if certificate file exists at specified path or root directory
-  const certPath = process.env.DB_CERT_PATH || path.join(process.cwd(), 'ca-certificate.crt');
-  if (fs.existsSync(certPath)) {
-    return {
-      rejectUnauthorized,
-      ca: fs.readFileSync(certPath, 'utf8'),
-    };
-  }
-
-  // 3. Fallback: allow SSL connection if no certificate file is supplied
+  // Standard Managed DB SSL (DigitalOcean, Heroku, Render):
+  // Enables full TLS encryption without strict CA chain rejection
   return { rejectUnauthorized: false };
 }
 
