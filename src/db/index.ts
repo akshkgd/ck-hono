@@ -1,16 +1,17 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 
-const hasSslOption = process.env.DATABASE_URL?.includes('sslmode=') || process.env.DATABASE_URL?.includes('ssl=');
-const isLocalhost = process.env.DATABASE_URL?.includes('localhost') || process.env.DATABASE_URL?.includes('127.0.0.1');
+const dbUrl = process.env.DATABASE_URL || '';
+const isLocalhost = !dbUrl || 
+  dbUrl.includes('localhost') || 
+  dbUrl.includes('127.0.0.1') ||
+  dbUrl.includes('0.0.0.0');
 
-const useSsl = hasSslOption
-  ? !process.env.DATABASE_URL?.includes('sslmode=disable')
-  : (process.env.NODE_ENV === 'production' && !isLocalhost);
+const useSsl = !isLocalhost && !dbUrl.includes('sslmode=disable');
 
 // For Node-postgres pool setup
 const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: dbUrl,
   ssl: useSsl ? { rejectUnauthorized: false } : undefined,
 });
 
