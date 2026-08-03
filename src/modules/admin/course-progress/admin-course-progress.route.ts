@@ -3,7 +3,12 @@ import { AdminCourseProgressController } from './admin-course-progress.controlle
 import { adminMiddleware } from '../../../middleware/admin.middleware.js';
 import { authMiddleware } from '../../../middleware/auth.middleware.js';
 import { zValidator } from '@hono/zod-validator';
-import { progressQuerySchema, enrollmentProgressParamsSchema, resetAssignmentsSchema } from './admin-course-progress.validation.js';
+import {
+  progressQuerySchema,
+  enrollmentProgressParamsSchema,
+  resetAssignmentsSchema,
+  bulkUpdateProgressSchema
+} from './admin-course-progress.validation.js';
 
 const adminProgressRouter = new Hono();
 const controller = new AdminCourseProgressController();
@@ -28,6 +33,12 @@ adminProgressRouter.post(
   '/assignments/reset-submitted',
   zValidator('json', resetAssignmentsSchema),
   controller.resetSubmittedAssignments
+);
+
+adminProgressRouter.post(
+  '/bulk-update',
+  zValidator('json', bulkUpdateProgressSchema),
+  controller.bulkUpdateProgress
 );
 
 export default adminProgressRouter;

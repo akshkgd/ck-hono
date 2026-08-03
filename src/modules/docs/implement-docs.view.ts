@@ -275,6 +275,40 @@ export function getImplementDocsHtml(): string {
 }</code></pre>
             </div>
           </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">5. Bulk Update Course Progress for a Student</h3>
+            <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/course-progress/bulk-update</p>
+            <p class="text-xs text-zinc-400 mb-2">
+              Updates course progress, watch minutes, GitHub links, and deployment links for multiple batch content items for a specific student. Wraps all updates and parent enrollment progress recalculation inside a single database transaction. Auto-completes chapters if watch minutes match or exceed 90% of the video duration.
+            </p>
+            <div>
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Request Payload:</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-400 border border-zinc-800/60 overflow-x-auto"><code>{
+  "userId": "989c5a03-dbb7-49ab-ac19-1a6156b83ea1",
+  "batchId": "768bc964-7c8e-4fd7-8dd0-0a328e9f82d4",
+  "items": [
+    {
+      "batchContentId": "d1a8c8e9-5f2b-4e3a-8b1c-9d0e1f2a3b4c",
+      "watchMinutes": 45,
+      "githubLink": "https://github.com/username/repo",
+      "deployedLink": "https://my-app.vercel.app",
+      "completed": true
+    }
+  ]
+}</code></pre>
+            </div>
+            <div class="mt-2">
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Response JSON:</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Successfully updated progress for 1 chapters",
+  "data": {
+    "updatedCount": 1
+  }
+}</code></pre>
+            </div>
+          </div>
         </div>
       </div>
     </section>

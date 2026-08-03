@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { AdminCourseProgressService } from './admin-course-progress.service.js';
+import { bulkUpdateProgressSchema } from './admin-course-progress.validation.js';
 
 export class AdminCourseProgressController {
   private progressService: AdminCourseProgressService;
@@ -57,6 +58,25 @@ export class AdminCourseProgressController {
       return c.json({
         status: 'error',
         message: err.message || 'Failed to reset assignment statuses',
+      }, 400);
+    }
+  };
+
+  public bulkUpdateProgress = async (c: Context) => {
+    try {
+      const rawBody = await c.req.json();
+      const body = bulkUpdateProgressSchema.parse(rawBody);
+
+      const result = await this.progressService.bulkUpdateProgress(body);
+      return c.json({
+        status: 'success',
+        message: `Successfully updated progress for ${result.updatedCount} chapters`,
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to update course progress',
       }, 400);
     }
   };

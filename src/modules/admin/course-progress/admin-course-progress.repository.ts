@@ -317,4 +317,48 @@ export class AdminCourseProgressRepository {
       return result.length;
     }
   }
+
+  public async bulkUpsertProgress(values: any[], tx: any = db) {
+    if (values.length === 0) return;
+    await tx
+      .insert(courseProgress)
+      .values(values)
+      .onConflictDoUpdate({
+        target: [courseProgress.enrollmentId, courseProgress.batchContentId],
+        set: {
+          timeSpent: sql`excluded.time_spent`,
+          progress: sql`excluded.progress`,
+          status: sql`excluded.status`,
+          githubLink: sql`excluded.github_link`,
+          deployedLink: sql`excluded.deployed_link`,
+          assignmentStatus: sql`excluded.assignment_status`,
+          updatedAt: sql`excluded.updated_at`,
+        },
+      });
+  }
+
+  public async getAggregateProgressForEnrollment(enrollmentId: string, tx: any = db) {
+    const results = await tx
+      .select({
+        totalTimeSpent: sql<number>`cast(coalesce(sum(${courseProgress.timeSpent}), 0) as integer)`,
+        totalProgressSum: sql<number>`cast(coalesce(sum(${courseProgress.progress}), 0) as integer)`,
+      })
+      .from(courseProgress)
+      .where(eq(courseProgress.enrollmentId, enrollmentId));
+
+    return results[0] || { totalTimeSpent: 0, totalProgressSum: 0 };
+  }
+
+  public async getBatchContentVideoDurations(batchContentIds: string[], tx: any = db) {
+    if (batchContentIds.length === 0) return [];
+    return tx
+      .select({
+        id: batchContent.id,
+        videoDuration: contentLibrary.videoDuration,
+      })
+      .from(batchContent)
+      .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
+      .where(inArray(batchContent.id, batchContentIds));
+  }
 }
+

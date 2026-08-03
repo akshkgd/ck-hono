@@ -1,12 +1,28 @@
+import { db } from '../../../db/index.js';
 import { AdminCourseProgressRepository } from './admin-course-progress.repository.js';
-import type { ProgressQueryInput } from './admin-course-progress.validation.js';
+import type { ProgressQueryInput, BulkUpdateProgressInput } from './admin-course-progress.validation.js';
 import { calculateDateRange } from '../../../utils/date-range.js';
+import { EnrollmentRepository } from '../../enrollments/enrollment.repository.js';
+import { BatchContentRepository } from '../../batch-content/batch-content.repository.js';
+
+function sanitizeString(val: string | null | undefined): string | null {
+  if (!val) return null;
+  const trimmed = val.trim();
+  if (trimmed === '' || trimmed === 'null' || trimmed === 'undefined') {
+    return null;
+  }
+  return trimmed;
+}
 
 export class AdminCourseProgressService {
   private repository: AdminCourseProgressRepository;
+  private enrollmentRepository: EnrollmentRepository;
+  private batchContentRepository: BatchContentRepository;
 
   constructor() {
     this.repository = new AdminCourseProgressRepository();
+    this.enrollmentRepository = new EnrollmentRepository();
+    this.batchContentRepository = new BatchContentRepository();
   }
 
   public async getProgressReport(input: ProgressQueryInput) {
@@ -145,5 +161,70 @@ export class AdminCourseProgressService {
 
   public async resetSubmittedAssignmentsToPending(batchId?: string) {
     return this.repository.resetSubmittedAssignmentsToPending(batchId);
+  }
+
+  public async bulkUpdateProgress(input: BulkUpdateProgressInput) {
+    const { userId, batchId, items } = input;
+
+    // 1. Verify Enrollment Exists
+    const enrollment = await this.enrollmentRepository.findByUserAndBatch(userId, batchId);
+    if (!enrollment) {
+      throw new Error('User is not enrolled in the specified batch');
+    }
+
+    // 2. Perform bulk update and recalculation in a transaction
+    return db.transaction(async (tx) => {
+      // Fetch video durations for these batchContentIds
+      const contentIds = items.map((i) => i.batchContentId);
+      const durations = await this.repository.getBatchContentVideoDurations(contentIds, tx);
+      const durationMap = new Map(durations.map((d) => [d.id, d.videoDuration || 0]));
+
+      const valuesToUpsert = items.map((item) => {
+        const durationInSeconds = durationMap.get(item.batchContentId) || 0;
+        const timeSpentSeconds = item.watchMinutes * 60;
+        
+        // Auto-complete if checked OR watch time is at least 90% of duration
+        const isCompleted = item.completed || (durationInSeconds > 0 && timeSpentSeconds >= durationInSeconds * 0.9);
+        const progressPercent = isCompleted ? 100 : (durationInSeconds > 0 ? Math.min(100, Math.round((timeSpentSeconds * 100) / durationInSeconds)) : 0);
+        const statusValue = isCompleted ? 'completed' : (timeSpentSeconds > 0 ? 'learning' : 'not_started');
+        
+        const github = sanitizeString(item.githubLink);
+        const deployed = sanitizeString(item.deployedLink);
+        const assignmentStatusValue = (github || deployed) ? 'submitted' : null;
+
+        return {
+          userId,
+          enrollmentId: enrollment.id,
+          batchContentId: item.batchContentId,
+          timeSpent: timeSpentSeconds,
+          progress: progressPercent,
+          status: statusValue,
+          githubLink: github,
+          deployedLink: deployed,
+          assignmentStatus: assignmentStatusValue,
+          updatedAt: new Date(),
+        };
+      });
+
+      // Execute bulk insert/update (upsert) in repository
+      await this.repository.bulkUpsertProgress(valuesToUpsert, tx);
+
+      // Recalculate aggregates on enrollment
+      const totalContentCount = await this.batchContentRepository.count(batchId);
+      if (totalContentCount > 0) {
+        const aggregates = await this.repository.getAggregateProgressForEnrollment(enrollment.id, tx);
+        const overallProgress = Math.min(100, Math.round(aggregates.totalProgressSum / totalContentCount));
+        const overallTimeSpent = aggregates.totalTimeSpent;
+
+        await this.enrollmentRepository.update(enrollment.id, {
+          progress: overallProgress,
+          timeSpentSeconds: overallTimeSpent,
+        }, tx);
+      }
+
+      return {
+        updatedCount: items.length,
+      };
+    });
   }
 }

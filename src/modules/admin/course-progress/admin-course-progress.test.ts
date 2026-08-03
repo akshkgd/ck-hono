@@ -149,4 +149,75 @@ describe('Admin Course Progress Analytics Module', () => {
     expect(body.status).toBe('success');
     expect(body.data).toHaveProperty('count');
   });
+
+  it('should reject unauthenticated request with 401 on POST /v1/admin/course-progress/bulk-update', async () => {
+    const res = await app.request('/v1/admin/course-progress/bulk-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: '989c5a03-dbb7-49ab-ac19-1a6156b83ea1',
+        batchId: '768bc964-7c8e-4fd7-8dd0-0a328e9f82d4',
+        items: []
+      })
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it('should reject non-admin request with 403 on POST /v1/admin/course-progress/bulk-update', async () => {
+    const res = await app.request('/v1/admin/course-progress/bulk-update', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${userToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: '989c5a03-dbb7-49ab-ac19-1a6156b83ea1',
+        batchId: '768bc964-7c8e-4fd7-8dd0-0a328e9f82d4',
+        items: []
+      })
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it('should return 400 when invalid input is provided to bulk-update', async () => {
+    const res = await app.request('/v1/admin/course-progress/bulk-update', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: 'invalid-uuid',
+        batchId: '768bc964-7c8e-4fd7-8dd0-0a328e9f82d4',
+        items: []
+      })
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 with descriptive error if enrollment/user does not exist', async () => {
+    const res = await app.request('/v1/admin/course-progress/bulk-update', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: '989c5a03-dbb7-49ab-ac19-1a6156b83ea1',
+        batchId: '768bc964-7c8e-4fd7-8dd0-0a328e9f82d4',
+        items: [
+          {
+            batchContentId: '768bc964-7c8e-4fd7-8dd0-0a328e9f82d4',
+            watchMinutes: 10,
+            completed: false
+          }
+        ]
+      })
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe('error');
+    expect(body.message).toContain('not enrolled');
+  });
 });
+

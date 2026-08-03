@@ -47,3 +47,20 @@ export const resetAssignmentsSchema = z.object({
 
 export type ResetAssignmentsInput = z.infer<typeof resetAssignmentsSchema>;
 
+export const bulkUpdateProgressItemSchema = z.object({
+  batchContentId: z.string().uuid('Invalid batchContentId'),
+  watchMinutes: z.number().int().nonnegative().default(0),
+  githubLink: z.string().url('Invalid GitHub URL').or(z.string().length(0)).nullable().optional(),
+  deployedLink: z.string().url('Invalid Deployed URL').or(z.string().length(0)).nullable().optional(),
+  completed: z.boolean().default(false),
+});
+
+export const bulkUpdateProgressSchema = z.object({
+  userId: z.string().uuid('Invalid userId'),
+  batchId: z.string().uuid('Invalid batchId'),
+  items: z.array(bulkUpdateProgressItemSchema).min(1, 'At least one progress item is required'),
+});
+
+export type BulkUpdateProgressInput = z.infer<typeof bulkUpdateProgressSchema>;
+
+
