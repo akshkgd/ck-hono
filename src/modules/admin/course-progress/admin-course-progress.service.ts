@@ -176,8 +176,8 @@ export class AdminCourseProgressService {
     return db.transaction(async (tx) => {
       // Fetch video durations for these batchContentIds
       const contentIds = items.map((i) => i.batchContentId);
-      const durations = await this.repository.getBatchContentVideoDurations(contentIds, tx);
-      const durationMap = new Map(durations.map((d) => [d.id, d.videoDuration || 0]));
+      const durations = await this.repository.getBatchContentVideoDurations(contentIds, tx) as { id: string; videoDuration: number | null }[];
+      const durationMap = new Map<string, number>(durations.map((d) => [d.id, d.videoDuration || 0]));
 
       const valuesToUpsert = items.map((item) => {
         const durationInSeconds = durationMap.get(item.batchContentId) || 0;
