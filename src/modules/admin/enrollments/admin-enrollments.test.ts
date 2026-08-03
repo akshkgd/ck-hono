@@ -163,7 +163,10 @@ describe('Admin Enrollments CRUD Module', () => {
       expect(body.data.enrollments.length).toBeGreaterThan(0);
       expect(body.data.enrollments[0].amountPaid).toBeDefined();
       expect(body.data.enrollments[0].paidAt).toBeDefined();
-      expect(body.data.enrollments[0].batchType).toBeDefined();
+      expect(body.data.enrollments[0].batch).toBeDefined();
+      expect(body.data.enrollments[0].batch.id).toBeDefined();
+      expect(body.data.enrollments[0].batch.name).toBeDefined();
+      expect(body.data.enrollments[0].batch.slug).toBeDefined();
       expect(body.data.enrollments[0].batch.type).toBeDefined();
       expect(body.data.pagination.total).toBeGreaterThan(0);
     });
@@ -180,6 +183,9 @@ describe('Admin Enrollments CRUD Module', () => {
       expect(body.data.id).toBe(createdEnrollmentId);
       expect(body.data.user).toBeDefined();
       expect(body.data.batch).toBeDefined();
+      expect(body.data.batch.id).toBeDefined();
+      expect(body.data.batch.slug).toBeDefined();
+      expect(body.data.batch.type).toBeDefined();
       expect(body.data.user.email).toBe('aarav.sharma0@example.com');
       expect(body.data.batch.name).toBe(testBatchData.name);
       expect(body.data).toHaveProperty('sequentialLearning');

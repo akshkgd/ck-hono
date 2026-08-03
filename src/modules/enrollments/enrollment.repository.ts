@@ -43,7 +43,6 @@ export class EnrollmentRepository {
         metadata: batchEnrollments.metadata,
         createdAt: batchEnrollments.createdAt,
         updatedAt: batchEnrollments.updatedAt,
-        batchType: batches.type,
         user: {
           id: users.id,
           name: users.name,
@@ -133,14 +132,15 @@ export class EnrollmentRepository {
         sequentialLearning: batchEnrollments.sequentialLearning,
         sequentialLearningWithAssignments: batchEnrollments.sequentialLearningWithAssignments,
         createdAt: batchEnrollments.createdAt,
-        batchType: batches.type,
         user: {
           name: users.name,
           email: users.email,
           mobile: users.mobile,
         },
         batch: {
+          id: batches.id,
           name: batches.name,
+          slug: batches.slug,
           type: batches.type,
         }
       })
