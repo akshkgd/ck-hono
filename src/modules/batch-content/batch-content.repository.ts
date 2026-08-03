@@ -273,4 +273,17 @@ export class BatchContentRepository {
       return { sectionsCopied, contentCopied };
     });
   }
+
+  public async resetAccessTillToZero(): Promise<number> {
+    const results = await db
+      .update(batchContent)
+      .set({
+        accessTill: 0,
+        updatedAt: new Date(),
+      })
+      .returning({ id: batchContent.id });
+
+    return results.length;
+  }
 }
+

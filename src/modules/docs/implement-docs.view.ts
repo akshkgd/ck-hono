@@ -257,6 +257,24 @@ export function getImplementDocsHtml(): string {
 }</code></pre>
             </div>
           </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">4. Reset Access Till limit for All Batch Contents</h3>
+            <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/batch-contents/reset-access-till</p>
+            <p class="text-xs text-zinc-400 mb-2">
+              Resets the <code class="text-indigo-400 font-mono">accessTill</code> value to <code class="text-indigo-400 font-mono">0</code> for all existing batch content records in one shot. This is a one-time administrative action.
+            </p>
+            <div>
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Response JSON:</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Successfully reset accessTill to 0 for all batch contents (Updated 42 records)",
+  "data": {
+    "updatedCount": 42
+  }
+}</code></pre>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -16,6 +16,7 @@ adminBatchContentRouter.get('/:id', controller.get);
 adminBatchContentRouter.post('/', zValidator('json', createBatchContentSchema), controller.create);
 adminBatchContentRouter.post('/bulk', zValidator('json', createBulkBatchContentSchema), controller.createBulk);
 adminBatchContentRouter.post('/import', zValidator('json', importBatchContentSchema), controller.importContent);
+adminBatchContentRouter.post('/reset-access-till', controller.resetAccessTill);
 adminBatchContentRouter.put('/reorder', controller.reorder);
 adminBatchContentRouter.put('/:id', zValidator('json', updateBatchContentSchema), controller.edit);
 adminBatchContentRouter.delete('/:id', controller.delete);

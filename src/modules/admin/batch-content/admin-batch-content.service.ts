@@ -183,4 +183,9 @@ export class AdminBatchContentService {
 
     return this.batchContentRepository.importFromBatch(input.sourceBatchId, input.targetBatchId);
   }
+
+  public async resetAccessTillToZero() {
+    return this.batchContentRepository.resetAccessTillToZero();
+  }
 }
+

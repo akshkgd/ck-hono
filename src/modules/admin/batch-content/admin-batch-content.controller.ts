@@ -170,4 +170,23 @@ export class AdminBatchContentController {
       }, 400);
     }
   };
+
+  public resetAccessTill = async (c: Context) => {
+    try {
+      const count = await this.adminBatchContentService.resetAccessTillToZero();
+      return c.json({
+        status: 'success',
+        message: `Successfully reset accessTill to 0 for all batch contents (Updated ${count} records)`,
+        data: {
+          updatedCount: count,
+        },
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to reset accessTill for batch contents',
+      }, 400);
+    }
+  };
 }
+

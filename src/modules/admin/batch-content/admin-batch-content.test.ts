@@ -90,4 +90,37 @@ describe('Admin Batch Contents Bulk Association Module', () => {
     expect(body.data[1].contentId).toBe(2);
     expect(body.data[1].order).toBeGreaterThan(body.data[0].order); // Preserved sequential order
   });
+
+  describe('POST /v1/admin/batch-contents/reset-access-till', () => {
+    it('should reject unauthenticated request with 401', async () => {
+      const res = await app.request('/v1/admin/batch-contents/reset-access-till', {
+        method: 'POST',
+      });
+      expect(res.status).toBe(401);
+    });
+
+    it('should reject non-admin request with 403', async () => {
+      const res = await app.request('/v1/admin/batch-contents/reset-access-till', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${userToken}`,
+        },
+      });
+      expect(res.status).toBe(403);
+    });
+
+    it('should succeed and reset accessTill to 0 for all batchContent records', async () => {
+      const res = await app.request('/v1/admin/batch-contents/reset-access-till', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+        },
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.updatedCount).toBeGreaterThanOrEqual(0);
+    });
+  });
 });
+
