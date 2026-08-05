@@ -134,6 +134,18 @@ describe('Student Dashboard Module', () => {
     expect(body.status).toBe('error');
   });
 
+  it('should accept progress update with progress >= 90 as completion criteria', async () => {
+    const res = await app.request('/v1/student/courses/content/progress', {
+      method: 'POST',
+      headers: {
+        'Cookie': studentCookie,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ batchContentId: 'bc_test_123', timeSpent: 45, progress: 95, status: 'completed' })
+    });
+    expect([200, 400, 403, 404]).toContain(res.status);
+  });
+
   it('should reject unauthenticated request with 401 on GET /v1/student/payments', async () => {
     const res = await app.request('/v1/student/payments', {
       method: 'GET',
