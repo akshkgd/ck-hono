@@ -16,15 +16,9 @@ export const assignmentsQuerySchema = z.object({
   batchId: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
   name: z.string().optional().nullable(),
-  q: z.string().optional().nullable(),
-  page: z.string()
-    .default('1')
-    .transform((val) => parseInt(val, 10))
-    .refine((val) => !isNaN(val) && val > 0, 'page must be positive number'),
-  limit: z.string()
-    .default('50')
-    .transform((val) => parseInt(val, 10))
-    .refine((val) => !isNaN(val) && val > 0 && val <= 100, 'limit must be between 1 and 100'),
+  q: z.string().optional().default(''),
+  page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).default(1)),
+  limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().int().min(1).max(100).default(50)),
 }).refine((data) => {
   if (data.timeRange === 'custom') {
     return !!data.startDate && !!data.endDate;
