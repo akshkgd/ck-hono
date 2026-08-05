@@ -33,7 +33,7 @@ export class AdminAssignmentsRepository {
       whereConditions.push(ilike(users.name, `%${name}%`));
     }
     if (q) {
-      whereConditions.push(or(ilike(users.email, `%${q}%`), ilike(users.name, `%${q}%`)));
+      whereConditions.push(or(ilike(users.email, `%${q}%`), ilike(users.name, `%${q}%`))!);
     }
 
     return db
@@ -105,7 +105,7 @@ export class AdminAssignmentsRepository {
       whereConditions.push(ilike(users.name, `%${name}%`));
     }
     if (q) {
-      whereConditions.push(or(ilike(users.email, `%${q}%`), ilike(users.name, `%${q}%`)));
+      whereConditions.push(or(ilike(users.email, `%${q}%`), ilike(users.name, `%${q}%`))!);
     }
 
     const results = await db
