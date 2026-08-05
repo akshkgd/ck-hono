@@ -1,6 +1,6 @@
 import { db } from '../../../db/index.js';
 import { courseProgress, users, batchContent, batches, contentLibrary, batchEnrollments } from '../../../db/schema.js';
-import { eq, and, desc, sql, ilike, isNotNull } from 'drizzle-orm';
+import { eq, and, desc, sql, ilike, isNotNull, or } from 'drizzle-orm';
 
 export class AdminAssignmentsRepository {
   public async getAssignmentsList(
@@ -11,7 +11,8 @@ export class AdminAssignmentsRepository {
     email?: string,
     limit: number = 50,
     offset: number = 0,
-    name?: string
+    name?: string,
+    q?: string
   ) {
     const whereConditions = [
       sql`${courseProgress.updatedAt} >= ${start}`,
@@ -30,6 +31,9 @@ export class AdminAssignmentsRepository {
     }
     if (name) {
       whereConditions.push(ilike(users.name, `%${name}%`));
+    }
+    if (q) {
+      whereConditions.push(or(ilike(users.email, `%${q}%`), ilike(users.name, `%${q}%`)));
     }
 
     return db
@@ -79,7 +83,8 @@ export class AdminAssignmentsRepository {
     status?: 'pending' | 'submitted' | 'under review' | 'approved' | 'rejected',
     batchId?: string,
     email?: string,
-    name?: string
+    name?: string,
+    q?: string
   ): Promise<number> {
     const whereConditions = [
       sql`${courseProgress.updatedAt} >= ${start}`,
@@ -98,6 +103,9 @@ export class AdminAssignmentsRepository {
     }
     if (name) {
       whereConditions.push(ilike(users.name, `%${name}%`));
+    }
+    if (q) {
+      whereConditions.push(or(ilike(users.email, `%${q}%`), ilike(users.name, `%${q}%`)));
     }
 
     const results = await db

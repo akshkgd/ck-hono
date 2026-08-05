@@ -69,6 +69,19 @@ describe('Admin Assignments Manager Module', () => {
     expect(body.data).toHaveProperty('pagination');
   });
 
+  it('should allow filtering assignments by search query q for admin', async () => {
+    const res = await app.request('/v1/admin/assignments?timeRange=this_week&q=Aarav', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`
+      }
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe('success');
+    expect(body.data.submissions).toBeInstanceOf(Array);
+  });
+
   it('should fail with 400 when grading submission with invalid status', async () => {
     const res = await app.request('/v1/admin/assignments/12/grade', {
       method: 'POST',

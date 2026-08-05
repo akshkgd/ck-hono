@@ -74,6 +74,19 @@ describe('Admin Course Progress Analytics Module', () => {
     expect(analytics).toHaveProperty('totalViews');
   });
 
+  it('should allow filtering by search query q for admin', async () => {
+    const res = await app.request('/v1/admin/course-progress?timeRange=this_week&q=Aarav', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`
+      }
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe('success');
+    expect(body.data.progressLogs).toBeInstanceOf(Array);
+  });
+
   it('should fail with 400 when custom range dates are missing', async () => {
     const res = await app.request('/v1/admin/course-progress?timeRange=custom', {
       method: 'GET',

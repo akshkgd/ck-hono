@@ -16,6 +16,7 @@ export const assignmentsQuerySchema = z.object({
   batchId: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
   name: z.string().optional().nullable(),
+  q: z.string().optional().nullable(),
   page: z.string()
     .default('1')
     .transform((val) => parseInt(val, 10))

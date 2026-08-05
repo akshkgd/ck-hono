@@ -31,7 +31,8 @@ export class AdminAssignmentsService {
         input.email || undefined,
         limit,
         offset,
-        input.name || undefined
+        input.name || undefined,
+        input.q || undefined
       ),
       this.repository.countAssignmentsTotal(
         start,
@@ -39,7 +40,8 @@ export class AdminAssignmentsService {
         input.status || undefined,
         input.batchId || undefined,
         input.email || undefined,
-        input.name || undefined
+        input.name || undefined,
+        input.q || undefined
       ),
     ]);
 
