@@ -104,7 +104,7 @@ export const auth = betterAuth({
             session.ipAddress = session.ipAddress.replace(/^::ffff:/, '');
           }
 
-          const headers = ctx.request?.headers;
+          const headers = ctx?.request?.headers;
           if (headers) {
             const country = headers.get('cf-ipcountry');
             const city = headers.get('cf-ipcity');
@@ -125,7 +125,7 @@ export const auth = betterAuth({
             session.ipAddress = session.ipAddress.replace(/^::ffff:/, '');
           }
 
-          const headers = ctx.request?.headers;
+          const headers = ctx?.request?.headers;
           if (headers) {
             const country = headers.get('cf-ipcountry');
             const city = headers.get('cf-ipcity');

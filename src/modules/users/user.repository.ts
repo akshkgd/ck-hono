@@ -185,6 +185,8 @@ export class UserRepository {
         expiresAt: session.expiresAt,
         ipAddress: session.ipAddress,
         userAgent: session.userAgent,
+        country: session.country,
+        city: session.city,
         createdAt: session.createdAt,
         updatedAt: session.updatedAt,
       })
