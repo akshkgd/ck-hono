@@ -2134,6 +2134,37 @@ export interface BatchContent {
   }
 });</code></pre>
             </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "c7a29d5b-f35f-4a0b-9dfa-c529d45e0fb1",
+        "batchId": "506bdffa-6dd5-4830-bc94-e306cfe1a60a",
+        "contentId": "f1a29d5b-f35f-4a0b-9dfa-c529d45e0fb2",
+        "sectionId": "a1a29d5b-f35f-4a0b-9dfa-c529d45e0fb3",
+        "order": 1,
+        "content": {
+          "title": "Introduction to Async JavaScript",
+          "type": "video",
+          "desc": "Learn Event Loop and Promises",
+          "videoLink": "https://video.codekaro.in/lecture1.mp4",
+          "videoUrl": "https://video.codekaro.in/lecture1.mp4",
+          "videoDuration": 600,
+          "assignment": null
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 200,
+      "total": 1
+    }
+  }
+}</code></pre>
+            </div>
           </div>
         </div>
 

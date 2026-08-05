@@ -31,6 +31,11 @@ export class BatchContentRepository {
         content: {
           title: contentLibrary.title,
           type: contentLibrary.type,
+          desc: contentLibrary.desc,
+          videoLink: contentLibrary.videoLink,
+          videoUrl: contentLibrary.videoLink,
+          videoDuration: contentLibrary.videoDuration,
+          assignment: contentLibrary.assignment,
         }
       })
       .from(batchContent)
@@ -115,6 +120,11 @@ export class BatchContentRepository {
         content: {
           title: contentLibrary.title,
           type: contentLibrary.type,
+          desc: contentLibrary.desc,
+          videoLink: contentLibrary.videoLink,
+          videoUrl: contentLibrary.videoLink,
+          videoDuration: contentLibrary.videoDuration,
+          assignment: contentLibrary.assignment,
         }
       })
       .from(batchContent)
