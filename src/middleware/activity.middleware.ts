@@ -1,7 +1,7 @@
 import type { MiddlewareHandler } from 'hono';
 import { redis, isRedisReady } from '../utils/redis.js';
 import { db } from '../db/index.js';
-import { users } from '../db/schema.js';
+import { session as sessionSchema, users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 
 export const activityMiddleware = (): MiddlewareHandler => {
@@ -17,6 +17,30 @@ export const activityMiddleware = (): MiddlewareHandler => {
     const userId = user.id;
 
     const runUpdate = async () => {
+      // Backfill session location data and normalize IPv4 address if missing
+      const currentSession = c.get('session') as any;
+      if (currentSession && currentSession.id && (!currentSession.country || !currentSession.city || currentSession.ipAddress?.startsWith('::ffff:'))) {
+        const country = c.req.header('cf-ipcountry');
+        const city = c.req.header('cf-ipcity');
+        const newCountry = country || currentSession.country;
+        const newCity = city || currentSession.city;
+        const normalizedIp = currentSession.ipAddress ? currentSession.ipAddress.replace(/^::ffff:/, '') : currentSession.ipAddress;
+
+        db.update(sessionSchema)
+          .set({
+            ...(normalizedIp && { ipAddress: normalizedIp }),
+            ...(newCountry && { country: newCountry }),
+            ...(newCity && { city: newCity }),
+            updatedAt: new Date(),
+          })
+          .where(eq(sessionSchema.id, currentSession.id))
+          .catch((err) => console.error('[Activity] Failed to update session location:', err));
+
+        if (newCountry) currentSession.country = newCountry;
+        if (newCity) currentSession.city = newCity;
+        if (normalizedIp) currentSession.ipAddress = normalizedIp;
+      }
+
       // 1. Fetch current streaks and last active date from DB
       const dbUser = await db.select({
         lastActiveAt: users.lastActiveAt,
