@@ -1129,6 +1129,34 @@ export interface BatchContent {
   }
 });</code></pre>
             </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "user": {
+      "id": "8a329d5b-f35f-4a0b-9dfa-c529d45e0fb1",
+      "name": "Aarav Sharma",
+      "email": "aarav@example.com",
+      "role": "student"
+    },
+    "enrollments": [],
+    "activeSessions": [
+      {
+        "sessionId": "sess_xyz12345",
+        "token": "token_abc123",
+        "expiresAt": "2026-08-28T12:00:00.000Z",
+        "ipAddress": "103.163.95.99",
+        "userAgent": "Mozilla/5.0...",
+        "country": "IN",
+        "city": "New Delhi",
+        "createdAt": "2026-08-05T08:45:00.000Z",
+        "updatedAt": "2026-08-05T08:45:00.000Z"
+      }
+    ]
+  }
+}</code></pre>
+            </div>
           </div>
         </div>
 

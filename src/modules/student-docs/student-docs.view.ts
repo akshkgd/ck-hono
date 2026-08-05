@@ -1123,6 +1123,8 @@ export function getStudentDocsHtml(): string {
       "expiresAt": "2026-08-28T12:00:00.000Z",
       "ipAddress": "192.168.1.1",
       "userAgent": "Mozilla/5.0...",
+      "country": "IN",
+      "city": "New Delhi",
       "createdAt": "2026-07-29T10:00:00.000Z",
       "updatedAt": "2026-07-29T10:00:00.000Z"
     }
