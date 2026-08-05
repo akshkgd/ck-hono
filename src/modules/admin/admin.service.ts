@@ -174,6 +174,8 @@ export class AdminService {
       expiresAt: s.expiresAt.toISOString(),
       ipAddress: s.ipAddress,
       userAgent: s.userAgent,
+      country: s.country,
+      city: s.city,
       createdAt: s.createdAt.toISOString(),
       updatedAt: s.updatedAt.toISOString(),
     }));

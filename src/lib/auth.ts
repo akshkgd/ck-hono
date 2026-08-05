@@ -34,7 +34,7 @@ export const auth = betterAuth({
       generateId: 'uuid',
     },
     ipAddress: {
-      ipAddressHeaders: ['x-forwarded-for', 'cf-connecting-ip', 'x-real-ip'],
+      ipAddressHeaders: ['cf-pseudo-ipv4', 'x-forwarded-for', 'cf-connecting-ip', 'x-real-ip'],
     },
   },
   user: {
@@ -84,6 +84,62 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: 60 * 60 * 24 * 30,
+    },
+    additionalFields: {
+      country: {
+        type: 'string',
+        required: false,
+      },
+      city: {
+        type: 'string',
+        required: false,
+      },
+    },
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session, ctx) => {
+          if (session.ipAddress) {
+            session.ipAddress = session.ipAddress.replace(/^::ffff:/, '');
+          }
+
+          const headers = ctx.request?.headers;
+          if (headers) {
+            const country = headers.get('cf-ipcountry');
+            const city = headers.get('cf-ipcity');
+            if (country) {
+              session.country = country;
+            }
+            if (city) {
+              session.city = city;
+            }
+          }
+
+          return { data: session };
+        },
+      },
+      update: {
+        before: async (session, ctx) => {
+          if (session.ipAddress) {
+            session.ipAddress = session.ipAddress.replace(/^::ffff:/, '');
+          }
+
+          const headers = ctx.request?.headers;
+          if (headers) {
+            const country = headers.get('cf-ipcountry');
+            const city = headers.get('cf-ipcity');
+            if (country) {
+              session.country = country;
+            }
+            if (city) {
+              session.city = city;
+            }
+          }
+
+          return { data: session };
+        },
+      },
     },
   },
   plugins: [
