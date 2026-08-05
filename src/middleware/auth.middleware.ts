@@ -45,7 +45,7 @@ export const authMiddleware = (): MiddlewareHandler => {
         const incomingCountry = c.req.header('cf-ipcountry') || c.req.header('x-country');
         const incomingCity = c.req.header('cf-ipcity') || c.req.header('x-city');
 
-        const isLocationMissing = !sessionObj.country;
+        const isLocationMissing = !sessionObj.country || !sessionObj.city;
         const isLocationChanged = (incomingCountry && incomingCountry !== sessionObj.country) || 
                                   (incomingCity && incomingCity !== sessionObj.city);
 

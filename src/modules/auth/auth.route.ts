@@ -184,7 +184,29 @@ authRouter.on(['GET', 'POST', 'PUT', 'DELETE'], '/*', async (c) => {
       body: ['GET', 'HEAD'].includes(rawReq.method) ? undefined : await rawReq.clone().blob(),
     });
 
-    return await auth.handler(normalizedReq);
+    const response = await auth.handler(normalizedReq);
+
+    // Capture and save session location when Better Auth issues or refreshes a session cookie
+    const setCookie = response.headers.get('set-cookie');
+    if (setCookie && setCookie.includes('session_token')) {
+      const match = setCookie.match(/(?:better-auth\.session_token|__Secure-better-auth\.session_token)=([^;]+)/);
+      if (match && match[1]) {
+        const rawToken = decodeURIComponent(match[1]).split('.')[0];
+        const country = c.req.header('cf-ipcountry') || c.req.header('x-country') || 'Unknown';
+        const city = c.req.header('cf-ipcity') || c.req.header('x-city') || null;
+
+        db.update(session)
+          .set({
+            country,
+            city,
+            updatedAt: new Date(),
+          })
+          .where(eq(session.token, rawToken))
+          .catch((err) => console.error('[AuthRoute] Failed to save session location:', err));
+      }
+    }
+
+    return response;
   } catch (err: any) {
     console.error('[BetterAuth] Handler caught error:', err?.message || err);
     if (c.req.path.includes('session')) {
