@@ -72,6 +72,10 @@ describe('Admin Course Progress Analytics Module', () => {
     expect(analytics).toHaveProperty('totalTimeSpentSeconds');
     expect(analytics).toHaveProperty('dailyAverageTimeSpentSeconds');
     expect(analytics).toHaveProperty('totalViews');
+
+    if (body.data.progressLogs.length > 0) {
+      expect(body.data.progressLogs[0]).toHaveProperty('enrollmentId');
+    }
   });
 
   it('should allow filtering by search query q for admin', async () => {

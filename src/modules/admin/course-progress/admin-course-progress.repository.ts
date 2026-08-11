@@ -35,6 +35,7 @@ export class AdminCourseProgressRepository {
     return db
       .select({
         id: courseProgress.id,
+        enrollmentId: courseProgress.enrollmentId,
         timeSpent: courseProgress.timeSpent,
         progress: courseProgress.progress,
         status: courseProgress.status,
