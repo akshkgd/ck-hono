@@ -87,6 +87,7 @@ export class AdminAssignmentsService {
       const firstName = user.name ? user.name.trim().split(' ')[0] : 'there';
       const assignmentTitle = content?.title || 'Assignment';
       const statusText = input.assignmentStatus;
+      const emoji = statusText === 'approved' ? '🎉' : statusText === 'rejected' ? '📝' : '📌';
       const rawUrl = process.env.FRONTEND_URL || 'https://app.codekaro.in';
       const baseUrl = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
       const feedbackUrl = (result.batchId && result.batchContentId)
@@ -94,7 +95,7 @@ export class AdminAssignmentsService {
         : `${baseUrl}/dashboard`;
 
       await queueGenericEmail(user.email, {
-        title: `Your assignment has been ${statusText}`,
+        title: `Your assignment has been ${statusText} ${emoji}`,
         message: `Your assignment ${assignmentTitle} has been ${statusText}!`,
         actionText: 'See feedback',
         actionUrl: feedbackUrl,
