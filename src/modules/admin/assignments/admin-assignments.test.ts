@@ -212,4 +212,36 @@ describe('Admin Assignments Manager Module', () => {
       expect(studentAfter.xp).toBeGreaterThan(studentBefore.xp);
     }
   });
+
+  it('should successfully grade submission with notifyUser set to true', async () => {
+    const existingProgress = await db
+      .select()
+      .from(courseProgress)
+      .where(isNotNull(courseProgress.assignmentStatus))
+      .limit(1)
+      .then((res) => res[0] || null);
+
+    if (existingProgress) {
+      const res = await app.request(`/v1/admin/assignments/${existingProgress.id}/grade`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          assignmentStatus: 'approved',
+          teacherRemark: '<p>Great job on this assignment!</p>',
+          videoFeedback: 'https://loom.com/share/test12345',
+          notifyUser: true
+        })
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.assignmentStatus).toBe('approved');
+      expect(body.data.teacherRemark).toBe('<p>Great job on this assignment!</p>');
+      expect(body.data.videoFeedback).toBe('https://loom.com/share/test12345');
+    }
+  });
 });

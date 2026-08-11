@@ -146,8 +146,19 @@ export class AdminAssignmentsRepository {
       .select({
         progress: courseProgress,
         xp: contentLibrary.xp,
+        batchContentId: courseProgress.batchContentId,
+        batchId: batchContent.batchId,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+        },
+        content: {
+          title: contentLibrary.title,
+        },
       })
       .from(courseProgress)
+      .innerJoin(users, eq(courseProgress.userId, users.id))
       .innerJoin(batchContent, eq(courseProgress.batchContentId, batchContent.id))
       .innerJoin(contentLibrary, eq(batchContent.contentId, contentLibrary.id))
       .where(eq(courseProgress.id, progressId))

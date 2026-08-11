@@ -4,6 +4,7 @@ import { calculateDateRange } from '../../../utils/date-range.js';
 import { db } from '../../../db/index.js';
 import { users } from '../../../db/schema.js';
 import { eq, sql } from 'drizzle-orm';
+import { queueGenericEmail } from '../../../queues/index.js';
 
 export class AdminAssignmentsService {
   private repository: AdminAssignmentsRepository;
@@ -61,7 +62,7 @@ export class AdminAssignmentsService {
       throw new Error('Progress record not found');
     }
 
-    const { progress, xp } = result;
+    const { progress, xp, user, content } = result;
 
     if (!progress.assignmentStatus) {
       throw new Error('Cannot grade a record that is not an assignment submission');
@@ -80,6 +81,25 @@ export class AdminAssignmentsService {
         .update(users)
         .set({ xp: sql`${users.xp} + ${xpToAward}` })
         .where(eq(users.id, progress.userId));
+    }
+
+    if (input.notifyUser && user?.email) {
+      const firstName = user.name ? user.name.trim().split(' ')[0] : 'there';
+      const assignmentTitle = content?.title || 'Assignment';
+      const statusText = input.assignmentStatus;
+      const rawUrl = process.env.FRONTEND_URL || 'https://app.codekaro.in';
+      const baseUrl = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
+      const feedbackUrl = (result.batchId && result.batchContentId)
+        ? `${baseUrl}/courses/${result.batchId}/learn?chapter=${result.batchContentId}&view=assignment`
+        : `${baseUrl}/dashboard`;
+
+      await queueGenericEmail(user.email, {
+        title: `Your assignment has been ${statusText}`,
+        message: `Your assignment ${assignmentTitle} has been ${statusText}!`,
+        actionText: 'See feedback',
+        actionUrl: feedbackUrl,
+        greeting: `Hey ${firstName},`,
+      });
     }
 
     return updated;

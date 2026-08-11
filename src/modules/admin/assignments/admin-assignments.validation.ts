@@ -34,6 +34,7 @@ export const gradeAssignmentSchema = z.object({
   teacherRemark: z.string().nullable().optional(),
   videoFeedback: z.string().url('Must be a valid URL').or(z.string().length(0)).nullable().optional(),
   codeSubmittedStatus: z.enum(['Accepted', 'rejected', 'attempted']).nullable().optional(),
+  notifyUser: z.boolean().optional().default(false),
 });
 
 export type AssignmentsQueryInput = z.infer<typeof assignmentsQuerySchema>;
