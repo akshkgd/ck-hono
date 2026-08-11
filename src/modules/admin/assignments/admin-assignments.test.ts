@@ -65,8 +65,14 @@ describe('Admin Assignments Manager Module', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.status).toBe('success');
+    expect(body.data).toHaveProperty('analytics');
     expect(body.data).toHaveProperty('submissions');
     expect(body.data).toHaveProperty('pagination');
+    const analytics = body.data.analytics;
+    expect(analytics).toHaveProperty('totalSubmissions');
+    expect(analytics).toHaveProperty('pendingReview');
+    expect(analytics).toHaveProperty('approved');
+    expect(analytics).toHaveProperty('rejected');
     if (body.data.submissions.length > 0) {
       expect(body.data.submissions[0]).toHaveProperty('enrollmentId');
     }

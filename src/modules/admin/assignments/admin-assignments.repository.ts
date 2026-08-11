@@ -119,6 +119,53 @@ export class AdminAssignmentsRepository {
     return results[0]?.count || 0;
   }
 
+  public async getAssignmentAnalytics(
+    start: Date,
+    end: Date,
+    batchId?: string,
+    email?: string,
+    name?: string,
+    q?: string
+  ) {
+    const whereConditions = [
+      sql`${courseProgress.updatedAt} >= ${start}`,
+      sql`${courseProgress.updatedAt} <= ${end}`,
+      isNotNull(courseProgress.assignmentStatus),
+    ];
+
+    if (batchId) {
+      whereConditions.push(eq(batchContent.batchId, batchId));
+    }
+    if (email) {
+      whereConditions.push(ilike(users.email, `%${email}%`));
+    }
+    if (name) {
+      whereConditions.push(ilike(users.name, `%${name}%`));
+    }
+    if (q) {
+      whereConditions.push(or(ilike(users.email, `%${q}%`), ilike(users.name, `%${q}%`))!);
+    }
+
+    const results = await db
+      .select({
+        totalSubmissions: sql<number>`cast(count(*) as integer)`,
+        pendingReview: sql<number>`cast(sum(case when ${courseProgress.assignmentStatus} in ('submitted', 'under review') then 1 else 0 end) as integer)`,
+        approved: sql<number>`cast(sum(case when ${courseProgress.assignmentStatus} = 'approved' then 1 else 0 end) as integer)`,
+        rejected: sql<number>`cast(sum(case when ${courseProgress.assignmentStatus} = 'rejected' then 1 else 0 end) as integer)`,
+      })
+      .from(courseProgress)
+      .innerJoin(users, eq(courseProgress.userId, users.id))
+      .innerJoin(batchContent, eq(courseProgress.batchContentId, batchContent.id))
+      .where(and(...whereConditions));
+
+    return {
+      totalSubmissions: results[0]?.totalSubmissions || 0,
+      pendingReview: results[0]?.pendingReview || 0,
+      approved: results[0]?.approved || 0,
+      rejected: results[0]?.rejected || 0,
+    };
+  }
+
   public async gradeAssignment(
     progressId: string,
     data: {

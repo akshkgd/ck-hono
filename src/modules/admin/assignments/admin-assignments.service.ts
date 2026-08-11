@@ -23,7 +23,7 @@ export class AdminAssignmentsService {
     const limit = input.limit;
     const offset = (input.page - 1) * limit;
 
-    const [submissions, totalCount] = await Promise.all([
+    const [submissions, totalCount, analytics] = await Promise.all([
       this.repository.getAssignmentsList(
         start,
         end,
@@ -44,9 +44,18 @@ export class AdminAssignmentsService {
         input.name || undefined,
         input.q || undefined
       ),
+      this.repository.getAssignmentAnalytics(
+        start,
+        end,
+        input.batchId || undefined,
+        input.email || undefined,
+        input.name || undefined,
+        input.q || undefined
+      ),
     ]);
 
     return {
+      analytics,
       submissions,
       pagination: {
         page: input.page,
