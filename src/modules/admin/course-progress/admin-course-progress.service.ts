@@ -73,8 +73,17 @@ export class AdminCourseProgressService {
 
     const { courseStartDate, batch, userId, ...enrollmentDetails } = enrollment;
     const now = new Date();
-    const startDate = new Date(courseStartDate);
-    const endDate = batch.endDate ? new Date(batch.endDate) : new Date();
+    const startedAtDate = enrollmentDetails.startedAt ? new Date(enrollmentDetails.startedAt) : null;
+    const paidAtDate = enrollmentDetails.paidAt ? new Date(enrollmentDetails.paidAt) : null;
+    const startDate = startedAtDate || paidAtDate || (courseStartDate ? new Date(courseStartDate) : (enrollmentDetails.createdAt ? new Date(enrollmentDetails.createdAt) : new Date()));
+
+    let endDate: Date;
+    if (enrollmentDetails.accessTill) {
+      endDate = new Date(enrollmentDetails.accessTill);
+    } else {
+      endDate = new Date(startDate);
+      endDate.setFullYear(endDate.getFullYear() + 1);
+    }
 
     const diffTime = now.getTime() - startDate.getTime();
     const calculatedDaysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));

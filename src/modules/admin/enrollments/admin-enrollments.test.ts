@@ -190,6 +190,8 @@ describe('Admin Enrollments CRUD Module', () => {
       expect(body.data.batch.name).toBe(testBatchData.name);
       expect(body.data).toHaveProperty('sequentialLearning');
       expect(body.data).toHaveProperty('sequentialLearningWithAssignments');
+      expect(body.data).toHaveProperty('isAccessActive');
+      expect(body.data).toHaveProperty('accessTill');
     });
 
     it('should allow admin to update enrollment properties', async () => {

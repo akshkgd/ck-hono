@@ -17,12 +17,32 @@ export class StudentService {
 
   public async getEnrolledCourses(userId: string) {
     const courses = await this.studentRepository.findEnrolledCourses(userId);
+    const now = new Date();
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
     return courses.map(course => {
       const payable = course.amountPayable || 0;
       const paid = course.amountPaid || 0;
       const remaining = Math.max(0, payable - paid);
+
+      const paidAtDate = course.paidAt ? new Date(course.paidAt) : null;
+      const startDate = paidAtDate || (course.courseStartDate ? new Date(course.courseStartDate) : (course.enrolledAt ? new Date(course.enrolledAt) : new Date()));
+
+      let endDate: Date;
+      if (course.accessTill) {
+        endDate = new Date(course.accessTill);
+      } else {
+        endDate = new Date(startDate);
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      }
+
+      const endDateMidnight = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+      const isAccessActive = todayMidnight.getTime() <= endDateMidnight.getTime();
+
       return {
         ...course,
+        accessTill: course.accessTill || endDate,
+        isAccessActive,
         amountPayable: payable,
         amountPaid: paid,
         amountRemaining: remaining

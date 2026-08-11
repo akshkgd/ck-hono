@@ -127,6 +127,46 @@ describe('Admin Course Progress Analytics Module', () => {
     expect(body.message).toContain('Enrollment not found');
   });
 
+  it('should correctly evaluate isAccessActive based on enrollment.accessTill instead of batch.endDate', async () => {
+    // Import service directly for unit validation
+    const { AdminCourseProgressService } = await import('./admin-course-progress.service.js');
+    const service = new AdminCourseProgressService();
+    
+    // Mock getEnrollmentDetails to simulate a batch ended in 2025 but learner accessTill until 2027
+    (service as any).repository.getEnrollmentDetails = async () => ({
+      id: 101,
+      status: 1,
+      progress: 50,
+      timeSpentSeconds: 3600,
+      paymentStatus: 'captured',
+      startedAt: new Date('2025-01-01'),
+      paidAt: new Date('2025-01-01'),
+      accessTill: '2027-06-07',
+      overrideAccessDays: null,
+      createdAt: new Date('2025-01-01'),
+      amountPayable: 1000,
+      amountPaid: 1000,
+      courseStartDate: '2025-01-01',
+      userId: 'user-123',
+      batch: {
+        id: 10,
+        name: 'Past Batch',
+        topic: 'Test',
+        description: 'Test batch',
+        slug: 'past-batch',
+        startDate: '2025-01-01',
+        endDate: '2025-06-23', // Ended in past!
+        img: null,
+      }
+    });
+    (service as any).repository.getBatchSections = async () => [];
+    (service as any).repository.getBatchContentWithProgress = async () => [];
+
+    const result = await service.getEnrollmentBatchProgress('101');
+    expect(result.enrollment.isAccessActive).toBe(true);
+    expect(new Date(result.enrollment.accessTill).toISOString()).toContain('2027-06-07');
+  });
+
   it('should reject unauthenticated request with 401 on POST /v1/admin/course-progress/assignments/reset-submitted', async () => {
     const res = await app.request('/v1/admin/course-progress/assignments/reset-submitted', {
       method: 'POST',

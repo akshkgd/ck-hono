@@ -197,9 +197,23 @@ export class AdminEnrollmentsService {
       ? Math.max(calculatedDaysPassed, enrollment.overrideAccessDays)
       : calculatedDaysPassed;
 
+    let endDate: Date;
+    if (enrollment.accessTill) {
+      endDate = new Date(enrollment.accessTill);
+    } else {
+      endDate = new Date(startDate);
+      endDate.setFullYear(endDate.getFullYear() + 1);
+    }
+
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endDateMidnight = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    const isAccessActive = todayMidnight.getTime() <= endDateMidnight.getTime();
+
     return {
       ...enrollment,
+      accessTill: enrollment.accessTill || endDate,
       daysPassed,
+      isAccessActive,
     };
   }
 
