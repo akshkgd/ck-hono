@@ -67,6 +67,9 @@ describe('Admin Assignments Manager Module', () => {
     expect(body.status).toBe('success');
     expect(body.data).toHaveProperty('submissions');
     expect(body.data).toHaveProperty('pagination');
+    if (body.data.submissions.length > 0) {
+      expect(body.data.submissions[0]).toHaveProperty('enrollmentId');
+    }
   });
 
   it('should allow filtering assignments by search query q for admin', async () => {
