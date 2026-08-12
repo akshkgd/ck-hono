@@ -3,6 +3,7 @@ import { auth } from '../lib/auth.js';
 import { db } from '../db/index.js';
 import { session as sessionSchema, users } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
+import { cleanClientIp, lookupIpLocation } from '../utils/ip-geo.js';
 
 export const authMiddleware = (): MiddlewareHandler => {
   return async (c, next) => {
@@ -40,33 +41,44 @@ export const authMiddleware = (): MiddlewareHandler => {
       // Normalize IP and lazy-backfill session location data asynchronously (0ms API latency)
       const sessionObj = sessionData.session as any;
       if (sessionObj && sessionObj.id) {
-        const rawIp = sessionObj.ipAddress || '';
-        const isMappedIp = rawIp.startsWith('::ffff:');
+        const clientIp = c.req.header('cf-connecting-ip') || c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || sessionObj.ipAddress || '';
+        const normalizedIp = cleanClientIp(clientIp) || cleanClientIp(sessionObj.ipAddress) || '';
+        const isMappedIp = sessionObj.ipAddress && sessionObj.ipAddress.startsWith('::ffff:');
+
         const incomingCountry = c.req.header('cf-ipcountry') || c.req.header('x-country') || c.req.header('x-user-country') || c.req.header('country');
         const incomingCity = c.req.header('cf-ipcity') || c.req.header('x-city') || c.req.header('x-user-city') || c.req.header('city');
 
-        const isLocationMissing = !sessionObj.country || !sessionObj.city;
+        const isLocationUnknown = !sessionObj.country || sessionObj.country === 'Unknown' || !sessionObj.city || sessionObj.city === 'Unknown';
         const isLocationChanged = (incomingCountry && incomingCountry !== sessionObj.country) || 
                                   (incomingCity && incomingCity !== sessionObj.city);
 
-        if (isMappedIp || isLocationMissing || isLocationChanged) {
-          const normalizedIp = rawIp.replace(/^::ffff:/, '');
-          const newCountry = incomingCountry || (sessionObj.country && sessionObj.country !== 'Unknown' ? sessionObj.country : 'Unknown');
-          const newCity = incomingCity || (sessionObj.city && sessionObj.city !== 'Unknown' ? sessionObj.city : 'Unknown');
+        if (isMappedIp || isLocationUnknown || isLocationChanged) {
+          (async () => {
+            let newCountry = incomingCountry || sessionObj.country;
+            let newCity = incomingCity || sessionObj.city;
 
-          if (normalizedIp) sessionObj.ipAddress = normalizedIp;
-          sessionObj.country = newCountry;
-          sessionObj.city = newCity;
+            if ((!newCountry || newCountry === 'Unknown' || !newCity || newCity === 'Unknown') && normalizedIp) {
+              const geo = await lookupIpLocation(normalizedIp);
+              if (geo.country !== 'Unknown') newCountry = geo.country;
+              if (geo.city !== 'Unknown') newCity = geo.city;
+            }
 
-          db.update(sessionSchema)
-            .set({
-              ipAddress: normalizedIp || sessionObj.ipAddress,
-              country: newCountry,
-              city: newCity,
-              updatedAt: new Date(),
-            })
-            .where(eq(sessionSchema.id, sessionObj.id))
-            .catch((err) => console.error('[AuthMiddleware] Failed to update session location:', err));
+            newCountry = newCountry || 'Unknown';
+            newCity = newCity || 'Unknown';
+
+            sessionObj.ipAddress = normalizedIp || sessionObj.ipAddress;
+            sessionObj.country = newCountry;
+            sessionObj.city = newCity;
+
+            await db.update(sessionSchema)
+              .set({
+                ipAddress: sessionObj.ipAddress,
+                country: newCountry,
+                city: newCity,
+                updatedAt: new Date(),
+              })
+              .where(eq(sessionSchema.id, sessionObj.id));
+          })().catch((err) => console.error('[AuthMiddleware] Failed to update session location:', err));
         }
       }
 
