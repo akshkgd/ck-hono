@@ -42,8 +42,8 @@ export const authMiddleware = (): MiddlewareHandler => {
       if (sessionObj && sessionObj.id) {
         const rawIp = sessionObj.ipAddress || '';
         const isMappedIp = rawIp.startsWith('::ffff:');
-        const incomingCountry = c.req.header('cf-ipcountry') || c.req.header('x-country');
-        const incomingCity = c.req.header('cf-ipcity') || c.req.header('x-city');
+        const incomingCountry = c.req.header('cf-ipcountry') || c.req.header('x-country') || c.req.header('x-user-country') || c.req.header('country');
+        const incomingCity = c.req.header('cf-ipcity') || c.req.header('x-city') || c.req.header('x-user-city') || c.req.header('city');
 
         const isLocationMissing = !sessionObj.country || !sessionObj.city;
         const isLocationChanged = (incomingCountry && incomingCountry !== sessionObj.country) || 
@@ -51,12 +51,12 @@ export const authMiddleware = (): MiddlewareHandler => {
 
         if (isMappedIp || isLocationMissing || isLocationChanged) {
           const normalizedIp = rawIp.replace(/^::ffff:/, '');
-          const newCountry = incomingCountry || sessionObj.country || 'Unknown';
-          const newCity = incomingCity || sessionObj.city || null;
+          const newCountry = incomingCountry || (sessionObj.country && sessionObj.country !== 'Unknown' ? sessionObj.country : 'Unknown');
+          const newCity = incomingCity || (sessionObj.city && sessionObj.city !== 'Unknown' ? sessionObj.city : 'Unknown');
 
           if (normalizedIp) sessionObj.ipAddress = normalizedIp;
-          if (newCountry) sessionObj.country = newCountry;
-          if (newCity) sessionObj.city = newCity;
+          sessionObj.country = newCountry;
+          sessionObj.city = newCity;
 
           db.update(sessionSchema)
             .set({

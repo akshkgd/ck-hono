@@ -106,14 +106,21 @@ export const auth = betterAuth({
 
           const headers = ctx?.request?.headers;
           if (headers) {
-            const country = headers.get('cf-ipcountry');
-            const city = headers.get('cf-ipcity');
-            if (country) {
-              session.country = country;
-            }
-            if (city) {
-              session.city = city;
-            }
+            const getHeader = (key: string) => {
+              if (typeof headers.get === 'function') {
+                return headers.get(key) || headers.get(key.toLowerCase()) || null;
+              }
+              return (headers as any)[key] || (headers as any)[key.toLowerCase()] || null;
+            };
+
+            const country = getHeader('cf-ipcountry') || getHeader('x-country') || getHeader('x-user-country') || getHeader('country');
+            const city = getHeader('cf-ipcity') || getHeader('x-city') || getHeader('x-user-city') || getHeader('city');
+
+            session.country = country || session.country || 'Unknown';
+            session.city = city || session.city || 'Unknown';
+          } else {
+            session.country = session.country || 'Unknown';
+            session.city = session.city || 'Unknown';
           }
 
           return { data: session };
@@ -127,14 +134,18 @@ export const auth = betterAuth({
 
           const headers = ctx?.request?.headers;
           if (headers) {
-            const country = headers.get('cf-ipcountry');
-            const city = headers.get('cf-ipcity');
-            if (country) {
-              session.country = country;
-            }
-            if (city) {
-              session.city = city;
-            }
+            const getHeader = (key: string) => {
+              if (typeof headers.get === 'function') {
+                return headers.get(key) || headers.get(key.toLowerCase()) || null;
+              }
+              return (headers as any)[key] || (headers as any)[key.toLowerCase()] || null;
+            };
+
+            const country = getHeader('cf-ipcountry') || getHeader('x-country') || getHeader('x-user-country') || getHeader('country');
+            const city = getHeader('cf-ipcity') || getHeader('x-city') || getHeader('x-user-city') || getHeader('city');
+
+            if (country) session.country = country;
+            if (city) session.city = city;
           }
 
           return { data: session };

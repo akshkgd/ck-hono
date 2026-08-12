@@ -192,8 +192,8 @@ authRouter.on(['GET', 'POST', 'PUT', 'DELETE'], '/*', async (c) => {
       const match = setCookie.match(/(?:better-auth\.session_token|__Secure-better-auth\.session_token)=([^;]+)/);
       if (match && match[1]) {
         const rawToken = decodeURIComponent(match[1]).split('.')[0];
-        const country = c.req.header('cf-ipcountry') || c.req.header('x-country') || 'Unknown';
-        const city = c.req.header('cf-ipcity') || c.req.header('x-city') || null;
+        const country = c.req.header('cf-ipcountry') || c.req.header('x-country') || c.req.header('x-user-country') || c.req.header('country') || 'Unknown';
+        const city = c.req.header('cf-ipcity') || c.req.header('x-city') || c.req.header('x-user-city') || c.req.header('city') || 'Unknown';
 
         db.update(session)
           .set({
