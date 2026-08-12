@@ -152,6 +152,58 @@ authRouter.get('/me', authMiddleware(), async (c) => {
   });
 });
 
+// Debug session & location headers endpoint
+authRouter.get('/debug-session', async (c) => {
+  const allHeaders: Record<string, string> = {};
+  c.req.raw.headers.forEach((val, key) => {
+    allHeaders[key] = val;
+  });
+
+  const connInfo = getConnInfo(c);
+  const clientIp = connInfo?.remote?.address || c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'Unknown';
+  
+  const country = c.req.header('cf-ipcountry') || c.req.header('x-country') || c.req.header('x-user-country') || c.req.header('country') || 'Unknown';
+  const city = c.req.header('cf-ipcity') || c.req.header('x-city') || c.req.header('x-user-city') || c.req.header('city') || 'Unknown';
+
+  let sessionData = null;
+  try {
+    sessionData = await auth.api.getSession({
+      headers: c.req.raw.headers,
+    });
+  } catch (e: any) {
+    console.error('[DebugSession] Error fetching session:', e?.message);
+  }
+
+  const debugPayload = {
+    timestamp: new Date().toISOString(),
+    clientIp,
+    detectedLocation: {
+      country,
+      city,
+    },
+    locationHeaders: {
+      'cf-ipcountry': c.req.header('cf-ipcountry') || null,
+      'cf-ipcity': c.req.header('cf-ipcity') || null,
+      'x-country': c.req.header('x-country') || null,
+      'x-city': c.req.header('x-city') || null,
+      'x-user-country': c.req.header('x-user-country') || null,
+      'x-user-city': c.req.header('x-user-city') || null,
+      'country': c.req.header('country') || null,
+      'city': c.req.header('city') || null,
+    },
+    activeSession: sessionData?.session || null,
+    user: sessionData?.user ? { id: sessionData.user.id, email: sessionData.user.email, name: sessionData.user.name } : null,
+    allHeaders,
+  };
+
+  console.log('[DEBUG SESSION LOG]:', JSON.stringify(debugPayload, null, 2));
+
+  return c.json({
+    status: 'success',
+    data: debugPayload,
+  });
+});
+
 
 
 // Primary Better Auth Handler with path normalization (/v1/auth -> /api/auth)
