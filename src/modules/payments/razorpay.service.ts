@@ -95,16 +95,17 @@ export class RazorpayService {
     }
 
     let enrollment: any;
+    let targetBatch: any = null;
     let amountRupees = 0;
 
     if (input.paymentType === 'enrollment') {
       const batchId = input.batchId!;
-      const batch = await this.batchRepository.findById(batchId);
-      if (!batch) {
+      targetBatch = await this.batchRepository.findById(batchId);
+      if (!targetBatch) {
         throw new Error('Batch not found');
       }
 
-      const price = batch.price;
+      const price = targetBatch.price;
       if (price === null || price <= 0) {
         throw new Error('This batch price is invalid or not set');
       }
@@ -137,6 +138,8 @@ export class RazorpayService {
         throw new Error('Enrollment not found');
       }
 
+      targetBatch = await this.batchRepository.findById(enrollment.batchId);
+
       const remainingAmount = enrollment.amountPayable - enrollment.amountPaid;
       if (remainingAmount <= 0) {
         throw new Error('Payment already completed for this enrollment');
@@ -150,13 +153,13 @@ export class RazorpayService {
         throw new Error('Enrollment not found');
       }
 
-      const batch = await this.batchRepository.findById(enrollment.batchId);
-      if (!batch) {
+      targetBatch = await this.batchRepository.findById(enrollment.batchId);
+      if (!targetBatch) {
         throw new Error('Batch not found');
       }
 
-      const renewalFee = batch.renewalFee;
-      const price = (renewalFee !== null && renewalFee !== undefined) ? renewalFee : batch.price;
+      const renewalFee = targetBatch.renewalFee;
+      const price = (renewalFee !== null && renewalFee !== undefined) ? renewalFee : targetBatch.price;
       if (price === null || price <= 0) {
         throw new Error('Batch renewal price is invalid or not set');
       }
@@ -168,6 +171,12 @@ export class RazorpayService {
       throw new Error('Invalid payment amount calculated');
     }
 
+    // Resolve user details for order notes
+    let targetUser = userFromContext;
+    if (!targetUser || !targetUser.name || !targetUser.email) {
+      targetUser = await this.userRepository.findById(userId);
+    }
+
     // Call Razorpay API to generate order
     const amountPaise = amountRupees * 100;
     const receipt = `r_${enrollment.id}`;
@@ -176,6 +185,9 @@ export class RazorpayService {
       purpose: input.paymentType,
       userId,
       batchId: enrollment.batchId.toString(),
+      name: targetUser?.name || '',
+      email: targetUser?.email || '',
+      batchName: targetBatch?.name || '',
     };
 
     const razorpayOrder = await this.callRazorpay('/orders', 'POST', {
