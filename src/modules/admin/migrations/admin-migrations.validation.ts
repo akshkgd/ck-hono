@@ -54,6 +54,8 @@ export const legacyBatchItemSchema = z.object({
   slug: z.string().optional().nullable(),
   price: z.union([z.number(), z.string()]).optional().nullable(),
   payable: z.union([z.number(), z.string()]).optional().nullable(),
+  renewalFee: z.union([z.number(), z.string()]).optional().nullable(),
+  renewal_fee: z.union([z.number(), z.string()]).optional().nullable(),
   certificateFee: z.union([z.number(), z.string()]).optional().nullable(),
   certificate_fee: z.union([z.number(), z.string()]).optional().nullable(),
   offerId: z.string().optional().nullable(),

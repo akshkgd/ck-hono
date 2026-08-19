@@ -14,6 +14,7 @@ describe('Admin Batches CRUD Module', () => {
     description: 'Learn modern backend development using Hono and TypeScript.',
     slug: uniqueSlug,
     price: 499,
+    renewalFee: 299,
     certificateFee: 50,
     limit: 100,
     type: 'cohort',
@@ -177,6 +178,7 @@ describe('Admin Batches CRUD Module', () => {
         body: JSON.stringify({
           name: updatedName,
           price: 599,
+          renewalFee: 349,
           type: 'live'
         })
       });
@@ -186,6 +188,7 @@ describe('Admin Batches CRUD Module', () => {
       expect(body.status).toBe('success');
       expect(body.data.name).toBe(updatedName);
       expect(body.data.price).toBe(599);
+      expect(body.data.renewalFee).toBe(349);
       expect(body.data.type).toBe('live');
     });
 

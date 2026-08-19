@@ -155,7 +155,8 @@ export class RazorpayService {
         throw new Error('Batch not found');
       }
 
-      const price = batch.price;
+      const renewalFee = batch.renewalFee;
+      const price = (renewalFee !== null && renewalFee !== undefined) ? renewalFee : batch.price;
       if (price === null || price <= 0) {
         throw new Error('Batch renewal price is invalid or not set');
       }

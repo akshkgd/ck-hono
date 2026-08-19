@@ -9,6 +9,7 @@ const baseBatchSchema = z.object({
   description: z.string().max(255).optional().nullable(),
   slug: z.string().max(255).optional().nullable(),
   price: z.number().int().nonnegative().optional().nullable(),
+  renewalFee: z.number().int().nonnegative().optional().nullable(),
   certificateFee: z.number().int().nonnegative(),
   limit: z.number().int().nonnegative().optional().nullable(),
   img: z.string().max(255).optional().nullable(),

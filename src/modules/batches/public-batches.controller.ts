@@ -26,6 +26,7 @@ export class PublicBatchesController {
           id: batch.id,
           name: batch.name,
           price: batch.price,
+          renewalFee: batch.renewalFee,
         },
       }, 200);
     } catch (err: any) {
@@ -51,6 +52,7 @@ export class PublicBatchesController {
           id: batch.id,
           name: batch.name,
           price: batch.price,
+          renewalFee: batch.renewalFee,
         },
       }, 200);
     } catch (err: any) {

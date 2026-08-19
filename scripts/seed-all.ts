@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import argon2 from 'argon2';
 import { db } from '../src/db/index.js';
-import { users, batches, batchEnrollments, batchEnrollmentPayments, batchSections, contentLibrary, batchContent } from '../src/db/schema.js';
+import { users, batches, batchEnrollments, batchEnrollmentPayments, batchSections, contentLibrary, batchContent, account } from '../src/db/schema.js';
 import { eq } from 'drizzle-orm';
 
 const firstNames = [
@@ -110,10 +110,10 @@ async function seed() {
         const expYears = isStudent ? 0 : (i % 12) + 1;
         
         let role: 'student' | 'admin' | 'user' | 'moderator' | 'teacher' = 'user';
-        if (isStudent) {
-          role = 'student';
-        } else if (i === 0) {
+        if (i === 0) {
           role = 'admin';
+        } else if (isStudent) {
+          role = 'student';
         } else if (i === 1) {
           role = 'moderator';
         } else if (i % 8 === 0) {
@@ -145,6 +145,15 @@ async function seed() {
       
       seededUsersList = await db.insert(users).values(dummyUsers).returning();
       console.log(`Successfully seeded ${seededUsersList.length} users!`);
+
+      // Seed Better Auth account table for password authentication
+      const accountEntries = seededUsersList.map(u => ({
+        userId: u.id,
+        accountId: u.email,
+        providerId: 'credential',
+        password: u.password,
+      }));
+      await db.insert(account).values(accountEntries);
     } else {
       seededUsersList = await db.select().from(users);
       console.log(`Found ${seededUsersList.length} existing users. Skipping user seeding.`);

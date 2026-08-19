@@ -152,6 +152,9 @@ export function getPaymentsDocsHtml(): string {
           <p class="mt-1">
             💡 <strong class="text-white">Frontend Tip:</strong> You can pass the parameters (<code>batchId</code>, <code>email</code>, <code>phone</code>, <code>name</code>, etc.) either as a JSON request body OR directly as URL query parameters (e.g., <code>/v1/payments/razorpay/create-order?batchId=4&email=guest@example.com&phone=9999999999&name=John</code>).
           </p>
+          <p class="mt-1 text-emerald-300">
+            🔄 <strong class="text-white">Renewal Pricing Note:</strong> When <code>paymentType</code> is <code>"renew"</code>, the checkout system checks if a custom <code>renewalFee</code> is configured on the batch. If set, <code>renewalFee</code> is charged; if blank (<code>null</code>), it falls back to <code>batch.price</code>.
+          </p>
         </div>
       </section>
 

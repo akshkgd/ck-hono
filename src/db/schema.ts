@@ -47,6 +47,7 @@ export const batches = pgTable('batches', {
   description: varchar('description', { length: 255 }),
   slug: varchar('slug', { length: 255 }),
   price: integer('price'),
+  renewalFee: integer('renewal_fee'),
   certificateFee: integer('certificate_fee').default(0).notNull(),
   limit: integer('limit').default(0),
   img: varchar('img', { length: 255 }),

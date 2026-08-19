@@ -313,6 +313,94 @@ export function getImplementDocsHtml(): string {
       </div>
     </section>
 
+    <!-- SECTION 3: BATCH RENEWAL & RENEWAL FEE SYSTEM -->
+    <section class="space-y-6 pt-6 border-t border-zinc-900">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Module 3</div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Batch Renewal Fee & Renewal Checkout System</h2>
+        <p class="text-zinc-400 text-sm">
+          Allows admins to specify a custom renewal fee for course batches. When students renew their enrollment, the checkout engine automatically applies the custom <code class="text-indigo-400 font-mono">renewalFee</code> if configured, or falls back to the standard course <code class="text-indigo-400 font-mono">price</code> when left blank.
+        </p>
+      </div>
+
+      <!-- Admin Batch API Updates -->
+      <div class="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-xs font-mono font-semibold border border-indigo-500/20">Admin Endpoints</span>
+          </div>
+          <span class="text-xs text-zinc-500 font-mono">Requires Admin Authorization</span>
+        </div>
+
+        <div class="space-y-4">
+          <div class="space-y-1">
+            <h3 class="text-sm font-semibold text-white">1. Create or Update Batch with Renewal Fee</h3>
+            <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/batches &nbsp;|&nbsp; PUT /v1/admin/batches/:id</p>
+            <p class="text-xs text-zinc-400">Pass <code class="text-indigo-300 font-mono">renewalFee</code> as an integer representing the amount in INR (rupees). Set to <code class="text-zinc-400 font-mono">null</code> or omit to leave blank.</p>
+            <div class="mt-2">
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">JSON Payload:</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "name": "Fullstack Web Development Cohort",
+  "topic": "Web Development",
+  "slug": "fullstack-web-dev",
+  "price": 4999,
+  "renewalFee": 1999, // Renewal fee in rupees (or null to fallback to price)
+  "type": "cohort",
+  "status": "active"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public Batch & Checkout APIs -->
+      <div class="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono font-semibold border border-emerald-500/20">Public & Student Endpoints</span>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="space-y-1">
+            <h3 class="text-sm font-semibold text-white">1. Fetch Public Batch Details</h3>
+            <p class="text-zinc-400 text-xs font-mono">GET /v1/batches/:id &nbsp;|&nbsp; GET /v1/batches/slug/:slug</p>
+            <p class="text-xs text-zinc-400">Public batch responses include <code class="text-indigo-300 font-mono">renewalFee</code> so frontend client apps can render renewal prices on course detail or account renewal pages.</p>
+            <div class="mt-2">
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Response JSON Excerpt:</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": "768bc964-7c8e-4fd7-8dd0-0a328e9f82d4",
+    "name": "Fullstack Web Development Cohort",
+    "price": 4999,
+    "renewalFee": 1999,
+    "slug": "fullstack-web-dev"
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">2. Renewal Checkout Order Creation</h3>
+            <p class="text-zinc-400 text-xs font-mono">POST /v1/payments/razorpay/create-order</p>
+            <p class="text-xs text-zinc-400">When initiating a course renewal order, set <code class="text-indigo-300 font-mono">paymentType</code> to <code class="text-emerald-400 font-mono">"renew"</code> and pass the student's existing <code class="text-indigo-300 font-mono">enrollmentId</code>.</p>
+            <div class="mt-2">
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Renewal Order Request Payload:</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-400 border border-zinc-800/60 overflow-x-auto"><code>{
+  "paymentType": "renew",
+  "enrollmentId": "c3a1b2c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c"
+}</code></pre>
+            </div>
+            <div class="mt-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3 text-xs text-indigo-300 leading-relaxed">
+              💡 <strong class="text-white">Fee Evaluation Order:</strong>
+              If <code class="text-indigo-200 font-mono">batch.renewalFee</code> is configured (e.g. 1999), the Razorpay order amount will be 1999 INR (199900 paise). If <code class="text-indigo-200 font-mono">batch.renewalFee</code> is <code class="text-zinc-400 font-mono">null</code> or blank, it automatically falls back to charging <code class="text-indigo-200 font-mono">batch.price</code> (4999 INR).
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Footer -->
