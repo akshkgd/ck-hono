@@ -192,8 +192,8 @@ export class AdminCourseProgressService {
         const durationInSeconds = durationMap.get(item.batchContentId) || 0;
         const timeSpentSeconds = item.watchMinutes * 60;
         
-        // Auto-complete if checked OR watch time is at least 90% of duration
-        const isCompleted = item.completed || (durationInSeconds > 0 && timeSpentSeconds >= durationInSeconds * 0.9);
+        // Auto-complete if checked OR watch time is at least 75% of duration
+        const isCompleted = item.completed || (durationInSeconds > 0 && timeSpentSeconds >= durationInSeconds * 0.75);
         const progressPercent = isCompleted ? 100 : (durationInSeconds > 0 ? Math.min(100, Math.round((timeSpentSeconds * 100) / durationInSeconds)) : 0);
         const statusValue = isCompleted ? 'completed' : (timeSpentSeconds > 0 ? 'learning' : 'not_started');
         

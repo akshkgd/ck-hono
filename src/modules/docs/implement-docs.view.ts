@@ -280,7 +280,7 @@ export function getImplementDocsHtml(): string {
             <h3 class="text-sm font-semibold text-white">5. Bulk Update Course Progress for a Student</h3>
             <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/course-progress/bulk-update</p>
             <p class="text-xs text-zinc-400 mb-2">
-              Updates course progress, watch minutes, GitHub links, and deployment links for multiple batch content items for a specific student. Wraps all updates and parent enrollment progress recalculation inside a single database transaction. Auto-completes chapters if watch minutes match or exceed 90% of the video duration.
+              Updates course progress, watch minutes, GitHub links, and deployment links for multiple batch content items for a specific student. Wraps all updates and parent enrollment progress recalculation inside a single database transaction. Auto-completes chapters if watch minutes match or exceed 75% of the video duration.
             </p>
             <div>
               <span class="text-[11px] text-zinc-500 font-mono block mb-1">Request Payload:</span>
