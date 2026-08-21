@@ -263,6 +263,7 @@ export const learnerWatchlist = pgTable('learner_watchlist', {
   enrollmentId: uuid('enrollment_id').references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
   batchId: uuid('batch_id').references(() => batches.id, { onDelete: 'cascade' }).notNull(),
   reason: text('reason'),
+  lastFollowup: timestamp('last_followup'),
   addedBy: uuid('added_by').references(() => users.id, { onDelete: 'set null' }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

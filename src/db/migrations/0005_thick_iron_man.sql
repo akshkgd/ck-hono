@@ -1,0 +1,1 @@
+ALTER TABLE "learner_watchlist" ADD COLUMN "last_followup" timestamp;

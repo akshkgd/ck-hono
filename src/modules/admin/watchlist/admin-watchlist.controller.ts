@@ -55,7 +55,7 @@ export class AdminWatchlistController {
       const body = await c.req.json();
       const input = updateWatchlistSchema.parse(body);
 
-      const item = await this.service.updateWatchlistReason(id, input);
+      const item = await this.service.updateWatchlistDetails(id, input);
 
       return c.json({
         status: 'success',

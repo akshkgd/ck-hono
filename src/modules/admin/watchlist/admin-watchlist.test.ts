@@ -156,6 +156,7 @@ describe('Admin Learner Watchlist Module', () => {
       expect(item.assignments).toHaveProperty('total');
       expect(item.assignments).toHaveProperty('display');
       expect(item.reason).toBe('Needs close monitoring due to low lecture completion');
+      expect(item).toHaveProperty('lastFollowup');
     });
 
     it('should validate limit minimum of 50 and maximum of 200', async () => {
@@ -183,8 +184,9 @@ describe('Admin Learner Watchlist Module', () => {
       expect(highRes.status).toBe(400);
     });
 
-    it('should allow updating remark/reason for a watchlisted learner', async () => {
+    it('should allow updating remark/reason and lastFollowup date for a watchlisted learner', async () => {
       const updatedReason = 'Student contacted; progress resuming next week';
+      const followupDate = '2026-08-21T14:30:00.000Z';
       const res = await app.request(`/v1/admin/watchlist/${createdWatchlistId}`, {
         method: 'PUT',
         headers: {
@@ -193,6 +195,7 @@ describe('Admin Learner Watchlist Module', () => {
         },
         body: JSON.stringify({
           reason: updatedReason,
+          lastFollowup: followupDate,
         }),
       });
 
@@ -200,6 +203,7 @@ describe('Admin Learner Watchlist Module', () => {
       const body = await res.json();
       expect(body.status).toBe('success');
       expect(body.data.reason).toBe(updatedReason);
+      expect(body.data.lastFollowup).toBeDefined();
     });
 
     it('should allow removing a learner from the watchlist', async () => {

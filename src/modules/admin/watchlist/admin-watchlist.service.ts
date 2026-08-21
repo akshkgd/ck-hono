@@ -37,6 +37,7 @@ export class AdminWatchlistService {
       enrollmentId: enrollment.id,
       batchId: enrollment.batchId,
       reason: input.reason,
+      lastFollowup: input.lastFollowup ? new Date(input.lastFollowup) : null,
       addedBy: adminUserId,
     });
 
@@ -52,13 +53,16 @@ export class AdminWatchlistService {
     return await this.repository.removeFromWatchlist(id);
   }
 
-  public async updateWatchlistReason(id: string, input: UpdateWatchlistInput) {
+  public async updateWatchlistDetails(id: string, input: UpdateWatchlistInput) {
     const item = await this.repository.findById(id);
     if (!item) {
       throw new Error('Watchlist entry not found');
     }
 
-    return await this.repository.updateReason(id, input.reason ?? null);
+    return await this.repository.updateWatchlist(id, {
+      reason: input.reason,
+      lastFollowup: input.lastFollowup !== undefined ? (input.lastFollowup ? new Date(input.lastFollowup) : null) : undefined,
+    });
   }
 
   public async listWatchlist(query: ListWatchlistQuery) {
@@ -110,6 +114,7 @@ export class AdminWatchlistService {
         },
         lastActiveAt,
         reason: item.reason,
+        lastFollowup: item.lastFollowup || null,
         addedAt: item.addedAt,
       };
     });

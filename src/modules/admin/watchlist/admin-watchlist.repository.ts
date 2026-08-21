@@ -8,6 +8,7 @@ export class AdminWatchlistRepository {
     enrollmentId: string;
     batchId: string;
     reason?: string;
+    lastFollowup?: Date | null;
     addedBy?: string;
   }) {
     const [result] = await db
@@ -17,12 +18,14 @@ export class AdminWatchlistRepository {
         enrollmentId: data.enrollmentId,
         batchId: data.batchId,
         reason: data.reason || null,
+        lastFollowup: data.lastFollowup || null,
         addedBy: data.addedBy || null,
       })
       .onConflictDoUpdate({
         target: [learnerWatchlist.userId, learnerWatchlist.batchId],
         set: {
-          reason: data.reason || null,
+          reason: data.reason !== undefined ? data.reason : learnerWatchlist.reason,
+          lastFollowup: data.lastFollowup !== undefined ? data.lastFollowup : learnerWatchlist.lastFollowup,
           addedBy: data.addedBy || null,
           updatedAt: new Date(),
         },
@@ -57,10 +60,14 @@ export class AdminWatchlistRepository {
     return item || null;
   }
 
-  public async updateReason(id: string, reason: string | null) {
+  public async updateWatchlist(id: string, updates: { reason?: string | null; lastFollowup?: Date | null }) {
+    const setPayload: Record<string, any> = { updatedAt: new Date() };
+    if (updates.reason !== undefined) setPayload.reason = updates.reason;
+    if (updates.lastFollowup !== undefined) setPayload.lastFollowup = updates.lastFollowup;
+
     const [updated] = await db
       .update(learnerWatchlist)
-      .set({ reason, updatedAt: new Date() })
+      .set(setPayload)
       .where(eq(learnerWatchlist.id, id))
       .returning();
     return updated || null;
@@ -119,6 +126,7 @@ export class AdminWatchlistRepository {
         userLastActiveAt: users.lastActiveAt,
         latestProgressUpdatedAt: sql<Date | null>`max(${courseProgress.updatedAt})`,
         reason: learnerWatchlist.reason,
+        lastFollowup: learnerWatchlist.lastFollowup,
         addedAt: learnerWatchlist.createdAt,
         lecturesWatched: sql<number>`count(case when ${courseProgress.status} = 'completed' and ${contentLibrary.type} in ('video', 'coding lab', 'article') then 1 end)::int`,
         assignmentsSubmitted: sql<number>`count(case when ${courseProgress.assignmentStatus} in ('submitted', 'approved', 'under review') then 1 end)::int`,

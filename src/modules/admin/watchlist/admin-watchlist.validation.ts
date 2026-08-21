@@ -3,10 +3,12 @@ import { z } from 'zod';
 export const addToWatchlistSchema = z.object({
   enrollmentId: z.string().uuid('Invalid enrollment ID'),
   reason: z.string().max(1000, 'Reason must be under 1000 characters').optional(),
+  lastFollowup: z.coerce.date().optional().nullable(),
 });
 
 export const updateWatchlistSchema = z.object({
   reason: z.string().max(1000, 'Reason must be under 1000 characters').optional().nullable(),
+  lastFollowup: z.coerce.date().optional().nullable(),
 });
 
 export const listWatchlistSchema = z.object({
