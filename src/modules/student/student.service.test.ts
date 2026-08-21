@@ -88,6 +88,8 @@ describe('StudentService - Bunny CDN Signed URL & VideoLink Omission', () => {
       expect(result.allowed).toBe(true);
       expect(result.signedUrl).toBe('https://vz-other-library.b-cdn.net/12345/playlist.m3u8');
       expect(result.videoLink).toBe('https://vz-other-library.b-cdn.net/12345/playlist.m3u8');
+      expect(result.videoUrl).toBe('https://vz-other-library.b-cdn.net/12345/playlist.m3u8');
+      expect(result.url).toBe('https://vz-other-library.b-cdn.net/12345/playlist.m3u8');
       expect(result.expiresAt).toBeUndefined();
     });
   });
