@@ -22,7 +22,7 @@ describe('generateBunnySignedUrl', () => {
     expect(result?.expiresAt).toBeGreaterThan(Math.floor(Date.now() / 1000));
 
     const signedUrl = result!.signedUrl;
-    expect(signedUrl).toContain(`https://${TARGET_BUNNY_PULL_ZONE_HOST}/bcdn_token=HS256-`);
+    expect(signedUrl).toContain(`https://${TARGET_BUNNY_PULL_ZONE_HOST}/5a8e9321-abcd-1234-efgh-567890123456/playlist.m3u8?token=HS256-`);
     expect(signedUrl).toContain('&expires=');
     expect(signedUrl).toContain('token_path=%2F5a8e9321-abcd-1234-efgh-567890123456%2F');
     expect(signedUrl).toContain('/5a8e9321-abcd-1234-efgh-567890123456/playlist.m3u8');

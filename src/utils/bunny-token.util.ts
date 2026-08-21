@@ -94,7 +94,7 @@ export function generateBunnySignedUrl(
     pathQueryParams = `limit=${limitKBps}&${pathQueryParams}`;
   }
 
-  const signedUrl = `https://${TARGET_BUNNY_PULL_ZONE_HOST}/bcdn_token=${token}&expires=${expiresAt}&${pathQueryParams}/${videoId}/playlist.m3u8`;
+  const signedUrl = `https://${TARGET_BUNNY_PULL_ZONE_HOST}/${videoId}/playlist.m3u8?token=${token}&expires=${expiresAt}&${pathQueryParams}`;
 
   return {
     signedUrl,
