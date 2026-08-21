@@ -216,12 +216,12 @@ authRouter.on(['GET', 'POST', 'PUT', 'DELETE'], '/*', async (c) => {
     const headers = new Headers(rawReq.headers);
     try {
       const conn = getConnInfo(c);
-      const clientIp = conn.remote.address;
+      const clientIp = conn?.remote?.address;
       if (clientIp && !headers.has('x-forwarded-for') && !headers.has('x-real-ip')) {
         headers.set('x-forwarded-for', clientIp);
       }
     } catch (connErr) {
-      console.warn('[BetterAuth] Failed to get connection info for IP logging:', connErr);
+      // Ignore conn info errors in testing environment
     }
 
     // Path normalization (/v1/auth -> /api/auth)

@@ -257,6 +257,23 @@ export const systemSettings = pgTable('system_settings', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+export const learnerWatchlist = pgTable('learner_watchlist', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  enrollmentId: uuid('enrollment_id').references(() => batchEnrollments.id, { onDelete: 'cascade' }).notNull(),
+  batchId: uuid('batch_id').references(() => batches.id, { onDelete: 'cascade' }).notNull(),
+  reason: text('reason'),
+  addedBy: uuid('added_by').references(() => users.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex('learner_watchlist_user_batch_uniq_idx').on(table.userId, table.batchId),
+  index('learner_watchlist_batch_id_idx').on(table.batchId),
+  index('learner_watchlist_user_id_idx').on(table.userId),
+  index('learner_watchlist_enrollment_id_idx').on(table.enrollmentId),
+  index('learner_watchlist_created_at_idx').on(table.createdAt),
+]);
+
 // --- BETTER AUTH SCHEMA TABLES ---
 
 export const user = users;

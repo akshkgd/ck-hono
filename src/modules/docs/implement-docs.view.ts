@@ -56,88 +56,11 @@ export function getImplementDocsHtml(): string {
       </div>
       <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Feature Implementation Guide</h1>
       <p class="text-zinc-400 text-base max-w-2xl">
-        Developer reference for integrating the <strong>Bug Reporting & Tracking System</strong> and <strong>Live Session Attendance / Recorded Batches</strong> on the Codekaro client applications.
+        Developer reference for integrating <strong>Live Sessions & Attendance Tracking</strong> and the <strong>Targeted Learner Watchlist API</strong> on Codekaro client applications.
       </p>
     </section>
 
-    <!-- SECTION 1: BUG REPORTING & TRACKING SYSTEM -->
-    <section class="space-y-6 pt-6 border-t border-zinc-900">
-      <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Module 1</div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">Bug Reporting & Tracking System</h2>
-        <p class="text-zinc-400 text-sm">
-          Allows students to submit bugs with rich contextual logs (URL where the error happened, device parameters, and steps to reproduce). Admins can filter, monitor, update status, and track them to resolution.
-        </p>
-      </div>
-
-      <!-- Student reporting -->
-      <div class="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono font-semibold border border-emerald-500/20">Student Endpoints</span>
-          </div>
-          <span class="text-xs text-zinc-500 font-mono">Requires Authorization Cookie</span>
-        </div>
-
-        <div class="space-y-3">
-          <h3 class="text-sm font-semibold text-white">1. Report a Bug</h3>
-          <p class="text-zinc-400 text-xs font-mono">POST /v1/student/bugs</p>
-          <div>
-            <span class="text-[11px] text-zinc-500 font-mono block mb-1">JSON Payload:</span>
-            <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
-  "description": "The video player fails to enter full-screen mode on Safari.",
-  "severity": "medium", // 'low' | 'medium' | 'high' | 'critical'
-  "url": "https://app.codekaro.in/courses/batch-123/video-player", // The exact window.location.href where error occurred
-  "deviceInfo": {
-    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)...",
-    "viewport": "1440x900",
-    "language": "en-US"
-  },
-  "screenshotUrl": null // Optional URL of uploaded image
-}</code></pre>
-          </div>
-        </div>
-      </div>
-
-      <!-- Admin tracking -->
-      <div class="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-xs font-mono font-semibold border border-indigo-500/20">Admin Endpoints</span>
-          </div>
-          <span class="text-xs text-zinc-500 font-mono">Requires Admin Authorization</span>
-        </div>
-
-        <div class="space-y-4">
-          <div class="space-y-1">
-            <h3 class="text-sm font-semibold text-white">1. Search & Filter Bug Reports</h3>
-            <p class="text-zinc-400 text-xs font-mono">GET /v1/admin/bugs?page=1&limit=20&status=pending&severity=high&q=player</p>
-            <p class="text-xs text-zinc-400">Allows searching by submitter name/email or bug description, and filtering by severity or status.</p>
-          </div>
-
-          <div class="space-y-1 border-t border-zinc-900 pt-3">
-            <h3 class="text-sm font-semibold text-white">2. Update Bug Status / Severity / Remarks</h3>
-            <p class="text-zinc-400 text-xs font-mono">PUT /v1/admin/bugs/:id</p>
-            <div>
-              <span class="text-[11px] text-zinc-500 font-mono block mb-1">JSON Payload:</span>
-              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
-  "status": "resolved", // 'pending' | 'investigating' | 'resolved' | 'closed'
-  "severity": "high", // 'low' | 'medium' | 'high' | 'critical'
-  "remarks": "Investigated and fixed Safari full-screen handler in JS bundle v2.1.4"
-}</code></pre>
-            </div>
-          </div>
-
-          <div class="space-y-1 border-t border-zinc-900 pt-3">
-            <h3 class="text-sm font-semibold text-white">3. Delete Bug Report</h3>
-            <p class="text-zinc-400 text-xs font-mono">DELETE /v1/admin/bugs/:id</p>
-            <p class="text-xs text-zinc-400">Removes the bug report permanently from the tracking console.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 2: LIVE SESSIONS & ATTENDANCE TRACKING -->
+    <!-- SECTION: LIVE SESSIONS & ATTENDANCE TRACKING -->
     <section class="space-y-6 pt-6 border-t border-zinc-900">
       <div class="space-y-2">
         <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Module 2</div>
@@ -313,89 +236,63 @@ export function getImplementDocsHtml(): string {
       </div>
     </section>
 
-    <!-- SECTION 3: BATCH RENEWAL & RENEWAL FEE SYSTEM -->
+    <!-- SECTION: LEARNER WATCHLIST & PERFORMANCE MONITORING API -->
     <section class="space-y-6 pt-6 border-t border-zinc-900">
-      <div class="space-y-2">
-        <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 font-medium uppercase tracking-wider">Module 3</div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">Batch Renewal Fee & Renewal Checkout System</h2>
-        <p class="text-zinc-400 text-sm">
-          Allows admins to specify a custom renewal fee for course batches. When students renew their enrollment, the checkout engine automatically applies the custom <code class="text-indigo-400 font-mono">renewalFee</code> if configured, or falls back to the standard course <code class="text-indigo-400 font-mono">price</code> when left blank.
-        </p>
+      <div class="border-b border-zinc-800/80 pb-4">
+        <div class="flex items-center gap-3 mb-1">
+          <span class="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">LEARNER WATCHLIST</span>
+          <h2 class="text-xl font-semibold text-white tracking-tight">Targeted Learner Watchlist & Performance Monitoring API</h2>
+        </div>
+        <p class="text-xs text-zinc-400">Allows administrators to flag specific high-priority or struggling learners for continuous monitoring across enrollments with zero N+1 query overhead.</p>
       </div>
 
-      <!-- Admin Batch API Updates -->
-      <div class="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 text-xs font-mono font-semibold border border-indigo-500/20">Admin Endpoints</span>
-          </div>
-          <span class="text-xs text-zinc-500 font-mono">Requires Admin Authorization</span>
-        </div>
-
-        <div class="space-y-4">
+      <div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 space-y-6 shadow-xl">
+        <div class="space-y-6">
           <div class="space-y-1">
-            <h3 class="text-sm font-semibold text-white">1. Create or Update Batch with Renewal Fee</h3>
-            <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/batches &nbsp;|&nbsp; PUT /v1/admin/batches/:id</p>
-            <p class="text-xs text-zinc-400">Pass <code class="text-indigo-300 font-mono">renewalFee</code> as an integer representing the amount in INR (rupees). Set to <code class="text-zinc-400 font-mono">null</code> or omit to leave blank.</p>
+            <h3 class="text-sm font-semibold text-white">1. Add Learner to Watchlist</h3>
+            <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/watchlist</p>
             <div class="mt-2">
-              <span class="text-[11px] text-zinc-500 font-mono block mb-1">JSON Payload:</span>
-              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
-  "name": "Fullstack Web Development Cohort",
-  "topic": "Web Development",
-  "slug": "fullstack-web-dev",
-  "price": 4999,
-  "renewalFee": 1999, // Renewal fee in rupees (or null to fallback to price)
-  "type": "cohort",
-  "status": "active"
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Request Payload:</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-400 border border-zinc-800/60 overflow-x-auto"><code>{
+  "enrollmentId": "c3a1b2c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c",
+  "reason": "Low attendance - needs follow-up on assignments"
 }</code></pre>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Public Batch & Checkout APIs -->
-      <div class="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-xs font-mono font-semibold border border-emerald-500/20">Public & Student Endpoints</span>
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div class="space-y-1">
-            <h3 class="text-sm font-semibold text-white">1. Fetch Public Batch Details</h3>
-            <p class="text-zinc-400 text-xs font-mono">GET /v1/batches/:id &nbsp;|&nbsp; GET /v1/batches/slug/:slug</p>
-            <p class="text-xs text-zinc-400">Public batch responses include <code class="text-indigo-300 font-mono">renewalFee</code> so frontend client apps can render renewal prices on course detail or account renewal pages.</p>
+          <div class="space-y-1 border-t border-zinc-900 pt-4">
+            <h3 class="text-sm font-semibold text-white">2. Fetch Monitored Watchlist Learners</h3>
+            <p class="text-zinc-400 text-xs font-mono">GET /v1/admin/watchlist?batchId=...&q=...&page=1&limit=20</p>
+            <p class="text-xs text-zinc-400">Returns watchlisted learners with single-pass aggregated metrics including lectures watched (<code class="text-indigo-300 font-mono">4/36</code>), assignments submitted (<code class="text-indigo-300 font-mono">0/10</code>), progress percent, time spent, and last active timestamp.</p>
             <div class="mt-2">
-              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Response JSON Excerpt:</span>
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Sample Response:</span>
               <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
   "status": "success",
-  "data": {
-    "id": "768bc964-7c8e-4fd7-8dd0-0a328e9f82d4",
-    "name": "Fullstack Web Development Cohort",
-    "price": 4999,
-    "renewalFee": 1999,
-    "slug": "fullstack-web-dev"
-  }
+  "data": [
+    {
+      "watchlistId": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+      "userId": "989c5a03-dbb7-49ab-ac19-1a6156b83ea1",
+      "name": "Ananya Verma",
+      "email": "ananya.verma1@example.com",
+      "batchName": "Fullstack Web Development Cohort",
+      "accessStartsFrom": "2026-07-01T00:00:00.000Z",
+      "progressPercent": 65,
+      "formattedTimeSpent": "4h 0m",
+      "lectures": { "watched": 4, "total": 36, "display": "4/36" },
+      "assignments": { "submitted": 0, "total": 10, "display": "0/10" },
+      "lastActiveAt": "2026-08-21T11:45:00.000Z",
+      "reason": "Low attendance - needs follow-up on assignments"
+    }
+  ],
+  "pagination": { "page": 1, "limit": 20, "totalItems": 1, "totalPages": 1 }
 }</code></pre>
             </div>
           </div>
 
-          <div class="space-y-1 border-t border-zinc-900 pt-3">
-            <h3 class="text-sm font-semibold text-white">2. Renewal Checkout Order Creation</h3>
-            <p class="text-zinc-400 text-xs font-mono">POST /v1/payments/razorpay/create-order</p>
-            <p class="text-xs text-zinc-400">When initiating a course renewal order, set <code class="text-indigo-300 font-mono">paymentType</code> to <code class="text-emerald-400 font-mono">"renew"</code> and pass the student's existing <code class="text-indigo-300 font-mono">enrollmentId</code>.</p>
-            <div class="mt-2">
-              <span class="text-[11px] text-zinc-500 font-mono block mb-1">Renewal Order Request Payload:</span>
-              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-emerald-400 border border-zinc-800/60 overflow-x-auto"><code>{
-  "paymentType": "renew",
-  "enrollmentId": "c3a1b2c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c"
-}</code></pre>
-            </div>
-            <div class="mt-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3 text-xs text-indigo-300 leading-relaxed">
-              💡 <strong class="text-white">Fee Evaluation Order:</strong>
-              If <code class="text-indigo-200 font-mono">batch.renewalFee</code> is configured (e.g. 1999), the Razorpay order amount will be 1999 INR (199900 paise). If <code class="text-indigo-200 font-mono">batch.renewalFee</code> is <code class="text-zinc-400 font-mono">null</code> or blank, it automatically falls back to charging <code class="text-indigo-200 font-mono">batch.price</code> (4999 INR).
-            </div>
+          <div class="space-y-1 border-t border-zinc-900 pt-4">
+            <h3 class="text-sm font-semibold text-white">3. Update Remark / Remove from Watchlist</h3>
+            <p class="text-zinc-400 text-xs font-mono">PUT /v1/admin/watchlist/:id</p>
+            <p class="text-zinc-400 text-xs font-mono">DELETE /v1/admin/watchlist/:id</p>
           </div>
         </div>
       </div>
@@ -410,4 +307,3 @@ export function getImplementDocsHtml(): string {
 </body>
 </html>`;
 }
-

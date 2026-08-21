@@ -1,5 +1,5 @@
 import { betterAuth } from 'better-auth';
-import { emailOTP } from 'better-auth/plugins';
+import { emailOTP, bearer } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
@@ -154,6 +154,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    bearer(),
     emailOTP({
       otpLength: 4,
       rateLimit: {
