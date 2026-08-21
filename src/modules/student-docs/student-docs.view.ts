@@ -659,11 +659,24 @@ export function getStudentDocsHtml(): string {
 });</code></pre>
             </div>
             <div class="space-y-1">
-              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK - Allowed)</div>
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK - Allowed Tokenized Stream)</div>
               <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
   "status": "success",
   "data": {
-    "allowed": true
+    "allowed": true,
+    "signedUrl": "https://vz-09b5be34-aef.b-cdn.net/bcdn_token=HASH&expires=1724000000&token_path=%2FvideoId%2F&limit=1000/videoId/playlist.m3u8",
+    "expiresAt": 1724000000
+  }
+}</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK - Allowed Standard Stream)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "allowed": true,
+    "signedUrl": "https://vz-other-library.b-cdn.net/videoId/playlist.m3u8",
+    "videoLink": "https://vz-other-library.b-cdn.net/videoId/playlist.m3u8"
   }
 }</code></pre>
             </div>

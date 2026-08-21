@@ -177,6 +177,8 @@ export class StudentRepository {
         accessTillDate: batchContent.accessTillDate,
         canSubmitAssignment: batchContent.canSubmitAssignment,
         videoDuration: contentLibrary.videoDuration,
+        videoLink: contentLibrary.videoLink,
+        type: contentLibrary.type,
         xp: contentLibrary.xp,
         assignmentStatus: courseProgress.assignmentStatus,
         enrollment: {

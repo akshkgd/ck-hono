@@ -2,6 +2,7 @@ import { StudentRepository } from './student.repository.js';
 import { UserRepository } from '../users/user.repository.js';
 import type { StudentProgressInput, StudentAssignmentInput, UpdateProfileInput } from './student.validation.js';
 import { AdminLiveSessionsRepository } from '../admin/live-sessions/admin-live-sessions.repository.js';
+import { generateBunnySignedUrl } from '../../utils/bunny-token.util.js';
 
 export class StudentService {
   private studentRepository: StudentRepository;
@@ -139,7 +140,10 @@ export class StudentService {
         canSubmitAssignment: item.canSubmitAssignment,
         isSequentiallyLocked,
         type: 'content_library',
-        content: item.content,
+        content: {
+          ...item.content,
+          videoLink: null,
+        },
         progress: {
           status: progressStatus,
           timeSpent: item.progress?.timeSpent || 0,
@@ -338,6 +342,22 @@ export class StudentService {
           lastVideoItem = item;
         }
       }
+    }
+
+    if (details.videoLink) {
+      const signedResult = generateBunnySignedUrl(details.videoLink);
+      if (signedResult) {
+        return {
+          allowed: true,
+          signedUrl: signedResult.signedUrl,
+          expiresAt: signedResult.expiresAt,
+        };
+      }
+      return {
+        allowed: true,
+        signedUrl: details.videoLink,
+        videoLink: details.videoLink,
+      };
     }
 
     return { allowed: true };
