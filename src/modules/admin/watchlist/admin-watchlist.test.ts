@@ -140,6 +140,7 @@ describe('Admin Learner Watchlist Module', () => {
       const body = await res.json();
       expect(body.status).toBe('success');
       expect(body.data.length).toBeGreaterThanOrEqual(1);
+      expect(body.pagination.limit).toBe(50);
 
       const item = body.data.find((i: any) => i.watchlistId === createdWatchlistId);
       expect(item).toBeDefined();
@@ -155,6 +156,31 @@ describe('Admin Learner Watchlist Module', () => {
       expect(item.assignments).toHaveProperty('total');
       expect(item.assignments).toHaveProperty('display');
       expect(item.reason).toBe('Needs close monitoring due to low lecture completion');
+    });
+
+    it('should validate limit minimum of 50 and maximum of 200', async () => {
+      // Valid limit 200
+      const validRes = await app.request(`/v1/admin/watchlist?limit=200`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` },
+      });
+      expect(validRes.status).toBe(200);
+      const validBody = await validRes.json();
+      expect(validBody.pagination.limit).toBe(200);
+
+      // Invalid limit 20 (< 50)
+      const lowRes = await app.request(`/v1/admin/watchlist?limit=20`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` },
+      });
+      expect(lowRes.status).toBe(400);
+
+      // Invalid limit 250 (> 200)
+      const highRes = await app.request(`/v1/admin/watchlist?limit=250`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${adminToken}` },
+      });
+      expect(highRes.status).toBe(400);
     });
 
     it('should allow updating remark/reason for a watchlisted learner', async () => {

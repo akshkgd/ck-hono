@@ -13,7 +13,7 @@ export const listWatchlistSchema = z.object({
   batchId: z.string().uuid().optional(),
   q: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  limit: z.coerce.number().int().min(50, 'Minimum limit is 50').max(200, 'Maximum limit is 200').default(50),
 });
 
 export type AddToWatchlistInput = z.infer<typeof addToWatchlistSchema>;

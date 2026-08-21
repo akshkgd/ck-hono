@@ -262,8 +262,8 @@ export function getImplementDocsHtml(): string {
 
           <div class="space-y-1 border-t border-zinc-900 pt-4">
             <h3 class="text-sm font-semibold text-white">2. Fetch Monitored Watchlist Learners</h3>
-            <p class="text-zinc-400 text-xs font-mono">GET /v1/admin/watchlist?batchId=...&q=...&page=1&limit=20</p>
-            <p class="text-xs text-zinc-400">Returns watchlisted learners with single-pass aggregated metrics including lectures watched (<code class="text-indigo-300 font-mono">4/36</code>), assignments submitted (<code class="text-indigo-300 font-mono">0/10</code>), progress percent, time spent, and last active timestamp.</p>
+            <p class="text-zinc-400 text-xs font-mono">GET /v1/admin/watchlist?batchId=...&q=...&page=1&limit=50</p>
+            <p class="text-xs text-zinc-400">Returns watchlisted learners with single-pass aggregated metrics including lectures watched (<code class="text-indigo-300 font-mono">4/36</code>), assignments submitted (<code class="text-indigo-300 font-mono">0/10</code>), progress percent, time spent, and last active timestamp. Minimum limit is <code class="text-indigo-300 font-mono">50</code> (default), up to a maximum of <code class="text-indigo-300 font-mono">200</code>.</p>
             <div class="mt-2">
               <span class="text-[11px] text-zinc-500 font-mono block mb-1">Sample Response:</span>
               <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-indigo-300 border border-zinc-800/60 overflow-x-auto"><code>{
@@ -284,7 +284,7 @@ export function getImplementDocsHtml(): string {
       "reason": "Low attendance - needs follow-up on assignments"
     }
   ],
-  "pagination": { "page": 1, "limit": 20, "totalItems": 1, "totalPages": 1 }
+  "pagination": { "page": 1, "limit": 50, "totalItems": 1, "totalPages": 1 }
 }</code></pre>
             </div>
           </div>
