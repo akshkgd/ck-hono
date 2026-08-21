@@ -11,9 +11,10 @@ export const DEFAULT_DOWNLOAD_LIMIT_KBPS = 1000;
 
 /**
  * Generates a Bunny CDN Advanced Token Authentication (HMAC-SHA256) signed URL.
- * Follows official Bunny.net specification:
+ * Specification:
  * - HMAC algorithm: HMAC-SHA256 using security_key as HMAC secret.
  * - Token Format: HS256-<Base64URL(HMAC-SHA256(security_key, signature_path + expires + user_ip + signing_data))>
+ * - signing_data contains alphabetically sorted key=value pairs for parameters (limit, token_path, etc.) excluding token & expires.
  * - Base64URL encoding (no padding, '+' -> '-', '/' -> '_').
  * - Directory path-based token for HLS streaming.
  */
@@ -53,7 +54,8 @@ export function generateBunnySignedUrl(
     return null;
   }
 
-  const key = tokenKey || process.env.BUNNY_CDN_TOKEN_KEY || '';
+  const rawKey = tokenKey || process.env.BUNNY_CDN_TOKEN_KEY || '';
+  const key = rawKey.trim().replace(/^["']|["']$/g, '');
   const expiresAt = Math.floor(Date.now() / 1000) + ttlSeconds;
 
   // Path-based directory access for HLS video streaming (e.g. /5a8e9321-abcd-1234-efgh-567890123456/)
@@ -61,11 +63,15 @@ export function generateBunnySignedUrl(
   const signaturePath = tokenPath;
   const userIp = ''; // No IP locking
 
-  // signing_data: alphabetically-sorted parameters joined as key=value excluding token and expires
-  let signingData = '';
+  // Parameters map excluding token & expires, sorted alphabetically by parameter name
+  const paramsMap = new Map<string, string>();
   if (limitKBps > 0) {
-    signingData = `limit=${limitKBps}`;
+    paramsMap.set('limit', String(limitKBps));
   }
+  paramsMap.set('token_path', tokenPath);
+
+  const sortedKeys = Array.from(paramsMap.keys()).sort();
+  const signingData = sortedKeys.map(k => `${k}=${paramsMap.get(k)}`).join('&');
 
   // HMAC message construction per Bunny spec: signature_path + expires + user_ip + signing_data
   const messageToSign = signaturePath + expiresAt + userIp + signingData;
@@ -82,9 +88,9 @@ export function generateBunnySignedUrl(
   const token = `HS256-${hmacDigest}`;
   const encodedTokenPath = encodeURIComponent(tokenPath); // %2F{videoId}%2F
 
-  let pathQueryParams = `token_path=${encodedTokenPath}`;
-  if (limitKBps > 0) {
-    pathQueryParams += `&limit=${limitKBps}`;
+  let pathQueryParams = `limit=${limitKBps}&token_path=${encodedTokenPath}`;
+  if (limitKBps <= 0) {
+    pathQueryParams = `token_path=${encodedTokenPath}`;
   }
 
   const signedUrl = `https://${TARGET_BUNNY_PULL_ZONE_HOST}/bcdn_token=${token}&expires=${expiresAt}&${pathQueryParams}/${videoId}/playlist.m3u8`;
