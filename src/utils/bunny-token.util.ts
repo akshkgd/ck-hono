@@ -10,9 +10,12 @@ export const DEFAULT_BUNNY_TTL_SECONDS = 3 * 3600; // 3 hours (10800 seconds)
 export const DEFAULT_DOWNLOAD_LIMIT_KBPS = 1000;
 
 /**
- * Generates a Bunny CDN SHA-256 token-authenticated signed HLS URL for protected video streams.
- * Only processes videos originating from the targeted Pull Zone (vz-09b5be34-aef.b-cdn.net).
- * Returns null if the URL is not on the target pull zone or if videoId cannot be extracted.
+ * Generates a Bunny CDN Advanced Token Authentication (HMAC-SHA256) signed URL.
+ * Follows official Bunny.net specification:
+ * - HMAC algorithm: HMAC-SHA256 using security_key as HMAC secret.
+ * - Token Format: HS256-<Base64URL(HMAC-SHA256(security_key, signature_path + expires + user_ip + signing_data))>
+ * - Base64URL encoding (no padding, '+' -> '-', '/' -> '_').
+ * - Directory path-based token for HLS streaming.
  */
 export function generateBunnySignedUrl(
   videoLink: string | null | undefined,
@@ -40,7 +43,6 @@ export function generateBunnySignedUrl(
       videoId = segments[0];
     }
   } catch {
-    // If URL parsing fails, attempt regex fallback
     const match = videoLink.match(/vz-09b5be34-aef\.b-cdn\.net\/([^\/]+)/);
     if (match && match[1]) {
       videoId = match[1];
@@ -53,19 +55,39 @@ export function generateBunnySignedUrl(
 
   const key = tokenKey || process.env.BUNNY_CDN_TOKEN_KEY || '';
   const expiresAt = Math.floor(Date.now() / 1000) + ttlSeconds;
-  const videoPath = `/${videoId}/`;
-  const hashableBase = key + videoPath + expiresAt;
 
-  const token = Buffer.from(
-    crypto.createHash('sha256').update(hashableBase).digest()
-  )
-    .toString('base64')
+  // Path-based directory access for HLS video streaming (e.g. /5a8e9321-abcd-1234-efgh-567890123456/)
+  const tokenPath = `/${videoId}/`;
+  const signaturePath = tokenPath;
+  const userIp = ''; // No IP locking
+
+  // signing_data: alphabetically-sorted parameters joined as key=value excluding token and expires
+  let signingData = '';
+  if (limitKBps > 0) {
+    signingData = `limit=${limitKBps}`;
+  }
+
+  // HMAC message construction per Bunny spec: signature_path + expires + user_ip + signing_data
+  const messageToSign = signaturePath + expiresAt + userIp + signingData;
+
+  // Perform HMAC-SHA256 with security_key
+  const hmacDigest = crypto
+    .createHmac('sha256', key)
+    .update(messageToSign)
+    .digest('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=/g, '');
 
-  const encodedTokenPath = encodeURIComponent(videoPath); // %2F{videoId}%2F
-  const signedUrl = `https://${TARGET_BUNNY_PULL_ZONE_HOST}/bcdn_token=${token}&expires=${expiresAt}&token_path=${encodedTokenPath}&limit=${limitKBps}/${videoId}/playlist.m3u8`;
+  const token = `HS256-${hmacDigest}`;
+  const encodedTokenPath = encodeURIComponent(tokenPath); // %2F{videoId}%2F
+
+  let pathQueryParams = `token_path=${encodedTokenPath}`;
+  if (limitKBps > 0) {
+    pathQueryParams += `&limit=${limitKBps}`;
+  }
+
+  const signedUrl = `https://${TARGET_BUNNY_PULL_ZONE_HOST}/bcdn_token=${token}&expires=${expiresAt}&${pathQueryParams}/${videoId}/playlist.m3u8`;
 
   return {
     signedUrl,
