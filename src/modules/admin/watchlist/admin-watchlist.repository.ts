@@ -124,7 +124,6 @@ export class AdminWatchlistRepository {
         progressPercent: batchEnrollments.progress,
         timeSpentSeconds: batchEnrollments.timeSpentSeconds,
         userLastActiveAt: users.lastActiveAt,
-        latestProgressUpdatedAt: sql<Date | null>`max(${courseProgress.updatedAt})`,
         reason: learnerWatchlist.reason,
         lastFollowup: learnerWatchlist.lastFollowup,
         addedAt: learnerWatchlist.createdAt,

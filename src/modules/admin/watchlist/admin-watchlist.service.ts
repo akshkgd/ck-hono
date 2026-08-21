@@ -81,13 +81,8 @@ export class AdminWatchlistService {
 
       const accessStartsFrom = item.startedAt || item.subscriptionActiveOn || item.createdAt;
 
-      // Resolve latest activity timestamp
-      let lastActiveAt = item.userLastActiveAt || item.latestProgressUpdatedAt || item.createdAt;
-      if (item.userLastActiveAt && item.latestProgressUpdatedAt) {
-        lastActiveAt = new Date(item.userLastActiveAt) > new Date(item.latestProgressUpdatedAt)
-          ? item.userLastActiveAt
-          : item.latestProgressUpdatedAt;
-      }
+      // Resolve latest activity timestamp directly from users table
+      const lastActiveAt = item.userLastActiveAt || item.createdAt;
 
       return {
         watchlistId: item.watchlistId,
