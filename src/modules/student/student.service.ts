@@ -350,9 +350,6 @@ export class StudentService {
         return {
           allowed: true,
           signedUrl: signedResult.signedUrl,
-          videoLink: signedResult.signedUrl,
-          videoUrl: signedResult.signedUrl,
-          url: signedResult.signedUrl,
           expiresAt: signedResult.expiresAt,
         };
       }
@@ -360,8 +357,6 @@ export class StudentService {
         allowed: true,
         signedUrl: details.videoLink,
         videoLink: details.videoLink,
-        videoUrl: details.videoLink,
-        url: details.videoLink,
       };
     }
 
