@@ -7,7 +7,8 @@ export interface BunnySignedUrlResult {
 
 export const TARGET_BUNNY_PULL_ZONE_HOST = 'vz-09b5be34-aef.b-cdn.net';
 export const DEFAULT_BUNNY_TTL_SECONDS = 3 * 3600; // 3 hours (10800 seconds)
-export const DEFAULT_DOWNLOAD_LIMIT_KBPS = 0; // Default 0 (disabled) to match Bunny Pull Zone configuration
+const envLimit = process.env.BUNNY_CDN_LIMIT_KBPS ? parseInt(process.env.BUNNY_CDN_LIMIT_KBPS, 10) : 0;
+export const DEFAULT_DOWNLOAD_LIMIT_KBPS = Number.isNaN(envLimit) ? 0 : envLimit;
 
 /**
  * Generates a Bunny CDN Advanced Token Authentication (HMAC-SHA256) signed URL.
