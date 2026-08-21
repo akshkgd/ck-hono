@@ -7,14 +7,14 @@ export interface BunnySignedUrlResult {
 
 export const TARGET_BUNNY_PULL_ZONE_HOST = 'vz-09b5be34-aef.b-cdn.net';
 export const DEFAULT_BUNNY_TTL_SECONDS = 3 * 3600; // 3 hours (10800 seconds)
-export const DEFAULT_DOWNLOAD_LIMIT_KBPS = 1000;
+export const DEFAULT_DOWNLOAD_LIMIT_KBPS = 0; // Default 0 (disabled) to match Bunny Pull Zone configuration
 
 /**
  * Generates a Bunny CDN Advanced Token Authentication (HMAC-SHA256) signed URL.
  * Specification:
  * - HMAC algorithm: HMAC-SHA256 using security_key as HMAC secret.
  * - Token Format: HS256-<Base64URL(HMAC-SHA256(security_key, signature_path + expires + user_ip + signing_data))>
- * - signing_data contains alphabetically sorted key=value pairs for parameters (limit, token_path, etc.) excluding token & expires.
+ * - signing_data contains alphabetically sorted key=value pairs for parameters excluding token & expires.
  * - Base64URL encoding (no padding, '+' -> '-', '/' -> '_').
  * - Directory path-based token for HLS streaming.
  */
@@ -88,9 +88,9 @@ export function generateBunnySignedUrl(
   const token = `HS256-${hmacDigest}`;
   const encodedTokenPath = encodeURIComponent(tokenPath); // %2F{videoId}%2F
 
-  let pathQueryParams = `limit=${limitKBps}&token_path=${encodedTokenPath}`;
-  if (limitKBps <= 0) {
-    pathQueryParams = `token_path=${encodedTokenPath}`;
+  let pathQueryParams = `token_path=${encodedTokenPath}`;
+  if (limitKBps > 0) {
+    pathQueryParams = `limit=${limitKBps}&${pathQueryParams}`;
   }
 
   const signedUrl = `https://${TARGET_BUNNY_PULL_ZONE_HOST}/bcdn_token=${token}&expires=${expiresAt}&${pathQueryParams}/${videoId}/playlist.m3u8`;

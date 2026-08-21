@@ -47,8 +47,7 @@ describe('StudentService - Bunny CDN Signed URL & VideoLink Omission', () => {
       expect(result.signedUrl).toBeDefined();
       expect(result.signedUrl).toContain(`https://${TARGET_BUNNY_PULL_ZONE_HOST}/bcdn_token=`);
       expect(result.signedUrl).toContain('&expires=');
-      expect(result.signedUrl).toContain('&token_path=%2F5a8e9321-abcd-1234-efgh-567890123456%2F');
-      expect(result.signedUrl).toContain('&limit=1000');
+      expect(result.signedUrl).toContain('token_path=%2F5a8e9321-abcd-1234-efgh-567890123456%2F');
       expect(result.signedUrl).toContain('/5a8e9321-abcd-1234-efgh-567890123456/playlist.m3u8');
       expect(result.expiresAt).toBeDefined();
     });
