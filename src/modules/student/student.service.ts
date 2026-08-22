@@ -179,9 +179,6 @@ export class StudentService {
           contentType: 'live_session',
           desc: sessionItem.desc,
           time: sessionItem.time,
-          screenHlsVideo: sessionItem.screenHlsVideo,
-          faceHlsVideo: sessionItem.faceHlsVideo,
-          recordingHls: sessionItem.recordingHls,
           xp: 0
         },
         progress: {
@@ -244,7 +241,81 @@ export class StudentService {
   public async checkContentAccess(userId: string, batchContentId: string) {
     const details = await this.studentRepository.getBatchContentAccessDetails(batchContentId, userId);
     if (!details) {
-      throw new Error('Batch content not found');
+      // Check if ID belongs to a live session
+      const liveDetails = await this.studentRepository.getLiveSessionAccessDetails(batchContentId, userId);
+      if (!liveDetails) {
+        throw new Error('Batch content not found');
+      }
+
+      const enrollment = liveDetails.enrollment;
+      if (!enrollment) {
+        throw new Error('Access denied: You are not enrolled in this course');
+      }
+
+      if (enrollment.paymentStatus !== 'captured') {
+        throw new Error('Access denied: Course requires a captured enrollment payment');
+      }
+
+      const startedAtDate = enrollment.startedAt ? new Date(enrollment.startedAt) : null;
+      const paidAtDate = enrollment.paidAt ? new Date(enrollment.paidAt) : null;
+      const startDate = startedAtDate || paidAtDate || (enrollment.createdAt ? new Date(enrollment.createdAt) : new Date());
+
+      let endDate: Date;
+      if (enrollment.accessTill) {
+        endDate = new Date(enrollment.accessTill);
+      } else {
+        endDate = new Date(startDate);
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      }
+
+      const now = new Date();
+      const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endDateMidnight = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+      if (todayMidnight.getTime() > endDateMidnight.getTime()) {
+        return { allowed: false, reason: 'Course access has expired' };
+      }
+
+      // Check if recorded video is available
+      if (liveDetails.recordingHls && liveDetails.recordingHls.trim() !== '') {
+        const signedResult = generateBunnySignedUrl(liveDetails.recordingHls);
+        const finalVideoUrl = signedResult ? signedResult.signedUrl : liveDetails.recordingHls;
+
+        return {
+          allowed: true,
+          isRecording: true,
+          videoUrl: finalVideoUrl,
+          videoLink: finalVideoUrl,
+          signedUrl: finalVideoUrl,
+          recordingHls: finalVideoUrl,
+          liveSessionUrl: null,
+          title: liveDetails.topic,
+          topic: liveDetails.topic,
+          desc: liveDetails.desc,
+          time: liveDetails.time,
+          chapterName: liveDetails.chapterName || null,
+          sectionTitle: liveDetails.sectionTitle || null,
+          expiresAt: signedResult?.expiresAt,
+        };
+      }
+
+      // Recording not available -> Return live session URL and metadata
+      const liveSessionUrl = `https://live.codekaro.in/s/${liveDetails.id}`;
+      return {
+        allowed: true,
+        isRecording: false,
+        videoUrl: null,
+        videoLink: null,
+        signedUrl: null,
+        recordingHls: null,
+        liveSessionUrl,
+        title: liveDetails.topic,
+        topic: liveDetails.topic,
+        desc: liveDetails.desc,
+        time: liveDetails.time,
+        chapterName: liveDetails.chapterName || null,
+        sectionTitle: liveDetails.sectionTitle || null,
+      };
     }
 
     const enrollment = details.enrollment;

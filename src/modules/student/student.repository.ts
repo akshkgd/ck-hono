@@ -216,6 +216,47 @@ export class StudentRepository {
     return results[0];
   }
 
+  public async getLiveSessionAccessDetails(liveSessionId: string, userId: string) {
+    const results = await db
+      .select({
+        id: batchLiveSessions.id,
+        batchId: batchLiveSessions.batchId,
+        sectionId: batchLiveSessions.sectionId,
+        topic: batchLiveSessions.topic,
+        desc: batchLiveSessions.desc,
+        time: batchLiveSessions.time,
+        screenHlsVideo: batchLiveSessions.screenHlsVideo,
+        faceHlsVideo: batchLiveSessions.faceHlsVideo,
+        recordingHls: batchLiveSessions.recordingHls,
+        order: batchLiveSessions.order,
+        chapterName: batchSections.title,
+        sectionTitle: batchSections.title,
+        enrollment: {
+          id: batchEnrollments.id,
+          paymentStatus: batchEnrollments.paymentStatus,
+          startedAt: batchEnrollments.startedAt,
+          paidAt: batchEnrollments.paidAt,
+          accessTill: batchEnrollments.accessTill,
+          overrideAccessDays: batchEnrollments.overrideAccessDays,
+          createdAt: batchEnrollments.createdAt,
+          courseStartDate: batches.startDate,
+        }
+      })
+      .from(batchLiveSessions)
+      .innerJoin(batches, eq(batchLiveSessions.batchId, batches.id))
+      .leftJoin(batchSections, eq(batchLiveSessions.sectionId, batchSections.id))
+      .leftJoin(
+        batchEnrollments,
+        and(
+          eq(batchEnrollments.batchId, batchLiveSessions.batchId),
+          eq(batchEnrollments.userId, userId)
+        )
+      )
+      .where(eq(batchLiveSessions.id, liveSessionId))
+      .limit(1);
+    return results[0];
+  }
+
   public async upsertContentProgress(
     userId: string,
     enrollmentId: string,
