@@ -253,6 +253,36 @@ export function getDocsHtml(): string {
         </div>
 
         <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Live Sessions</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#live-sessions-list" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List batch sessions</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#live-sessions-create" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Create session</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#live-sessions-get" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Get session details</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">PATCH</span>
+              <a href="#live-sessions-update" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Update session</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-red-500/10 text-red-400 font-mono">DEL</span>
+              <a href="#live-sessions-delete" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Delete session</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#live-sessions-attendance" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Record attendance</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
           <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Enrollments</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
@@ -2459,6 +2489,197 @@ export interface BatchContent {
   headers: {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- -------------------- ADMIN: LIVE SESSIONS GROUP -------------------- -->
+
+        <!-- Endpoint: GET /admin/batches/:batchId/live-sessions -->
+        <div id="live-sessions-list" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Live Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">List batch live sessions</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Fetches all scheduled live sessions for a batch with optional <code class="text-indigo-400 font-mono">sectionId</code> filtering. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/batches/:batchId/live-sessions</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches/972d478e-d981-4579-a042-16a60a907ecd/live-sessions', {
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /admin/batches/:batchId/live-sessions -->
+        <div id="live-sessions-create" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Live Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Create live session</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Schedules a new live class session for a specific batch. Can optionally be linked to a curriculum section via <code class="text-indigo-400 font-mono">sectionId</code>. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/batches/:batchId/live-sessions</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/batches/972d478e-d981-4579-a042-16a60a907ecd/live-sessions', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    topic: 'Advanced RAG Patterns',
+    desc: 'Deep dive into vector search & query rewriting',
+    time: '2026-08-22T13:30:00.000Z',
+    sectionId: '2954771c-4a57-480e-b9e6-ca69161851b7',
+    order: 1
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /admin/live-sessions/:id -->
+        <div id="live-sessions-get" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Live Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get live session details</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Fetches details and configuration of a single live session by ID. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/live-sessions/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/live-sessions/091a6083-1cfd-421b-8a7c-781d912cd200', {
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: PATCH /admin/live-sessions/:id -->
+        <div id="live-sessions-update" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Live Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Update live session</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Updates details of an existing live session (topic, desc, scheduled time, sectionId, screen/face/recording HLS URLs, order). Supports partial updates. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">PATCH</span>
+              <span class="text-zinc-200">/v1/admin/live-sessions/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/live-sessions/091a6083-1cfd-421b-8a7c-781d912cd200', {
+  method: 'PATCH',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    topic: 'Advanced RAG Patterns & Vector Search',
+    recordingHls: 'https://vz-09b5be34-aef.b-cdn.net/8baa2dc7-1c5f-462c-85cf-ed132bd3b4c1/playlist.m3u8'
+  })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: DELETE /admin/live-sessions/:id -->
+        <div id="live-sessions-delete" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Live Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Delete live session</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Deletes a live session from the database. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 font-bold">DELETE</span>
+              <span class="text-zinc-200">/v1/admin/live-sessions/:id</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/live-sessions/091a6083-1cfd-421b-8a7c-781d912cd200', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /admin/live-sessions/attendance -->
+        <div id="live-sessions-attendance" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Live Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Record attendance event</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Records student join and leave events for attendance calculations and watch time progress metrics. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/live-sessions/attendance</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/live-sessions/attendance', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    email: 'student@example.com',
+    liveSessionId: '091a6083-1cfd-421b-8a7c-781d912cd200',
+    status: 'joined'
+  })
 });</code></pre>
             </div>
           </div>

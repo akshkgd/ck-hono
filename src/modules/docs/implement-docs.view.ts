@@ -141,7 +141,44 @@ export function getImplementDocsHtml(): string {
           </div>
 
           <div class="space-y-1 border-t border-zinc-900 pt-3">
-            <h3 class="text-sm font-semibold text-white">2. Record Session Join / Leave Attendance Events</h3>
+            <h3 class="text-sm font-semibold text-white">2. List Batch Live Sessions (Admin)</h3>
+            <p class="text-zinc-400 text-xs font-mono">GET /v1/admin/batches/:batchId/live-sessions</p>
+            <p class="text-xs text-zinc-400 mb-2">Fetches all live sessions scheduled for a batch with optional <code class="text-indigo-400 font-mono">sectionId</code> filtering.</p>
+          </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">3. Get Live Session Details</h3>
+            <p class="text-zinc-400 text-xs font-mono">GET /v1/admin/live-sessions/:id</p>
+            <p class="text-xs text-zinc-400 mb-2">Fetches detailed configuration and stream links for a single live session by ID.</p>
+          </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">4. Update a Live Session</h3>
+            <p class="text-zinc-400 text-xs font-mono">PATCH /v1/admin/live-sessions/:id</p>
+            <p class="text-xs text-zinc-300 mb-2">Updates details of an existing live session. All payload fields are optional.</p>
+            <div>
+              <span class="text-[11px] text-zinc-500 font-mono block mb-1">JSON Payload (Partial updates supported):</span>
+              <pre class="bg-zinc-950 p-4 rounded-lg text-xs font-mono text-amber-300 border border-zinc-800/60 overflow-x-auto"><code>{
+  "topic": "Updated Topic Title",
+  "desc": "Updated description",
+  "time": "2026-08-01T16:00:00.000Z",
+  "sectionId": "a2b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d",
+  "screenHlsVideo": "https://vz-09b5be34-aef.b-cdn.net/screen/playlist.m3u8",
+  "faceHlsVideo": "https://vz-09b5be34-aef.b-cdn.net/face/playlist.m3u8",
+  "recordingHls": "https://vz-09b5be34-aef.b-cdn.net/recording/playlist.m3u8",
+  "order": 2
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">5. Delete a Live Session</h3>
+            <p class="text-zinc-400 text-xs font-mono">DELETE /v1/admin/live-sessions/:id</p>
+            <p class="text-xs text-zinc-400 mb-2">Deletes a scheduled live session from the database.</p>
+          </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">6. Record Session Join / Leave Attendance Events</h3>
             <p class="text-zinc-400 text-xs font-mono">POST /v1/admin/live-sessions/attendance</p>
             <p class="text-xs text-zinc-400 mb-2">Typically called automatically when a student enters the live classroom interface ("joined") or when they disconnect / leave the tab ("left").</p>
             <div>
