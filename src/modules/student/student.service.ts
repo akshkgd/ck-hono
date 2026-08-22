@@ -279,42 +279,30 @@ export class StudentService {
       // Check if recorded video is available
       if (liveDetails.recordingHls && liveDetails.recordingHls.trim() !== '') {
         const signedResult = generateBunnySignedUrl(liveDetails.recordingHls);
-        const finalVideoUrl = signedResult ? signedResult.signedUrl : liveDetails.recordingHls;
-
+        if (signedResult) {
+          return {
+            allowed: true,
+            contentType: 'live',
+            signedUrl: signedResult.signedUrl,
+            expiresAt: signedResult.expiresAt,
+          };
+        }
         return {
           allowed: true,
-          isRecording: true,
-          videoUrl: finalVideoUrl,
-          videoLink: finalVideoUrl,
-          signedUrl: finalVideoUrl,
-          recordingHls: finalVideoUrl,
-          liveSessionUrl: null,
-          title: liveDetails.topic,
-          topic: liveDetails.topic,
-          desc: liveDetails.desc,
-          time: liveDetails.time,
-          chapterName: liveDetails.chapterName || null,
-          sectionTitle: liveDetails.sectionTitle || null,
-          expiresAt: signedResult?.expiresAt,
+          contentType: 'live',
+          signedUrl: liveDetails.recordingHls,
+          videoLink: liveDetails.recordingHls,
         };
       }
 
       // Recording not available -> Return live session URL and metadata
-      const liveSessionUrl = `https://live.codekaro.in/s/${liveDetails.id}`;
       return {
         allowed: true,
-        isRecording: false,
-        videoUrl: null,
-        videoLink: null,
-        signedUrl: null,
-        recordingHls: null,
-        liveSessionUrl,
+        contentType: 'live',
+        liveSessionUrl: `https://live.codekaro.in/s/${liveDetails.id}`,
         title: liveDetails.topic,
-        topic: liveDetails.topic,
         desc: liveDetails.desc,
         time: liveDetails.time,
-        chapterName: liveDetails.chapterName || null,
-        sectionTitle: liveDetails.sectionTitle || null,
       };
     }
 
