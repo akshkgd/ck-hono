@@ -188,10 +188,16 @@ export class AdminBatchContentService {
     }
 
     const batchIdToFetch = input.batchId || targetBatch?.id;
-    const [rawContentItems, liveSessionItems] = await Promise.all([
+    const [rawContentItems, liveSessionItems, batchSections] = await Promise.all([
       this.batchContentRepository.search(10000, 0, batchIdToFetch, input.sectionId),
-      batchIdToFetch ? this.liveSessionsRepository.findByBatchId(batchIdToFetch, input.sectionId) : Promise.resolve([])
+      batchIdToFetch ? this.liveSessionsRepository.findByBatchId(batchIdToFetch, input.sectionId) : Promise.resolve([]),
+      batchIdToFetch ? this.batchSectionRepository.search('', 1000, 0, batchIdToFetch) : Promise.resolve([])
     ]);
+
+    const sectionTitleMap = new Map<string, string>();
+    for (const sec of batchSections) {
+      sectionTitleMap.set(sec.id, sec.title);
+    }
 
     const formattedLiveSessions = liveSessionItems.map((session) => ({
       id: session.id,
@@ -212,7 +218,7 @@ export class AdminBatchContentService {
         name: targetBatch?.name || '',
       },
       section: {
-        title: session.sectionId ? '' : null,
+        title: session.sectionId ? (sectionTitleMap.get(session.sectionId) || null) : null,
       },
       content: {
         title: session.topic,
