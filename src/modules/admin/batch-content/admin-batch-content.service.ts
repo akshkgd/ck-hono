@@ -2,6 +2,7 @@ import { BatchContentRepository } from '../../batch-content/batch-content.reposi
 import { BatchRepository } from '../../batches/batch.repository.js';
 import { BatchSectionRepository } from '../../batches/batch-section.repository.js';
 import { ContentLibraryRepository } from '../../content-library/content-library.repository.js';
+import { AdminLiveSessionsRepository } from '../live-sessions/admin-live-sessions.repository.js';
 import type {
   CreateBatchContentInput,
   UpdateBatchContentInput,
@@ -15,12 +16,14 @@ export class AdminBatchContentService {
   private batchRepository: BatchRepository;
   private batchSectionRepository: BatchSectionRepository;
   private contentLibraryRepository: ContentLibraryRepository;
+  private liveSessionsRepository: AdminLiveSessionsRepository;
 
   constructor() {
     this.batchContentRepository = new BatchContentRepository();
     this.batchRepository = new BatchRepository();
     this.batchSectionRepository = new BatchSectionRepository();
     this.contentLibraryRepository = new ContentLibraryRepository();
+    this.liveSessionsRepository = new AdminLiveSessionsRepository();
   }
 
   public async createBatchContent(input: CreateBatchContentInput) {
@@ -151,12 +154,91 @@ export class AdminBatchContentService {
   }
 
   public async searchBatchContents(input: BatchContentSearchQueryInput) {
+    let includeLiveSessions = false;
+    let targetBatch: any = null;
+
+    if (input.batchId) {
+      targetBatch = await this.batchRepository.findById(input.batchId);
+      if (targetBatch && (targetBatch.type === 'cohort' || targetBatch.type === 'live')) {
+        includeLiveSessions = true;
+      }
+    } else if (input.sectionId) {
+      const section = await this.batchSectionRepository.findById(input.sectionId);
+      if (section && section.batchId) {
+        targetBatch = await this.batchRepository.findById(section.batchId);
+        if (targetBatch && (targetBatch.type === 'cohort' || targetBatch.type === 'live')) {
+          includeLiveSessions = true;
+        }
+      }
+    }
+
+    if (!includeLiveSessions) {
+      const offset = (input.page - 1) * input.limit;
+      const items = await this.batchContentRepository.search(input.limit, offset, input.batchId, input.sectionId);
+      const total = await this.batchContentRepository.count(input.batchId, input.sectionId);
+
+      return {
+        items,
+        pagination: {
+          page: input.page,
+          limit: input.limit,
+          total,
+        }
+      };
+    }
+
+    const batchIdToFetch = input.batchId || targetBatch?.id;
+    const [rawContentItems, liveSessionItems] = await Promise.all([
+      this.batchContentRepository.search(10000, 0, batchIdToFetch, input.sectionId),
+      batchIdToFetch ? this.liveSessionsRepository.findByBatchId(batchIdToFetch, input.sectionId) : Promise.resolve([])
+    ]);
+
+    const formattedLiveSessions = liveSessionItems.map((session) => ({
+      id: session.id,
+      batchId: session.batchId,
+      contentId: null,
+      sectionId: session.sectionId,
+      order: session.order,
+      accessOn: 0,
+      accessTill: 0,
+      accessOnDate: null,
+      accessTillDate: null,
+      canSubmitAssignment: false,
+      metadata: {},
+      type: 'live_session',
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt,
+      batch: {
+        name: targetBatch?.name || '',
+      },
+      section: {
+        title: session.sectionId ? '' : null,
+      },
+      content: {
+        title: session.topic,
+        type: 'video',
+        contentType: 'live_session',
+        desc: session.desc,
+        videoLink: session.recordingHls || session.screenHlsVideo || session.faceHlsVideo || null,
+        videoUrl: session.recordingHls || session.screenHlsVideo || session.faceHlsVideo || null,
+        videoDuration: null,
+        assignment: null,
+        time: session.time,
+        screenHlsVideo: session.screenHlsVideo,
+        faceHlsVideo: session.faceHlsVideo,
+        recordingHls: session.recordingHls,
+      }
+    }));
+
+    const combinedItems = [...rawContentItems, ...formattedLiveSessions];
+    combinedItems.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    const total = combinedItems.length;
     const offset = (input.page - 1) * input.limit;
-    const items = await this.batchContentRepository.search(input.limit, offset, input.batchId, input.sectionId);
-    const total = await this.batchContentRepository.count(input.batchId, input.sectionId);
+    const paginatedItems = combinedItems.slice(offset, offset + input.limit);
 
     return {
-      items,
+      items: paginatedItems,
       pagination: {
         page: input.page,
         limit: input.limit,
