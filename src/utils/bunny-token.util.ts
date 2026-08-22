@@ -29,29 +29,35 @@ export function generateBunnySignedUrl(
     return null;
   }
 
-  // Strictly target vz-09b5be34-aef.b-cdn.net
-  if (!videoLink.includes(TARGET_BUNNY_PULL_ZONE_HOST)) {
-    return null;
-  }
-
+  let hostname = '';
   let videoId = '';
+  let filename = 'playlist.m3u8';
+
   try {
     const parsedUrl = new URL(videoLink.startsWith('http') ? videoLink : `https://${videoLink}`);
-    if (parsedUrl.hostname !== TARGET_BUNNY_PULL_ZONE_HOST) {
+    if (!parsedUrl.hostname.endsWith('.b-cdn.net')) {
       return null;
     }
+    hostname = parsedUrl.hostname;
     const segments = parsedUrl.pathname.split('/').filter(Boolean);
     if (segments.length > 0) {
       videoId = segments[0];
     }
+    if (segments.length > 1) {
+      filename = segments.slice(1).join('/');
+    }
   } catch {
-    const match = videoLink.match(/vz-09b5be34-aef\.b-cdn\.net\/([^\/]+)/);
-    if (match && match[1]) {
-      videoId = match[1];
+    const match = videoLink.match(/([a-zA-Z0-9-]+\.b-cdn\.net)\/([^\/]+)(?:\/(.*))?/);
+    if (match && match[1] && match[2]) {
+      hostname = match[1];
+      videoId = match[2];
+      if (match[3]) {
+        filename = match[3];
+      }
     }
   }
 
-  if (!videoId) {
+  if (!hostname || !videoId) {
     return null;
   }
 
@@ -94,7 +100,7 @@ export function generateBunnySignedUrl(
     pathQueryParams = `limit=${limitKBps}&${pathQueryParams}`;
   }
 
-  const signedUrl = `https://${TARGET_BUNNY_PULL_ZONE_HOST}/${videoId}/playlist.m3u8?token=${token}&expires=${expiresAt}&${pathQueryParams}`;
+  const signedUrl = `https://${hostname}/${videoId}/${filename}?token=${token}&expires=${expiresAt}&${pathQueryParams}`;
 
   return {
     signedUrl,

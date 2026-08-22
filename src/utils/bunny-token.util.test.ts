@@ -8,9 +8,9 @@ describe('generateBunnySignedUrl', () => {
     expect(generateBunnySignedUrl(undefined)).toBeNull();
   });
 
-  it('should return null if videoLink is not on the target pull zone', () => {
-    expect(generateBunnySignedUrl('https://vz-other-library.b-cdn.net/12345/playlist.m3u8')).toBeNull();
+  it('should return null if videoLink is not on a Bunny CDN pull zone', () => {
     expect(generateBunnySignedUrl('https://vimeo.com/123456')).toBeNull();
+    expect(generateBunnySignedUrl('https://youtube.com/watch?v=123456')).toBeNull();
   });
 
   it('should generate a valid Bunny CDN Advanced HMAC-SHA256 signed URL with HS256- prefix and token_path in signingData', () => {
