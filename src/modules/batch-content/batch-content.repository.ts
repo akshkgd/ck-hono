@@ -1,5 +1,5 @@
 import { db } from '../../db/index.js';
-import { batchContent, batches, batchSections, contentLibrary } from '../../db/schema.js';
+import { batchContent, batches, batchSections, contentLibrary, batchLiveSessions } from '../../db/schema.js';
 import { eq, and, sql } from 'drizzle-orm';
 
 export type BatchContent = typeof batchContent.$inferSelect;
@@ -173,10 +173,18 @@ export class BatchContentRepository {
   public async updateOrders(orders: { id: string; order: number }[]): Promise<void> {
     await db.transaction(async (tx) => {
       for (const item of orders) {
-        await tx
+        const result = await tx
           .update(batchContent)
           .set({ order: item.order, updatedAt: new Date() })
-          .where(eq(batchContent.id, item.id));
+          .where(eq(batchContent.id, item.id))
+          .returning({ id: batchContent.id });
+
+        if (result.length === 0) {
+          await tx
+            .update(batchLiveSessions)
+            .set({ order: item.order, updatedAt: new Date() })
+            .where(eq(batchLiveSessions.id, item.id));
+        }
       }
     });
   }
