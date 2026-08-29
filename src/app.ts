@@ -38,6 +38,8 @@ import adminBugsRouter from './modules/reported-bugs/admin-bugs.route.js';
 import adminWatchlistRouter from './modules/admin/watchlist/admin-watchlist.route.js';
 import adminLiveSessionsRouter from './modules/admin/live-sessions/admin-live-sessions.route.js';
 import studentLiveSessionsRouter from './modules/student/live-sessions/student-live-sessions.route.js';
+import publicUsersRouter from './modules/users/public-users.route.js';
+import publicLiveSessionsRouter from './modules/live-sessions/public-live-sessions.route.js';
 import { getMigrationProgressHtml } from './modules/admin/migrations/migration-view.js';
 
 import { activityMiddleware } from './middleware/activity.middleware.js';
@@ -123,6 +125,8 @@ v1.route('/admin/watchlist', adminWatchlistRouter);
 
 v1.route('/payments/razorpay', razorpayRouter);
 v1.route('/batches', publicBatchesRouter);
+v1.route('/users', publicUsersRouter);
+v1.route('/live-sessions', publicLiveSessionsRouter);
 v1.route('/emails', emailRouter);
 
 // Register Routes

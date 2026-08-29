@@ -16,6 +16,21 @@ export class UserRepository {
     return results[0] || null;
   }
 
+  public async findActiveByEmail(email: string): Promise<{ id: string; name: string | null; email: string; avatar: string | null } | null> {
+    const results = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        avatar: users.avatarUrl,
+      })
+      .from(users)
+      .where(and(eq(users.email, email), eq(users.status, 'active')))
+      .limit(1);
+
+    return results[0] || null;
+  }
+
   public async findById(id: string): Promise<User | null> {
     const results = await db
       .select()

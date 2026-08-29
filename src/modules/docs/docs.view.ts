@@ -85,6 +85,24 @@ export function getDocsHtml(): string {
         </div>
 
         <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Public APIs</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#public-user-profile" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Public User Profile</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#public-live-session" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Public Live Session</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#public-session-attendance" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Public Session Attendance</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
           <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Student: Course Progress</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
@@ -888,6 +906,172 @@ export interface BatchContent {
     'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
   }
 });</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /users/public -->
+        <div id="public-user-profile" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Public APIs</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get Public User Profile by Email</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Returns public user profile information (<code class="font-mono text-zinc-200">id</code>, <code class="font-mono text-zinc-200">name</code>, <code class="font-mono text-zinc-200">email</code>, and <code class="font-mono text-zinc-200">avatar</code>) for active accounts. Returns HTTP 404 if the user is not found or inactive.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/users/public?email=user@example.com</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Query Parameters</div>
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Parameter</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">email</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">User's registered email address.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/users/public?email=user@example.com');
+const data = await response.json();</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Success Response (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "avatar": "https://example.com/avatar.png"
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /live-sessions/:id/public -->
+        <div id="public-live-session" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Public APIs</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Get Public Live Session Details</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Fetches public metadata for a live session including session topic, description, scheduled time, screen/face HLS stream links, and dummy count. Returns HTTP 404 if the session ID is not found.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/live-sessions/:id/public</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Path Parameters</div>
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Parameter</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">id</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Live Session UUID.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/live-sessions/3fa85f64-5717-4562-b3fc-2c963f66afa6/public');
+const data = await response.json();</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Success Response (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "topic": "System Design Masterclass",
+    "desc": "High scalability and microservices architecture.",
+    "time": "2026-09-01T10:00:00.000Z",
+    "screenHLS": "https://video.codekaro.in/screen/playlist.m3u8",
+    "FaceHLS": "https://video.codekaro.in/face/playlist.m3u8",
+    "screenHlsVideo": "https://video.codekaro.in/screen/playlist.m3u8",
+    "faceHlsVideo": "https://video.codekaro.in/face/playlist.m3u8",
+    "dummyCount": 150
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /live-sessions/attendance/public -->
+        <div id="public-session-attendance" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Public APIs</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Update Public Live Session Attendance & Progress</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Logs student join/leave events for a live session using user UUID without requiring JWT headers. Handles multi-join sessions automatically by retaining and accumulating total duration spent across all join/leave cycles.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/live-sessions/attendance/public</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Body Fields (JSON)</div>
+              <table class="w-full text-xs border-collapse border border-zinc-900 text-left">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900 font-mono"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">userId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Student's User UUID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">liveSessionId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Live Session UUID.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">status</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400"><code class="font-mono text-zinc-200">'joined'</code> or <code class="font-mono text-zinc-200">'left'</code>.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">durationSeconds</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">If status is 'left'</td><td class="p-2 text-zinc-400">Time spent during this session in seconds.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/live-sessions/attendance/public', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    userId: '9071b1e1-b92a-4208-974d-4e9c3e30934d',
+    liveSessionId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+    status: 'left',
+    durationSeconds: 420
+  })
+});
+const data = await response.json();</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Success Response (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "data": {
+    "id": "progress-uuid",
+    "status": "completed",
+    "liveSessionTimeSpent": 720, // accumulated time
+    "progress": 100,
+    "updatedAt": "2026-08-29T14:30:00.000Z"
+  }
+}</code></pre>
             </div>
           </div>
         </div>
