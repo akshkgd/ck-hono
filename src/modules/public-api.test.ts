@@ -50,7 +50,7 @@ describe('Public APIs (User Profile, Live Session Details & Public Attendance)',
     await db.insert(batchEnrollments).values({
       userId: studentUser.id,
       batchId: batch.id,
-      accessTillDate: '2027-01-01',
+      accessTill: '2027-01-01',
     });
 
     // Insert live session
