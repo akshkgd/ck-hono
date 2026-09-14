@@ -1,11 +1,36 @@
 import { ContentLibraryRepository } from '../../content-library/content-library.repository.js';
 import type { CreateContentLibraryInput, UpdateContentLibraryInput, ContentLibrarySearchQueryInput } from '../../content-library/content-library.validation.js';
+import { generateBunnySignedUrl } from '../../../utils/bunny-token.util.js';
 
 export class AdminContentLibraryService {
   private contentLibraryRepository: ContentLibraryRepository;
 
   constructor() {
     this.contentLibraryRepository = new ContentLibraryRepository();
+  }
+
+  private attachSignedUrl<T extends { videoLink?: string | null }>(item: T) {
+    if (!item) return item;
+    if (item.videoLink) {
+      const signedResult = generateBunnySignedUrl(item.videoLink);
+      if (signedResult) {
+        return {
+          ...item,
+          signedUrl: signedResult.signedUrl,
+          expiresAt: signedResult.expiresAt,
+        };
+      }
+      return {
+        ...item,
+        signedUrl: item.videoLink,
+        expiresAt: null,
+      };
+    }
+    return {
+      ...item,
+      signedUrl: null,
+      expiresAt: null,
+    };
   }
 
   public async createItem(input: CreateContentLibraryInput) {
@@ -22,7 +47,7 @@ export class AdminContentLibraryService {
       hints: input.hints,
       metadata: input.metadata,
     });
-    return item;
+    return this.attachSignedUrl(item);
   }
 
   public async getItem(id: string) {
@@ -30,7 +55,7 @@ export class AdminContentLibraryService {
     if (!item) {
       throw new Error('Content library item not found');
     }
-    return item;
+    return this.attachSignedUrl(item);
   }
 
   public async updateItem(id: string, input: UpdateContentLibraryInput) {
@@ -43,7 +68,7 @@ export class AdminContentLibraryService {
     if (!updated) {
       throw new Error('Failed to update content library item');
     }
-    return updated;
+    return this.attachSignedUrl(updated);
   }
 
   public async deleteItem(id: string) {
@@ -61,7 +86,7 @@ export class AdminContentLibraryService {
     const total = await this.contentLibraryRepository.count(input.q, input.type, input.contentType);
 
     return {
-      items,
+      items: items.map(item => this.attachSignedUrl(item)),
       pagination: {
         page: input.page,
         limit: input.limit,
@@ -70,3 +95,4 @@ export class AdminContentLibraryService {
     };
   }
 }
+
