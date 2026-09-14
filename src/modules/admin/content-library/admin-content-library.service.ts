@@ -16,21 +16,11 @@ export class AdminContentLibraryService {
       if (signedResult) {
         return {
           ...item,
-          signedUrl: signedResult.signedUrl,
-          expiresAt: signedResult.expiresAt,
+          videoLink: signedResult.signedUrl,
         };
       }
-      return {
-        ...item,
-        signedUrl: item.videoLink,
-        expiresAt: null,
-      };
     }
-    return {
-      ...item,
-      signedUrl: null,
-      expiresAt: null,
-    };
+    return item;
   }
 
   public async createItem(input: CreateContentLibraryInput) {
