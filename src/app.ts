@@ -131,6 +131,7 @@ v1.route('/emails', emailRouter);
 
 // Register Routes
 app.route('/v1', v1);
+app.route('/api', v1);
 app.route('/migration', adminMigrationsRouter);
 app.route('/api/auth', authRouter);
 app.route('/docs', docsRouter);

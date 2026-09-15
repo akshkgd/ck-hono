@@ -184,10 +184,25 @@ describe('Batch-Specific Live Sessions Feature Module', () => {
   });
 
   describe('GET /v1/admin/batches/:batchId/live-sessions - List Sessions (Admin)', () => {
-    it('should return live sessions scheduled for the batch', async () => {
+    it('should return live sessions scheduled for the batch via /v1', async () => {
       if (!studentBatchId) return;
 
       const res = await app.request(`/v1/admin/batches/${studentBatchId}/live-sessions`, {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(body.data.length).toBeGreaterThan(0);
+      const testSession = body.data.find((s: any) => s.id === testLiveSessionId);
+      expect(testSession).toBeDefined();
+    });
+
+    it('should return live sessions scheduled for the batch via /api prefix', async () => {
+      if (!studentBatchId) return;
+
+      const res = await app.request(`/api/admin/batches/${studentBatchId}/live-sessions?sectionId=all`, {
         headers: { 'Authorization': `Bearer ${adminToken}` }
       });
 
