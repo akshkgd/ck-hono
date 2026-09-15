@@ -122,17 +122,11 @@ export class AdminLiveSessionsRepository {
           createdAt: batchLiveSessions.createdAt,
           updatedAt: batchLiveSessions.updatedAt,
           batch: {
-            id: batches.id,
             name: batches.name,
-          },
-          section: {
-            id: batchSections.id,
-            title: batchSections.title,
           },
         })
         .from(batchLiveSessions)
         .leftJoin(batches, eq(batches.id, batchLiveSessions.batchId))
-        .leftJoin(batchSections, eq(batchSections.id, batchLiveSessions.sectionId))
         .where(whereClause)
         .orderBy(status === 'past' ? desc(batchLiveSessions.time) : asc(batchLiveSessions.time))
         .limit(limit)
