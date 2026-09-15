@@ -11,6 +11,7 @@ export const createBatchContentSchema = z.object({
   accessTillDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD').optional().nullable(),
   canSubmitAssignment: z.boolean().optional().nullable(),
   metadata: z.record(z.string(), z.any()).default({}),
+  dummyCount: z.number().int().nonnegative().optional().nullable(),
 });
 
 export const updateBatchContentSchema = createBatchContentSchema.partial();

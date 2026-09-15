@@ -62,21 +62,14 @@ export class AdminLiveSessionsRepository {
   }
 
   public async findByBatchId(batchId: string, sectionId?: string | null) {
-    const isValidSectionFilter =
-      Boolean(sectionId) &&
-      sectionId !== 'all' &&
-      sectionId !== 'null' &&
-      sectionId !== 'undefined' &&
-      sectionId!.trim() !== '';
-
     let query = db
       .select()
       .from(batchLiveSessions)
       .where(
-        isValidSectionFilter
+        sectionId
           ? and(
               eq(batchLiveSessions.batchId, batchId),
-              eq(batchLiveSessions.sectionId, sectionId!)
+              eq(batchLiveSessions.sectionId, sectionId)
             )
           : eq(batchLiveSessions.batchId, batchId)
       )

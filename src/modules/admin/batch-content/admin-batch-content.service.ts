@@ -95,6 +95,53 @@ export class AdminBatchContentService {
   public async getBatchContent(id: string) {
     const record = await this.batchContentRepository.findById(id);
     if (!record) {
+      const liveSession = await this.liveSessionsRepository.findById(id);
+      if (liveSession) {
+        const batch = await this.batchRepository.findById(liveSession.batchId);
+        let sectionTitle: string | null = null;
+        if (liveSession.sectionId) {
+          const section = await this.batchSectionRepository.findById(liveSession.sectionId);
+          sectionTitle = section?.title || null;
+        }
+        return {
+          id: liveSession.id,
+          batchId: liveSession.batchId,
+          contentId: null,
+          sectionId: liveSession.sectionId,
+          order: liveSession.order,
+          accessOn: 0,
+          accessTill: 0,
+          accessOnDate: null,
+          accessTillDate: null,
+          canSubmitAssignment: false,
+          metadata: {},
+          type: 'live_session',
+          createdAt: liveSession.createdAt,
+          updatedAt: liveSession.updatedAt,
+          batch: {
+            name: batch?.name || '',
+          },
+          section: {
+            title: sectionTitle,
+          },
+          dummyCount: liveSession.dummyCount,
+          content: {
+            title: liveSession.topic,
+            type: 'video',
+            contentType: 'live_session',
+            desc: liveSession.desc,
+            videoLink: liveSession.recordingHls || liveSession.screenHlsVideo || liveSession.faceHlsVideo || null,
+            videoUrl: liveSession.recordingHls || liveSession.screenHlsVideo || liveSession.faceHlsVideo || null,
+            videoDuration: null,
+            assignment: null,
+            time: liveSession.time,
+            screenHlsVideo: liveSession.screenHlsVideo,
+            faceHlsVideo: liveSession.faceHlsVideo,
+            recordingHls: liveSession.recordingHls,
+            dummyCount: liveSession.dummyCount,
+          }
+        };
+      }
       throw new Error('Batch content linkage not found');
     }
     return record;
@@ -103,6 +150,15 @@ export class AdminBatchContentService {
   public async updateBatchContent(id: string, input: UpdateBatchContentInput) {
     const record = await this.batchContentRepository.findById(id);
     if (!record) {
+      const liveSession = await this.liveSessionsRepository.findById(id);
+      if (liveSession) {
+        await this.liveSessionsRepository.update(id, {
+          sectionId: input.sectionId ?? undefined,
+          order: input.order ?? undefined,
+          dummyCount: input.dummyCount ?? undefined,
+        });
+        return this.getBatchContent(id);
+      }
       throw new Error('Batch content linkage not found');
     }
 
@@ -147,6 +203,11 @@ export class AdminBatchContentService {
   public async deleteBatchContent(id: string) {
     const record = await this.batchContentRepository.findById(id);
     if (!record) {
+      const liveSession = await this.liveSessionsRepository.findById(id);
+      if (liveSession) {
+        await this.liveSessionsRepository.delete(id);
+        return true;
+      }
       throw new Error('Batch content linkage not found');
     }
     await this.batchContentRepository.delete(id);
@@ -159,14 +220,14 @@ export class AdminBatchContentService {
 
     if (input.batchId) {
       targetBatch = await this.batchRepository.findById(input.batchId);
-      if (targetBatch && (targetBatch.type === 'cohort' || targetBatch.type === 'live')) {
+      if (targetBatch) {
         includeLiveSessions = true;
       }
     } else if (input.sectionId) {
       const section = await this.batchSectionRepository.findById(input.sectionId);
       if (section && section.batchId) {
         targetBatch = await this.batchRepository.findById(section.batchId);
-        if (targetBatch && (targetBatch.type === 'cohort' || targetBatch.type === 'live')) {
+        if (targetBatch) {
           includeLiveSessions = true;
         }
       }
