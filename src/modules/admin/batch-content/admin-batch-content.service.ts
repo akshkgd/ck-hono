@@ -220,6 +220,7 @@ export class AdminBatchContentService {
       section: {
         title: session.sectionId ? (sectionTitleMap.get(session.sectionId) || null) : null,
       },
+      dummyCount: session.dummyCount,
       content: {
         title: session.topic,
         type: 'video',
@@ -233,6 +234,7 @@ export class AdminBatchContentService {
         screenHlsVideo: session.screenHlsVideo,
         faceHlsVideo: session.faceHlsVideo,
         recordingHls: session.recordingHls,
+        dummyCount: session.dummyCount,
       }
     }));
 

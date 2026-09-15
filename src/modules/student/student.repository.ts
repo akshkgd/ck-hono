@@ -145,6 +145,7 @@ export class StudentRepository {
         faceHlsVideo: batchLiveSessions.faceHlsVideo,
         recordingHls: batchLiveSessions.recordingHls,
         order: batchLiveSessions.order,
+        dummyCount: batchLiveSessions.dummyCount,
         progress: {
           status: courseProgress.status,
           timeSpent: courseProgress.timeSpent,
@@ -229,6 +230,7 @@ export class StudentRepository {
         faceHlsVideo: batchLiveSessions.faceHlsVideo,
         recordingHls: batchLiveSessions.recordingHls,
         order: batchLiveSessions.order,
+        dummyCount: batchLiveSessions.dummyCount,
         chapterName: batchSections.title,
         sectionTitle: batchSections.title,
         enrollment: {

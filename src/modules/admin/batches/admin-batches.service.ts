@@ -129,6 +129,7 @@ export class AdminBatchesService {
         sectionId: sessionItem.sectionId,
         order: sessionItem.order,
         type: 'live_session',
+        dummyCount: sessionItem.dummyCount,
         content: {
           title: sessionItem.topic,
           type: 'video', // for frontend representation
@@ -138,6 +139,7 @@ export class AdminBatchesService {
           screenHlsVideo: sessionItem.screenHlsVideo,
           faceHlsVideo: sessionItem.faceHlsVideo,
           recordingHls: sessionItem.recordingHls,
+          dummyCount: sessionItem.dummyCount,
           xp: 0
         }
       };
