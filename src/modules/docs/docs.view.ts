@@ -85,7 +85,7 @@ export function getDocsHtml(): string {
         </div>
 
         <div>
-          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Public APIs & Status</div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Public APIs</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
@@ -99,6 +99,12 @@ export function getDocsHtml(): string {
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
               <a href="#public-session-attendance" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Public Session Attendance</a>
             </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">System Health Checks</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
               <a href="#health-overall" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Overall Health Status</a>
