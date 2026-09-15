@@ -142,7 +142,13 @@ export function getImplementDocsHtml(): string {
           </div>
 
           <div class="space-y-1 border-t border-zinc-900 pt-3">
-            <h3 class="text-sm font-semibold text-white">2. List Batch Live Sessions (Admin)</h3>
+            <h3 class="text-sm font-semibold text-white">2. List All Live Sessions (Global Admin List)</h3>
+            <p class="text-zinc-400 text-xs font-mono">GET /v1/admin/live-sessions?status=upcoming&limit=20&page=1</p>
+            <p class="text-xs text-zinc-400 mb-2">Fetches all live sessions across batches with status filtering (<code class="text-indigo-400 font-mono">status=upcoming|past|all</code>), optional <code class="text-indigo-400 font-mono">batchId</code>, search, and pagination (max limit 100).</p>
+          </div>
+
+          <div class="space-y-1 border-t border-zinc-900 pt-3">
+            <h3 class="text-sm font-semibold text-white">3. List Batch Live Sessions (Admin)</h3>
             <p class="text-zinc-400 text-xs font-mono">GET /v1/admin/batches/:batchId/live-sessions</p>
             <p class="text-xs text-zinc-400 mb-2">Fetches all live sessions scheduled for a batch with optional <code class="text-indigo-400 font-mono">sectionId</code> filtering.</p>
           </div>

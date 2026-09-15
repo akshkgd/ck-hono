@@ -92,6 +92,23 @@ export class AdminLiveSessionsController {
     }
   };
 
+  public listAll = async (c: Context) => {
+    try {
+      const query = (c.req as any).valid('query');
+      const result = await this.service.getAllLiveSessions(query);
+
+      return c.json({
+        status: 'success',
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to list all live sessions',
+      }, 400);
+    }
+  };
+
   public recordAttendance = async (c: Context) => {
     try {
       const body = (c.req as any).valid('json');

@@ -200,6 +200,50 @@ describe('Batch-Specific Live Sessions Feature Module', () => {
     });
   });
 
+  describe('GET /v1/admin/live-sessions - List All Live Sessions (Admin)', () => {
+    it('should return paginated list of all live sessions with batch details', async () => {
+      const res = await app.request('/v1/admin/live-sessions?limit=20&page=1', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+      expect(Array.isArray(body.data.items)).toBe(true);
+      expect(body.data.pagination).toBeDefined();
+      expect(body.data.pagination.page).toBe(1);
+      expect(body.data.pagination.limit).toBe(20);
+    });
+
+    it('should filter live sessions by status (upcoming vs past)', async () => {
+      const upcomingRes = await app.request('/v1/admin/live-sessions?status=upcoming', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      expect(upcomingRes.status).toBe(200);
+
+      const pastRes = await app.request('/v1/admin/live-sessions?status=past', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      expect(pastRes.status).toBe(200);
+    });
+
+    it('should allow searching live sessions by topic', async () => {
+      const res = await app.request('/v1/admin/live-sessions?search=PostgreSQL', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.status).toBe('success');
+    });
+
+    it('should enforce maximum limit of 100 per page', async () => {
+      const res = await app.request('/v1/admin/live-sessions?limit=150', {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+      expect(res.status).toBe(400); // Fails max(100) validation
+    });
+  });
+
   describe('GET /v1/student/batches/:batchId/live-sessions - List Sessions (Student)', () => {
     it('should reject access if student is not enrolled', async () => {
       const res = await app.request('/v1/student/batches/a0000000-0000-0000-0000-000000000000/live-sessions', {

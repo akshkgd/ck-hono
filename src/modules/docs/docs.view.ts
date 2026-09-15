@@ -275,6 +275,10 @@ export function getDocsHtml(): string {
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#live-sessions-all" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List all sessions</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
               <a href="#live-sessions-list" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">List batch sessions</a>
             </li>
             <li class="flex items-center gap-2">
@@ -2741,6 +2745,34 @@ const data = await response.json();</code></pre>
     order: 1,
     dummyCount: 150
   })
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /admin/live-sessions -->
+        <div id="live-sessions-all" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Live Sessions</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">List all live sessions</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Fetches a paginated list of all live sessions across batches with filtering for <code class="text-indigo-400 font-mono">status</code> (upcoming, past, all), optional <code class="text-indigo-400 font-mono">batchId</code>, topic <code class="text-indigo-400 font-mono">search</code>, and configurable page pagination (max limit 100). Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/v1/admin/live-sessions?status=upcoming&limit=20&page=1</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/admin/live-sessions?status=upcoming&limit=50&page=1', {
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1Ni...'
+  }
 });</code></pre>
             </div>
           </div>

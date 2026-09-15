@@ -1,7 +1,7 @@
 import { db } from '../../../db/index.js';
-import { batchLiveSessions, users, batchEnrollments, courseProgress } from '../../../db/schema.js';
-import { eq, and, asc } from 'drizzle-orm';
-import { CreateLiveSessionInput, UpdateLiveSessionInput } from './admin-live-sessions.validation.js';
+import { batchLiveSessions, users, batchEnrollments, courseProgress, batches, batchSections } from '../../../db/schema.js';
+import { eq, and, asc, desc, gte, lt, ilike, count } from 'drizzle-orm';
+import { CreateLiveSessionInput, UpdateLiveSessionInput, ListAllLiveSessionsQueryInput } from './admin-live-sessions.validation.js';
 
 export class AdminLiveSessionsRepository {
   public async create(batchId: string, data: CreateLiveSessionInput) {
@@ -76,6 +76,84 @@ export class AdminLiveSessionsRepository {
       .orderBy(asc(batchLiveSessions.order));
 
     return await query;
+  }
+
+  public async findAll({
+    status = 'all',
+    batchId,
+    search,
+    page = 1,
+    limit = 20,
+  }: ListAllLiveSessionsQueryInput) {
+    const conditions = [];
+
+    const now = new Date();
+    if (status === 'upcoming') {
+      conditions.push(gte(batchLiveSessions.time, now));
+    } else if (status === 'past') {
+      conditions.push(lt(batchLiveSessions.time, now));
+    }
+
+    if (batchId) {
+      conditions.push(eq(batchLiveSessions.batchId, batchId));
+    }
+
+    if (search && search.trim() !== '') {
+      conditions.push(ilike(batchLiveSessions.topic, `%${search.trim()}%`));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const offset = (page - 1) * limit;
+
+    const [items, totalResult] = await Promise.all([
+      db
+        .select({
+          id: batchLiveSessions.id,
+          batchId: batchLiveSessions.batchId,
+          sectionId: batchLiveSessions.sectionId,
+          topic: batchLiveSessions.topic,
+          desc: batchLiveSessions.desc,
+          time: batchLiveSessions.time,
+          screenHlsVideo: batchLiveSessions.screenHlsVideo,
+          faceHlsVideo: batchLiveSessions.faceHlsVideo,
+          recordingHls: batchLiveSessions.recordingHls,
+          order: batchLiveSessions.order,
+          dummyCount: batchLiveSessions.dummyCount,
+          createdAt: batchLiveSessions.createdAt,
+          updatedAt: batchLiveSessions.updatedAt,
+          batch: {
+            id: batches.id,
+            name: batches.name,
+          },
+          section: {
+            id: batchSections.id,
+            title: batchSections.title,
+          },
+        })
+        .from(batchLiveSessions)
+        .leftJoin(batches, eq(batches.id, batchLiveSessions.batchId))
+        .leftJoin(batchSections, eq(batchSections.id, batchLiveSessions.sectionId))
+        .where(whereClause)
+        .orderBy(status === 'past' ? desc(batchLiveSessions.time) : asc(batchLiveSessions.time))
+        .limit(limit)
+        .offset(offset),
+
+      db
+        .select({ count: count() })
+        .from(batchLiveSessions)
+        .where(whereClause),
+    ]);
+
+    const total = Number(totalResult[0]?.count || 0);
+
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+      },
+    };
   }
 
   public async findEnrollmentByEmailAndLiveSession(email: string, liveSessionId: string) {

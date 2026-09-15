@@ -7,6 +7,7 @@ import {
   createLiveSessionSchema,
   updateLiveSessionSchema,
   queryLiveSessionSchema,
+  listAllLiveSessionsQuerySchema,
   recordAttendanceSchema
 } from './admin-live-sessions.validation.js';
 
@@ -21,6 +22,12 @@ adminLiveSessionsRouter.post(
   '/live-sessions/attendance',
   zValidator('json', recordAttendanceSchema),
   controller.recordAttendance
+);
+
+adminLiveSessionsRouter.get(
+  '/live-sessions',
+  zValidator('query', listAllLiveSessionsQuerySchema),
+  controller.listAll
 );
 
 adminLiveSessionsRouter.get(

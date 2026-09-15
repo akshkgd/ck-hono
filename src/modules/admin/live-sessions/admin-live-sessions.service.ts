@@ -1,5 +1,5 @@
 import { AdminLiveSessionsRepository } from './admin-live-sessions.repository.js';
-import { CreateLiveSessionInput, UpdateLiveSessionInput, RecordAttendanceInput } from './admin-live-sessions.validation.js';
+import { CreateLiveSessionInput, UpdateLiveSessionInput, RecordAttendanceInput, ListAllLiveSessionsQueryInput } from './admin-live-sessions.validation.js';
 
 export class AdminLiveSessionsService {
   private repository = new AdminLiveSessionsRepository();
@@ -34,6 +34,10 @@ export class AdminLiveSessionsService {
 
   public async getLiveSessionsForBatch(batchId: string, sectionId?: string | null) {
     return await this.repository.findByBatchId(batchId, sectionId);
+  }
+
+  public async getAllLiveSessions(query: ListAllLiveSessionsQueryInput) {
+    return await this.repository.findAll(query);
   }
 
   public async recordAttendance(data: RecordAttendanceInput) {
