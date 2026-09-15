@@ -85,7 +85,7 @@ export function getDocsHtml(): string {
         </div>
 
         <div>
-          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Public APIs</div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Public APIs & Status</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
@@ -98,6 +98,22 @@ export function getDocsHtml(): string {
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
               <a href="#public-session-attendance" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Public Session Attendance</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#health-overall" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Overall Health Status</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#health-server" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Backend Server Status</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#health-db" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Database Status</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-green-500/10 text-green-400 font-mono">GET</span>
+              <a href="#health-bunny" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Bunny CDN / Player Status</a>
             </li>
           </ul>
         </div>
@@ -1075,6 +1091,143 @@ const data = await response.json();</code></pre>
     "progress": 100,
     "updatedAt": "2026-08-29T14:30:00.000Z"
   }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /health -->
+        <div id="health-overall" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Status & Health</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Overall System Health</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Consolidated health status check designed for external status pages (e.g., Better Stack, Upptime). Runs health checks concurrently for backend server instance, PostgreSQL database, and Bunny CDN / video player infrastructure.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/health</span>
+              <span class="text-zinc-500">or</span>
+              <span class="text-zinc-200">/v1/health</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Request Code</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/health');
+const data = await response.json();</code></pre>
+            </div>
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Success Response (200 OK / 503 Service Unavailable)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "operational",
+  "timestamp": "2026-09-15T22:50:51.224Z",
+  "services": {
+    "server": { "status": "operational", "service": "backend", "uptime": 124.5 },
+    "database": { "status": "operational", "service": "database", "latencyMs": 2.11 },
+    "bunny": { "status": "operational", "service": "bunny", "latencyMs": 35.42 }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /health/server -->
+        <div id="health-server" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Status & Health</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Backend Server Health</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Monitors backend Node.js application process health, returning server uptime, Node version, platform information, and heap/RSS memory usage metrics.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/health/server</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Success Response (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "operational",
+  "service": "backend",
+  "timestamp": "2026-09-15T22:50:51.196Z",
+  "uptime": 124.5,
+  "system": {
+    "nodeVersion": "v24.15.0",
+    "platform": "darwin",
+    "memory": {
+      "heapUsed": "75.41 MB",
+      "heapTotal": "181.34 MB",
+      "rss": "260.97 MB"
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /health/db -->
+        <div id="health-db" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Status & Health</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">PostgreSQL Database Health</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Pings the PostgreSQL database with a lightweight query (<code class="font-mono text-zinc-200">SELECT 1</code>) to verify database connectivity and measure query round-trip latency.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/health/db</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Success Response (200 OK / 503 Service Unavailable)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "operational",
+  "service": "database",
+  "timestamp": "2026-09-15T22:50:51.203Z",
+  "latencyMs": 2.11
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: GET /health/bunny -->
+        <div id="health-bunny" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Status & Health</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Bunny CDN / Video Player Health</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Checks Bunny CDN & Stream edge player infrastructure by sending an HTTP <code class="font-mono text-zinc-200">HEAD</code> request with a 5-second timeout to Bunny pull zone host (<code class="font-mono text-zinc-200">vz-09b5be34-aef.b-cdn.net</code>).
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 font-bold">GET</span>
+              <span class="text-zinc-200">/health/bunny</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Success Response (200 OK / 503 Service Unavailable)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "operational",
+  "service": "bunny",
+  "endpoint": "vz-09b5be34-aef.b-cdn.net",
+  "timestamp": "2026-09-15T22:50:51.221Z",
+  "latencyMs": 35.42,
+  "statusCode": 200
 }</code></pre>
             </div>
           </div>
