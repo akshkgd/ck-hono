@@ -11,6 +11,7 @@ export const createLiveSessionSchema = z.object({
   faceHlsVideo: z.string().url('Invalid URL format').or(z.literal('')).optional().nullable(),
   recordingHls: z.string().url('Invalid URL format').or(z.literal('')).optional().nullable(),
   order: z.number().int().nonnegative().default(0),
+  dummyCount: z.number().int().nonnegative().optional().nullable(),
 });
 
 export const updateLiveSessionSchema = z.object({
@@ -24,6 +25,7 @@ export const updateLiveSessionSchema = z.object({
   faceHlsVideo: z.string().url('Invalid URL format').or(z.literal('')).optional().nullable(),
   recordingHls: z.string().url('Invalid URL format').or(z.literal('')).optional().nullable(),
   order: z.number().int().nonnegative().optional(),
+  dummyCount: z.number().int().nonnegative().optional().nullable(),
 });
 
 export const queryLiveSessionSchema = z.object({

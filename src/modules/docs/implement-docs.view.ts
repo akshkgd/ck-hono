@@ -135,7 +135,8 @@ export function getImplementDocsHtml(): string {
   "screenHlsVideo": null,
   "faceHlsVideo": null,
   "recordingHls": null,
-  "order": 1 // Determines placement order within the section
+  "order": 1, // Determines placement order within the section
+  "dummyCount": 150 // Optional dummy participant count
 }</code></pre>
             </div>
           </div>
@@ -166,7 +167,8 @@ export function getImplementDocsHtml(): string {
   "screenHlsVideo": "https://vz-09b5be34-aef.b-cdn.net/screen/playlist.m3u8",
   "faceHlsVideo": "https://vz-09b5be34-aef.b-cdn.net/face/playlist.m3u8",
   "recordingHls": "https://vz-09b5be34-aef.b-cdn.net/recording/playlist.m3u8",
-  "order": 2
+  "order": 2,
+  "dummyCount": 200
 }</code></pre>
             </div>
           </div>

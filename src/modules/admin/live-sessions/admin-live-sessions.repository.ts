@@ -17,6 +17,7 @@ export class AdminLiveSessionsRepository {
         faceHlsVideo: data.faceHlsVideo || null,
         recordingHls: data.recordingHls || null,
         order: data.order ?? 0,
+        dummyCount: data.dummyCount ?? null,
       })
       .returning();
     return results[0];
@@ -32,6 +33,7 @@ export class AdminLiveSessionsRepository {
     if (data.faceHlsVideo !== undefined) updateData.faceHlsVideo = data.faceHlsVideo;
     if (data.recordingHls !== undefined) updateData.recordingHls = data.recordingHls;
     if (data.order !== undefined) updateData.order = data.order;
+    if (data.dummyCount !== undefined) updateData.dummyCount = data.dummyCount;
     updateData.updatedAt = new Date();
 
     const results = await db

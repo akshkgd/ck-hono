@@ -110,7 +110,8 @@ describe('Batch-Specific Live Sessions Feature Module', () => {
           screenHlsVideo: 'https://video.codekaro.in/hls/postres-indexes-screen.m3u8',
           faceHlsVideo: 'https://video.codekaro.in/hls/postres-indexes-face.m3u8',
           recordingHls: 'https://video.codekaro.in/hls/postres-indexes-recording.m3u8',
-          order: 5
+          order: 5,
+          dummyCount: 150,
         })
       });
 
@@ -119,6 +120,7 @@ describe('Batch-Specific Live Sessions Feature Module', () => {
       expect(body.status).toBe('success');
       expect(body.data.id).toBeDefined();
       expect(body.data.topic).toBe('Introduction to PostgreSQL Indexes');
+      expect(body.data.dummyCount).toBe(150);
       testLiveSessionId = body.data.id;
     });
 
@@ -153,6 +155,7 @@ describe('Batch-Specific Live Sessions Feature Module', () => {
       const body = await res.json();
       expect(body.status).toBe('success');
       expect(body.data.topic).toBe('Introduction to PostgreSQL Indexes');
+      expect(body.data.dummyCount).toBe(150);
     });
 
     it('should allow admin to update live session details', async () => {
@@ -166,7 +169,8 @@ describe('Batch-Specific Live Sessions Feature Module', () => {
         },
         body: JSON.stringify({
           topic: 'Optimizing PostgreSQL Indexes & Joins',
-          order: 8
+          order: 8,
+          dummyCount: 200,
         })
       });
 
@@ -175,6 +179,7 @@ describe('Batch-Specific Live Sessions Feature Module', () => {
       expect(body.status).toBe('success');
       expect(body.data.topic).toBe('Optimizing PostgreSQL Indexes & Joins');
       expect(body.data.order).toBe(8);
+      expect(body.data.dummyCount).toBe(200);
     });
   });
 

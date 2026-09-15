@@ -2738,7 +2738,8 @@ const data = await response.json();</code></pre>
     desc: 'Deep dive into vector search & query rewriting',
     time: '2026-08-22T13:30:00.000Z',
     sectionId: '2954771c-4a57-480e-b9e6-ca69161851b7',
-    order: 1
+    order: 1,
+    dummyCount: 150
   })
 });</code></pre>
             </div>
@@ -2781,7 +2782,7 @@ const data = await response.json();</code></pre>
             <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Admin: Live Sessions</div>
             <h3 class="text-2xl font-semibold text-zinc-100">Update live session</h3>
             <p class="text-zinc-400 text-sm leading-relaxed">
-              Updates details of an existing live session (topic, desc, scheduled time, sectionId, screen/face/recording HLS URLs, order). Supports partial updates. Requires Admin Role.
+              Updates details of an existing live session (topic, desc, scheduled time, sectionId, screen/face/recording HLS URLs, order, dummyCount). Supports partial updates. Requires Admin Role.
             </p>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
               <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">PATCH</span>
@@ -2800,6 +2801,7 @@ const data = await response.json();</code></pre>
   },
   body: JSON.stringify({
     topic: 'Advanced RAG Patterns & Vector Search',
+    dummyCount: 200,
     recordingHls: 'https://vz-09b5be34-aef.b-cdn.net/8baa2dc7-1c5f-462c-85cf-ed132bd3b4c1/playlist.m3u8'
   })
 });</code></pre>
