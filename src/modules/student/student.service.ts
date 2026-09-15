@@ -173,7 +173,6 @@ export class StudentService {
         order: sessionItem.order,
         isSequentiallyLocked: false,
         type: 'live_session',
-        dummyCount: sessionItem.dummyCount,
         content: {
           title: sessionItem.topic,
           type: 'video',

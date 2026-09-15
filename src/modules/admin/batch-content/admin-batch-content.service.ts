@@ -124,7 +124,6 @@ export class AdminBatchContentService {
           section: {
             title: sectionTitle,
           },
-          dummyCount: liveSession.dummyCount,
           content: {
             title: liveSession.topic,
             type: 'video',
@@ -281,7 +280,6 @@ export class AdminBatchContentService {
       section: {
         title: session.sectionId ? (sectionTitleMap.get(session.sectionId) || null) : null,
       },
-      dummyCount: session.dummyCount,
       content: {
         title: session.topic,
         type: 'video',

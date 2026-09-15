@@ -129,7 +129,6 @@ export class AdminBatchesService {
         sectionId: sessionItem.sectionId,
         order: sessionItem.order,
         type: 'live_session',
-        dummyCount: sessionItem.dummyCount,
         content: {
           title: sessionItem.topic,
           type: 'video', // for frontend representation
