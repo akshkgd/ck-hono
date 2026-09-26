@@ -18,7 +18,7 @@ export class EmailService {
    * Queue enrollment email notification
    */
   async sendEnrollmentEmail(input: SendEnrollmentEmailInput) {
-    const { to, studentName, courseName, startDate, whatsappLink, telegramLink, meetingLink, dashboardUrl } = input;
+    const { to, studentName, courseName, startDate, whatsappLink, telegramLink, meetingLink, callBookingLink, dashboardUrl } = input;
     const job = await queueEnrollmentEmail(to, {
       studentName,
       courseName,
@@ -26,6 +26,7 @@ export class EmailService {
       whatsappLink,
       telegramLink,
       meetingLink,
+      callBookingLink,
       dashboardUrl,
     });
 

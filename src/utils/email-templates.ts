@@ -5,6 +5,7 @@ export interface EnrollmentTemplatePayload {
   whatsappLink?: string;
   telegramLink?: string;
   meetingLink?: string;
+  callBookingLink?: string;
   dashboardUrl?: string;
 }
 
@@ -38,7 +39,7 @@ export interface GenericTemplatePayload {
 /**
  * Base HTML Template wrapper matching Codekaro minimalist email design specification.
  */
-function renderBaseLayout(title: string, contentHtml: string): string {
+function renderBaseLayout(title: string, contentHtml: string, regardsText: string = 'Codekaro'): string {
   const currentYear = new Date().getFullYear();
   return `<!DOCTYPE html>
 <html lang="en">
@@ -117,7 +118,7 @@ function renderBaseLayout(title: string, contentHtml: string): string {
 
       <div class="regards">
         Regards,<br>
-        Codekaro
+        ${regardsText}
       </div>
 
       <div class="divider">
@@ -142,10 +143,68 @@ export function generateEnrollmentEmail(payload: EnrollmentTemplatePayload): { s
     whatsappLink,
     telegramLink,
     meetingLink,
+    callBookingLink,
     dashboardUrl = process.env.FRONTEND_URL || 'https://codekaro.in/dashboard',
   } = payload;
 
   const nameGreeting = studentName ? ` ${studentName}` : '';
+
+  if (callBookingLink) {
+    const subject = 'Book your Discovery call with Ashish';
+    const html = renderBaseLayout(
+      subject,
+      `
+      <p>Hello${nameGreeting}!</p>
+
+      <p>Thank you for your payment.</p>
+
+      <p>In this 30-minute discovery call, we’ll deep dive into your career goals and honestly evaluate if we can help you achieve guaranteed results with speed and precision.</p>
+
+      <p style="font-weight: 600; color: #171717;">Only apply if you’re 100% committed.</p>
+
+      <p>Please click the button below to schedule your call:</p>
+
+      <div>
+        <a href="${callBookingLink}" class="btn">Book Your Discovery Call</a>
+      </div>
+
+      ${whatsappLink || telegramLink || meetingLink ? `
+      <p>
+        ${whatsappLink ? `<a href="${whatsappLink}" style="color: #171717; font-weight: 600; text-decoration: underline;">Join WhatsApp Group →</a><br>` : ''}
+        ${telegramLink ? `<a href="${telegramLink}" style="color: #171717; font-weight: 600; text-decoration: underline;">Join Telegram Channel →</a><br>` : ''}
+        ${meetingLink ? `<a href="${meetingLink}" style="color: #171717; font-weight: 600; text-decoration: underline;">Live Class Link →</a><br>` : ''}
+      </p>
+      ` : ''}
+
+      <p style="font-size: 13px; color: #525252; margin-top: 16px;">
+        You can also access your account details anytime on your <a href="${dashboardUrl}" style="color: #171717; text-decoration: underline;">Dashboard</a>.
+      </p>
+      `,
+      'Team Codekaro'
+    );
+
+    const text = `Hello${nameGreeting}!
+
+Thank you for your payment.
+
+In this 30-minute discovery call, we’ll deep dive into your career goals and honestly evaluate if we can help you achieve guaranteed results with speed and precision.
+
+Only apply if you’re 100% committed.
+
+Please schedule your discovery call using the link below:
+${callBookingLink}
+
+Dashboard: ${dashboardUrl}
+
+Regards,
+Team Codekaro
+
+Electronic City Phase-1, Bengaluru, BLR 560100, India
+© ${new Date().getFullYear()} Codekaro. All rights reserved.`;
+
+    return { subject, html, text };
+  }
+
   const subject = `Welcome to ${courseName}! Enrollment Confirmed 🎉`;
 
   const html = renderBaseLayout(

@@ -28,6 +28,19 @@ describe('Email Utility & Template Generators', () => {
     expect(rendered.text).toContain('Rahul Sharma');
   });
 
+  it('should generate responsive HTML for call booking enrollment email', () => {
+    const rendered = generateEnrollmentEmail({
+      studentName: 'Ankit Mehta',
+      courseName: '1-on-1 Mentorship Call',
+      callBookingLink: 'https://cal.com/ashish-shukla-ye5ege/apply',
+    });
+
+    expect(rendered.subject).toContain('Book your Discovery call with Ashish');
+    expect(rendered.html).toContain('Ankit Mehta');
+    expect(rendered.html).toContain('https://cal.com/ashish-shukla-ye5ege/apply');
+    expect(rendered.html).toContain('Team Codekaro');
+  });
+
   it('should generate responsive HTML for payment success email', () => {
     const rendered = generatePaymentSuccessEmail({
       studentName: 'Priya Verma',
@@ -37,11 +50,9 @@ describe('Email Utility & Template Generators', () => {
       invoiceId: 'inv_1009',
     });
 
-    expect(rendered.subject).toContain('pay_P12345678');
+    expect(rendered.subject).toContain('Backend Engineering Masterclass');
     expect(rendered.html).toContain('Priya Verma');
     expect(rendered.html).toContain('Backend Engineering Masterclass');
-    expect(rendered.html).toContain('pay_P12345678');
-    expect(rendered.html).toContain('inv_1009');
   });
 
   it('should generate responsive HTML for access granted email', () => {
@@ -53,7 +64,6 @@ describe('Email Utility & Template Generators', () => {
 
     expect(rendered.subject).toContain('Advanced System Design');
     expect(rendered.html).toContain('Amit Kumar');
-    expect(rendered.html).toContain('Lifetime Access');
   });
 
   it('should generate responsive HTML for generic email', () => {

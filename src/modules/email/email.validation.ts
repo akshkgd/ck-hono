@@ -8,6 +8,7 @@ export const sendEnrollmentEmailSchema = z.object({
   whatsappLink: z.string().url().optional(),
   telegramLink: z.string().url().optional(),
   meetingLink: z.string().url().optional(),
+  callBookingLink: z.string().url().optional(),
   dashboardUrl: z.string().url().optional(),
 });
 

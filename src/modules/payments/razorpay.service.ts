@@ -409,6 +409,9 @@ export class RazorpayService {
             dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
           });
         } else {
+          const isCallBooking = batch?.type === 'callBooking';
+          const defaultCallBookingUrl = 'https://cal.com/ashish-shukla-ye5ege/apply';
+
           await queueEnrollmentEmail(user.email, {
             studentName,
             courseName: itemName,
@@ -416,6 +419,7 @@ export class RazorpayService {
             whatsappLink: batch?.whatsAppLink || undefined,
             telegramLink: batch?.telegramLink || undefined,
             meetingLink: batch?.meetingLink || undefined,
+            callBookingLink: isCallBooking ? (batch?.meetingLink || defaultCallBookingUrl) : undefined,
             dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
           });
         }

@@ -120,6 +120,9 @@ export class AdminEnrollmentsService {
         const studentName = user.name || user.email.split('@')[0];
         const courseName = batch.name || 'Cohort Batch';
 
+        const isCallBooking = batch.type === 'callBooking';
+        const defaultCallBookingUrl = 'https://cal.com/ashish-shukla-ye5ege/apply';
+
         // 1. Enrollment Welcome Email
         await queueEnrollmentEmail(user.email, {
           studentName,
@@ -128,6 +131,7 @@ export class AdminEnrollmentsService {
           whatsappLink: batch.whatsAppLink || undefined,
           telegramLink: batch.telegramLink || undefined,
           meetingLink: batch.meetingLink || undefined,
+          callBookingLink: isCallBooking ? (batch.meetingLink || defaultCallBookingUrl) : undefined,
           dashboardUrl: process.env.FRONTEND_URL || 'https://codingkampus.com/dashboard',
         });
 

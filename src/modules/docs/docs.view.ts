@@ -353,6 +353,24 @@ export function getDocsHtml(): string {
         </div>
 
         <div>
+          <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Razorpay Payments</div>
+          <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#razorpay-create-order" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Create Order</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
+              <a href="#razorpay-verify" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Verify Payment</a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-[8px] font-bold px-1 rounded bg-amber-500/10 text-amber-400 font-mono">POST</span>
+              <a href="#razorpay-webhook" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Webhook Handler</a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
           <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Admin: Payments</div>
           <ul class="space-y-1.5 pl-2 border-l border-zinc-900 ml-1">
             <li class="flex items-center gap-2">
@@ -488,8 +506,11 @@ export function getDocsHtml(): string {
       <div class="flex items-center space-x-4">
         <h2 class="text-zinc-100 text-sm font-normal font-mono select-none">API Integration Reference</h2>
       </div>
-      <div class="flex items-center gap-4">
-        <a href="/playground" class="text-indigo-400 hover:text-indigo-300 text-sm transition font-normal font-mono">
+      <div class="flex items-center gap-3">
+        <a href="/docs/payments" class="text-xs text-zinc-400 hover:text-zinc-50 transition border border-zinc-800 px-3 py-1.5 rounded-lg bg-zinc-900 font-mono">Razorpay Guide</a>
+        <a href="/docs/implement" class="text-xs text-zinc-400 hover:text-zinc-50 transition border border-zinc-800 px-3 py-1.5 rounded-lg bg-zinc-900 font-mono">Integration Guide</a>
+        <a href="/docs/email-preview" class="text-xs text-zinc-400 hover:text-zinc-50 transition border border-zinc-800 px-3 py-1.5 rounded-lg bg-zinc-900 font-mono">Email Sandbox</a>
+        <a href="/playground" class="text-indigo-400 hover:text-indigo-300 text-sm transition font-normal font-mono border border-indigo-500/20 px-3 py-1.5 rounded-lg bg-indigo-500/10">
           Playground &rarr;
         </a>
       </div>
@@ -3249,6 +3270,133 @@ const data = await response.json();</code></pre>
           </div>
         </div>
 
+
+        <!-- -------------------- RAZORPAY PAYMENTS GROUP -------------------- -->
+
+        <!-- Endpoint: POST /v1/payments/razorpay/create-order -->
+        <div id="razorpay-create-order" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Razorpay Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Create Razorpay Payment Order</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Initializes a Razorpay order for cohort enrollment, pending payment completion, or access renewal. Supports optional authentication: logged-in students use Bearer token; guest users pass email and phone (creates student account automatically if not registered).
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/payments/razorpay/create-order</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Request Body / Query Parameters</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Key</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">paymentType</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No (enrollment)</td><td class="p-2">One of <code>enrollment</code>, <code>pending_payment</code>, or <code>renew</code>.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Conditional</td><td class="p-2">Required if <code>paymentType</code> is <code>enrollment</code>.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">enrollmentId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Conditional</td><td class="p-2">Required if <code>paymentType</code> is <code>pending_payment</code> or <code>renew</code>.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">email</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">For Guests</td><td class="p-2">Guest student email address. Auto-creates account if not registered.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">phone</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">For Guests</td><td class="p-2">Guest student contact number (10-15 digits).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">name</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2">Optional student display name.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Fetch Example</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/payments/razorpay/create-order', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    paymentType: 'enrollment',
+    batchId: '4',
+    email: 'guest@example.com',
+    phone: '9999999999'
+  })
+});
+const data = await response.json();</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /v1/payments/razorpay/verify -->
+        <div id="razorpay-verify" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Razorpay Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Verify Payment Signature</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Verifies the Razorpay HMAC SHA-256 payment signature. Upon validation, logs payment in database, recalculates total amount paid, marks enrollment captured and active, issues HTTP-only 30-day session cookie, and queues background emails.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/payments/razorpay/verify</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Request Payload (JSON)</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Key</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">enrollmentId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2">Target batch enrollment ID (O(1) database lookup).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">razorpay_payment_id</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2">Payment ID returned from Razorpay SDK modal.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">razorpay_order_id</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2">Order ID returned from Razorpay SDK modal.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">razorpay_signature</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2">HMAC signature string generated by Razorpay SDK.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">JavaScript Verification Call</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>const response = await fetch('https://api.codekaro.in/v1/payments/razorpay/verify', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    enrollmentId: '248',
+    razorpay_payment_id: 'pay_O2GZ...',
+    razorpay_order_id: 'order_O2GY...',
+    razorpay_signature: '9b8a7f...'
+  })
+});
+const data = await response.json();</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /v1/payments/razorpay/webhook -->
+        <div id="razorpay-webhook" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase font-mono">Razorpay Payments</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Razorpay Webhook Callback</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              Handles server-to-server notifications sent by Razorpay. Validates <code>X-Razorpay-Signature</code> header against <code>RAZORPAY_WEBHOOK_SECRET</code>. Processes <code>payment.captured</code> events idempotently for guaranteed payment capture.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/payments/razorpay/webhook</span>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Webhook Headers</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>Content-Type: application/json
+X-Razorpay-Signature: <HMAC_SHA256_HEX></code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
 
         <!-- -------------------- ADMIN: PAYMENTS GROUP -------------------- -->
 
