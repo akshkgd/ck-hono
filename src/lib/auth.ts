@@ -20,6 +20,8 @@ export const auth = betterAuth({
     'https://codekaro.in',
     'https://app.codekaro.in',
     'http://app.codekaro.in',
+    // API host itself: lets server-rendered admin pages (e.g. /admin/fix-enrollment-totals) sign in same-origin
+    'https://api.codekaro.in',
     'https://live.codekaro.in',
     'http://live.codekaro.in',
     'http://localhost:3000',
