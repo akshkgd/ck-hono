@@ -1,0 +1,1 @@
+ALTER TABLE "course_progress" ADD COLUMN "last_ping_at" timestamp;

@@ -4,10 +4,10 @@ export const getCoursesQuerySchema = z.object({});
 
 export const studentProgressSchema = z.object({
   batchContentId: z.string(),
-  timeSpent: z.number().int().nonnegative().default(0), // Delta time spent (seconds) since last ping
+  timeSpent: z.number().int().nonnegative().optional(), // Legacy hint: delta seconds since last ping. Only an upper bound; the server credits time itself
   progress: z.number().int().min(0).max(100).default(0), // Completion progress percentage (0-100)
   status: z.enum(['not_started', 'learning', 'completed']).default('learning'),
-  lastWatchedPosition: z.number().int().nonnegative().default(0), // Latest playback timestamp in seconds
+  lastWatchedPosition: z.number().int().nonnegative().optional(), // Latest playback timestamp in seconds; used for resume and to verify the video actually advanced
 });
 
 export type StudentProgressInput = z.infer<typeof studentProgressSchema>;

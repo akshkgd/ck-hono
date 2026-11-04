@@ -218,6 +218,8 @@ export const courseProgress = pgTable('course_progress', {
   codeSubmitted: text('code_submitted'),
   codeSubmittedStatus: codeSubmittedStatusEnum('code_submitted_status'),
   lastWatchedPosition: integer('last_watched_position').default(0).notNull(),
+  // Server-side timestamp of the last heartbeat; anchors time credit so pings never overlap.
+  lastPingAt: timestamp('last_ping_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [

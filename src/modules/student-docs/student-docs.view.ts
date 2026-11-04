@@ -893,9 +893,9 @@ const data = await response.json();</code></pre>
             <div class="space-y-2 text-zinc-400 text-xs leading-relaxed">
               <p><strong>High-Performance Aggregations:</strong></p>
               <ul class="list-disc pl-5 space-y-1">
-                <li><code class="font-mono text-zinc-200">timeSpent</code>: The value passed represents the elapsed time delta (e.g. 60 seconds) since the last ping. The backend atomically increments the cumulative database counter.</li>
+                <li><code class="font-mono text-zinc-200">timeSpent</code> / <code class="font-mono text-zinc-200">lastWatchedPosition</code>: Watch time is credited by the server. <code class="font-mono text-zinc-200">timeSpent</code> (optional delta seconds) is only an upper bound; the credited time is also capped by the wall-clock gap since the previous heartbeat and by how far <code class="font-mono text-zinc-200">lastWatchedPosition</code> advanced, so a paused video, duplicate pings and multiple tabs cannot inflate it. Send <code class="font-mono text-zinc-200">lastWatchedPosition</code> (seconds) on every heartbeat, including on pause. A row is created on the first heartbeat, so short sessions are never dropped.</li>
                 <li><code class="font-mono text-zinc-200">progress</code>: The backend updates the progress to the maximum of the current value and the new value.</li>
-                <li><code class="font-mono text-zinc-200">Enrollment Aggregates</code>: Automatically increments total course viewing duration and re-calculates batch average completion percentage in a single optimized query.</li>
+                <li><code class="font-mono text-zinc-200">Enrollment Aggregates</code>: Total viewing time and completion percentage are re-derived from the per-video rows in the same transaction, so the enrollment total always equals the sum of its videos.</li>
               </ul>
             </div>
             <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
@@ -911,7 +911,7 @@ const data = await response.json();</code></pre>
                 </thead>
                 <tbody>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">batchContentId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-indigo-400">Yes</td><td class="p-2 text-zinc-400">Batch content unique ID.</td></tr>
-                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">timeSpent</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Delta time spent in seconds (default 0).</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">timeSpent</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Optional delta seconds since the last heartbeat (upper bound only; the server credits the time).</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">progress</td><td class="p-2 border-r border-zinc-900 text-zinc-400">number</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Completion progress percentage (0-100).</td></tr>
                   <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 font-mono text-zinc-300">status</td><td class="p-2 border-r border-zinc-900 text-zinc-400">enum</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">'not_started' | 'learning' | 'completed'</td></tr>
                 </tbody>

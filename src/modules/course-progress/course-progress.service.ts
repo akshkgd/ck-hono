@@ -1,6 +1,8 @@
 import { CourseProgressRepository } from './course-progress.repository.js';
 import { EnrollmentRepository } from '../enrollments/enrollment.repository.js';
 import { BatchContentRepository } from '../batch-content/batch-content.repository.js';
+import { recalculateEnrollmentAggregates } from '../enrollments/enrollment-aggregates.js';
+import { db } from '../../db/index.js';
 import type { UpsertProgressInput } from './course-progress.validation.js';
 
 export class CourseProgressService {
@@ -37,19 +39,9 @@ export class CourseProgressService {
       status: input.status,
     });
 
-    // 4. Recalculate and update total progress on the parent enrollment
+    // 4. Re-derive enrollment totals from the per-content rows (shared with the student heartbeat flow)
     const totalContentCount = await this.batchContentRepository.count(contentLink.batchId);
-    if (totalContentCount > 0) {
-      const aggregates = await this.courseProgressRepository.getAggregateProgressForEnrollment(enrollment.id);
-      
-      const overallProgress = Math.min(100, Math.round(aggregates.totalProgressSum / totalContentCount));
-      const overallTimeSpent = aggregates.totalTimeSpent;
-
-      await this.enrollmentRepository.update(enrollment.id, {
-        progress: overallProgress,
-        timeSpentSeconds: overallTimeSpent,
-      });
-    }
+    await recalculateEnrollmentAggregates(db, enrollment.id, totalContentCount);
 
     return progressRecord;
   }

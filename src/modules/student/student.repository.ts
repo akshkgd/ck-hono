@@ -1,6 +1,8 @@
 import { db } from '../../db/index.js';
 import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress, batchEnrollmentPayments, users, batchLiveSessions } from '../../db/schema.js';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
+import { recalculateEnrollmentAggregates, type DbExecutor } from '../enrollments/enrollment-aggregates.js';
+import { computeTimeCredit, computeProgressState, normalizeVideoDurationSeconds, type ProgressStatus } from './video-progress.util.js';
 
 export class StudentRepository {
   public async findEnrolledCourses(userId: string) {
@@ -259,123 +261,142 @@ export class StudentRepository {
     return results[0];
   }
 
-  public async upsertContentProgress(
-    userId: string,
-    enrollmentId: string,
-    batchContentId: string,
-    timeSpentDelta: number,
-    progress: number,
-    status: 'not_started' | 'learning' | 'completed',
-    videoDuration?: number | null,
-    canSubmitAssignment?: boolean | null,
-    lastWatchedPosition?: number,
-    xp?: number | null
-  ) {
-    const existing = await db
-      .select({ id: courseProgress.id, status: courseProgress.status })
-      .from(courseProgress)
-      .where(and(
-        eq(courseProgress.enrollmentId, enrollmentId),
-        eq(courseProgress.batchContentId, batchContentId)
-      ))
-      .limit(1);
+  /**
+   * Records one video heartbeat atomically.
+   *
+   * Everything happens in one transaction under a row lock on the enrollment, so
+   * concurrent heartbeats (multiple tabs, retries, pause + timer pings) are
+   * applied one after another. Time is credited server-side (see
+   * `computeTimeCredit`), the content row is written with explicit values,
+   * the enrollment aggregates are re-derived from the rows, and XP is awarded
+   * exactly once on the transition to completed.
+   *
+   * A row is always created on the first heartbeat, so short sessions and the
+   * resume position are never dropped.
+   */
+  public async recordVideoHeartbeat(params: {
+    userId: string;
+    enrollmentId: string;
+    batchId: string;
+    batchContentId: string;
+    /** Legacy client-reported delta (seconds); only used as an upper bound. */
+    claimedTimeSpent?: number;
+    progress: number;
+    status: ProgressStatus;
+    position?: number;
+    videoDuration?: number | null;
+    canSubmitAssignment?: boolean | null;
+    xp?: number | null;
+  }) {
+    const durationSeconds = normalizeVideoDurationSeconds(params.videoDuration);
 
-    const wasCompleted = existing.length > 0 && existing[0].status === 'completed';
-    const hasRecord = existing.length > 0;
+    return db.transaction(async (tx) => {
+      // Serialise all heartbeats of this enrollment.
+      await tx
+        .select({ id: batchEnrollments.id })
+        .from(batchEnrollments)
+        .where(eq(batchEnrollments.id, params.enrollmentId))
+        .for('update');
 
-    if (!hasRecord && timeSpentDelta < 60 && status !== 'completed' && progress < 75) {
-      return null;
-    }
+      const [existing] = await tx
+        .select()
+        .from(courseProgress)
+        .where(and(
+          eq(courseProgress.enrollmentId, params.enrollmentId),
+          eq(courseProgress.batchContentId, params.batchContentId)
+        ))
+        .limit(1);
 
-    const durationInSeconds = videoDuration && videoDuration < 100 ? videoDuration * 60 : videoDuration;
+      const now = new Date();
+      const credit = computeTimeCredit({
+        claimedSeconds: params.claimedTimeSpent,
+        now,
+        lastPingAt: existing?.lastPingAt ?? null,
+        position: params.position,
+        lastPosition: existing ? existing.lastWatchedPosition : null,
+      });
 
-    const isCompletedOnInsert = progress >= 75 || status === 'completed' || (durationInSeconds ? timeSpentDelta >= durationInSeconds * 0.75 : false);
-    const calculatedProgressFromTime = durationInSeconds ? Math.min(100, Math.round((timeSpentDelta * 100) / durationInSeconds)) : 0;
-    const progressOnInsert = isCompletedOnInsert 
-      ? 100 
-      : Math.max(progress, calculatedProgressFromTime);
-    const assignmentStatusOnInsert = (canSubmitAssignment && timeSpentDelta >= 600) ? 'pending' : null;
+      const next = computeProgressState({
+        prevTimeSpent: existing?.timeSpent ?? 0,
+        prevProgress: existing?.progress ?? 0,
+        prevStatus: existing?.status ?? null,
+        creditedSeconds: credit,
+        inputProgress: params.progress,
+        inputStatus: params.status,
+        durationSeconds,
+      });
 
-    const results = await db
-      .insert(courseProgress)
-      .values({
-        userId,
-        enrollmentId,
-        batchContentId,
-        timeSpent: timeSpentDelta,
-        progress: progressOnInsert,
-        status: isCompletedOnInsert ? 'completed' : 'learning',
-        assignmentStatus: assignmentStatusOnInsert,
-        lastWatchedPosition: lastWatchedPosition || 0,
-      })
-      .onConflictDoUpdate({
-        target: [courseProgress.enrollmentId, courseProgress.batchContentId],
-        set: {
-          timeSpent: sql`${courseProgress.timeSpent} + ${timeSpentDelta}`,
-          progress: durationInSeconds
-            ? sql`CASE 
-                WHEN GREATEST(${courseProgress.progress}, ${progress}) >= 75 OR ${status} = 'completed' OR ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${durationInSeconds} * 0.75 THEN 100 
-                ELSE CAST(LEAST(100, GREATEST(${courseProgress.progress}, ${progress}, ROUND((${courseProgress.timeSpent} + ${timeSpentDelta}) * 100.0 / ${durationInSeconds}))) AS integer) 
-              END`
-            : sql`CASE 
-                WHEN GREATEST(${courseProgress.progress}, ${progress}) >= 75 OR ${status} = 'completed' THEN 100
-                ELSE GREATEST(${courseProgress.progress}, ${progress})
-              END`,
-          status: durationInSeconds
-            ? sql`CASE 
-                WHEN GREATEST(${courseProgress.progress}, ${progress}) >= 75 OR ${status} = 'completed' OR ${courseProgress.timeSpent} + ${timeSpentDelta} >= ${durationInSeconds} * 0.75 OR CAST(LEAST(100, ROUND((${courseProgress.timeSpent} + ${timeSpentDelta}) * 100.0 / ${durationInSeconds})) AS integer) >= 75 THEN 'completed'::user_status 
-                ELSE 'learning'::user_status 
-              END`
-            : sql`CASE 
-                WHEN GREATEST(${courseProgress.progress}, ${progress}) >= 75 OR ${status} = 'completed' THEN 'completed'::user_status 
-                ELSE 'learning'::user_status 
-              END`,
-          assignmentStatus: canSubmitAssignment
-            ? sql`CASE 
-                WHEN ${courseProgress.assignmentStatus} IS NULL AND ${courseProgress.timeSpent} + ${timeSpentDelta} >= 600 THEN 'pending'::assignment_status 
-                ELSE ${courseProgress.assignmentStatus} 
-              END`
-            : courseProgress.assignmentStatus,
-          lastWatchedPosition: lastWatchedPosition !== undefined ? lastWatchedPosition : courseProgress.lastWatchedPosition,
-          updatedAt: new Date(),
-        }
-      })
-      .returning();
+      const position = params.position ?? existing?.lastWatchedPosition ?? 0;
+      const assignmentStatus =
+        existing?.assignmentStatus ??
+        (params.canSubmitAssignment && next.timeSpent >= 600 ? ('pending' as const) : null);
 
-    const progressRecord = results[0];
+      let record: typeof courseProgress.$inferSelect;
+      if (existing) {
+        [record] = await tx
+          .update(courseProgress)
+          .set({
+            timeSpent: next.timeSpent,
+            progress: next.progress,
+            status: next.status,
+            assignmentStatus,
+            lastWatchedPosition: position,
+            lastPingAt: now,
+            updatedAt: now,
+          })
+          .where(eq(courseProgress.id, existing.id))
+          .returning();
+      } else {
+        [record] = await tx
+          .insert(courseProgress)
+          .values({
+            userId: params.userId,
+            enrollmentId: params.enrollmentId,
+            batchContentId: params.batchContentId,
+            timeSpent: next.timeSpent,
+            progress: next.progress,
+            status: next.status,
+            assignmentStatus,
+            lastWatchedPosition: position,
+            lastPingAt: now,
+          })
+          .returning();
+      }
 
-    // Award XP on transition to completed
-    if (progressRecord && !wasCompleted && progressRecord.status === 'completed' && xp) {
-      await db
-        .update(users)
-        .set({ xp: sql`${users.xp} + ${xp}` })
-        .where(eq(users.id, userId));
-    }
+      const aggregatesChanged =
+        !existing ||
+        credit > 0 ||
+        existing.progress !== next.progress ||
+        existing.status !== next.status;
 
-    return progressRecord;
+      if (aggregatesChanged) {
+        const totalContentCount = await this.countBatchContents(params.batchId, tx);
+        await recalculateEnrollmentAggregates(tx, params.enrollmentId, totalContentCount);
+      }
+
+      // Award XP on the transition to completed (serialised by the enrollment lock).
+      if (existing?.status !== 'completed' && next.status === 'completed' && params.xp) {
+        await tx
+          .update(users)
+          .set({ xp: sql`${users.xp} + ${params.xp}` })
+          .where(eq(users.id, params.userId));
+      }
+
+      return record;
+    });
   }
 
-  public async countBatchContents(batchId: string): Promise<number> {
-    const results = await db
+  public async countBatchContents(batchId: string, executor: DbExecutor = db): Promise<number> {
+    const results = await executor
       .select({ count: sql<number>`cast(count(*) as integer)` })
       .from(batchContent)
       .where(eq(batchContent.batchId, batchId));
     return results[0]?.count || 0;
   }
 
-  public async updateEnrollmentAggregates(enrollmentId: string, timeSpentDelta: number, totalContentCount: number) {
-    await db
-      .update(batchEnrollments)
-      .set({
-        timeSpentSeconds: sql`${batchEnrollments.timeSpentSeconds} + ${timeSpentDelta}`,
-        progress: sql`(
-          SELECT LEAST(100, COALESCE(ROUND(SUM(${courseProgress.progress}) * 1.0 / ${totalContentCount}), 0))
-          FROM ${courseProgress}
-          WHERE ${courseProgress.enrollmentId} = ${enrollmentId}
-        )`,
-        updatedAt: new Date(),
-      })
-      .where(eq(batchEnrollments.id, enrollmentId));
+  /** Re-derives enrollment progress/time from the per-content rows. */
+  public async updateEnrollmentAggregates(enrollmentId: string, totalContentCount: number) {
+    await recalculateEnrollmentAggregates(db, enrollmentId, totalContentCount);
   }
 
   public async upsertAssignmentSubmission(

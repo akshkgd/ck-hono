@@ -449,49 +449,21 @@ export class StudentService {
 
     const enrollmentId = enrollment.id!;
 
-    // 2. Perform atomic upsert for specific batchContent progress (Query 1)
-    const progressRecord = await this.studentRepository.upsertContentProgress(
+    // 2. Record the heartbeat atomically (row upsert + enrollment aggregates + XP in one transaction).
+    //    Watch time is credited server-side; the client's `timeSpent` is only an upper bound.
+    return this.studentRepository.recordVideoHeartbeat({
       userId,
       enrollmentId,
-      input.batchContentId,
-      input.timeSpent,
-      input.progress,
-      input.status,
-      details.videoDuration,
-      details.canSubmitAssignment,
-      input.lastWatchedPosition,
-      details.xp
-    );
-
-    // 3. Count all contents in the batch
-    const totalContentCount = await this.studentRepository.countBatchContents(details.batchId);
-
-    // 4. Atomic aggregate update to enrollment records (Query 2)
-    if (totalContentCount > 0) {
-      await this.studentRepository.updateEnrollmentAggregates(
-        enrollmentId,
-        input.timeSpent,
-        totalContentCount
-      );
-    }
-
-    if (!progressRecord) {
-      return {
-        id: 'none',
-        userId,
-        enrollmentId,
-        batchContentId: input.batchContentId,
-        timeSpent: 0,
-        progress: 0,
-        status: 'not_started' as const,
-        assignmentStatus: null,
-        lastWatchedPosition: input.lastWatchedPosition || 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-    }
-
-    return progressRecord;
+      batchId: details.batchId,
+      batchContentId: input.batchContentId,
+      claimedTimeSpent: input.timeSpent,
+      progress: input.progress,
+      status: input.status,
+      position: input.lastWatchedPosition,
+      videoDuration: details.videoDuration,
+      canSubmitAssignment: details.canSubmitAssignment,
+      xp: details.xp,
+    });
   }
 
   public async submitAssignment(userId: string, batchContentId: string, input: StudentAssignmentInput) {
@@ -536,11 +508,10 @@ export class StudentService {
     // 3. Count all contents in the batch
     const totalContentCount = await this.studentRepository.countBatchContents(details.batchId);
 
-    // 4. Update aggregates (Query 2) - Note: assignment submission adds 0 delta to timeSpent, but updates completion progress
+    // 4. Re-derive enrollment aggregates (assignment submission adds no time, but updates completion progress)
     if (totalContentCount > 0) {
       await this.studentRepository.updateEnrollmentAggregates(
         enrollmentId,
-        0,
         totalContentCount
       );
     }
