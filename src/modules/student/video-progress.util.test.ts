@@ -3,6 +3,7 @@ import {
   computeTimeCredit,
   computeProgressState,
   normalizeVideoDurationSeconds,
+  deriveAssignmentStatus,
   MAX_CREDIT_PER_PING_SECONDS,
 } from './video-progress.util.js';
 
@@ -92,5 +93,26 @@ describe('normalizeVideoDurationSeconds', () => {
     const durationSeconds = normalizeVideoDurationSeconds(30); // stored as 30 minutes
     const s = computeProgressState({ prevTimeSpent: 40, prevProgress: 2, prevStatus: 'learning', creditedSeconds: 20, inputProgress: 0, inputStatus: 'learning', durationSeconds });
     expect(s.status).toBe('learning');
+  });
+});
+
+describe('deriveAssignmentStatus', () => {
+  it('keeps any status that is already set', () => {
+    expect(deriveAssignmentStatus({ canSubmitAssignment: true, assignmentStatus: 'submitted', status: 'completed' })).toBe('submitted');
+    expect(deriveAssignmentStatus({ canSubmitAssignment: false, assignmentStatus: 'approved' })).toBe('approved');
+  });
+
+  it('becomes pending when a completed video has submissions enabled', () => {
+    expect(deriveAssignmentStatus({ canSubmitAssignment: true, assignmentStatus: null, status: 'completed' })).toBe('pending');
+  });
+
+  it('does not unlock by watch time alone', () => {
+    expect(deriveAssignmentStatus({ canSubmitAssignment: true, assignmentStatus: null, status: 'learning' })).toBeNull();
+  });
+
+  it('stays null when submissions are off or the video is not completed', () => {
+    expect(deriveAssignmentStatus({ canSubmitAssignment: false, assignmentStatus: null, status: 'completed' })).toBeNull();
+    expect(deriveAssignmentStatus({ canSubmitAssignment: null, assignmentStatus: null, status: 'completed' })).toBeNull();
+    expect(deriveAssignmentStatus({ canSubmitAssignment: true, assignmentStatus: null, status: null })).toBeNull();
   });
 });

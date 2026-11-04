@@ -303,5 +303,20 @@ export class BatchContentRepository {
 
     return results.length;
   }
-}
 
+  /**
+   * When canSubmitAssignment is switched on for existing content, students who already completed
+   * it still have a null assignment_status. Move them to 'pending'.
+   * Students who haven't completed it yet get it when they complete it, as usual.
+   */
+  public async promoteQualifiedAssignments(batchContentId: string): Promise<number> {
+    const result = await db.execute(sql`
+      UPDATE course_progress
+      SET assignment_status = 'pending', updated_at = now()
+      WHERE batch_content_id = ${batchContentId}::uuid
+        AND assignment_status IS NULL
+        AND status = 'completed'
+    `);
+    return result.rowCount ?? 0;
+  }
+}

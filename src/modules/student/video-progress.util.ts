@@ -115,3 +115,23 @@ export function computeProgressState(input: ProgressStateInput): ProgressState {
     status: completed ? 'completed' : 'learning',
   };
 }
+
+export type AssignmentStatus = 'pending' | 'submitted' | 'under review' | 'approved' | 'rejected';
+
+/**
+ * The assignment status a student should see/use.
+ *
+ * An assignment becomes `pending` when its video is completed (completion is reported by the client,
+ * since playback speed varies). `assignment_status` is normally saved at that moment, but if
+ * `canSubmitAssignment` was switched on AFTER the student completed the video, the row would keep a
+ * null status forever. A completed video with submissions enabled is therefore treated as `pending`.
+ */
+export function deriveAssignmentStatus(input: {
+  canSubmitAssignment?: boolean | null;
+  assignmentStatus?: AssignmentStatus | null;
+  status?: ProgressStatus | null;
+}): AssignmentStatus | null {
+  if (input.assignmentStatus) return input.assignmentStatus;
+  if (input.canSubmitAssignment !== true) return null;
+  return input.status === 'completed' ? 'pending' : null;
+}

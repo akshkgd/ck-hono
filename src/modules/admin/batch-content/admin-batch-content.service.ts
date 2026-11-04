@@ -196,6 +196,11 @@ export class AdminBatchContentService {
       throw new Error('Failed to update batch content linkage');
     }
 
+    // Assignments switched on after students already watched this content: make them submittable.
+    if (input.canSubmitAssignment === true && record.canSubmitAssignment !== true) {
+      await this.batchContentRepository.promoteQualifiedAssignments(id);
+    }
+
     return updated;
   }
 

@@ -1,4 +1,5 @@
 import { StudentRepository } from './student.repository.js';
+import { deriveAssignmentStatus } from './video-progress.util.js';
 import { UserRepository } from '../users/user.repository.js';
 import type { StudentProgressInput, StudentAssignmentInput, UpdateProfileInput } from './student.validation.js';
 import { AdminLiveSessionsRepository } from '../admin/live-sessions/admin-live-sessions.repository.js';
@@ -152,7 +153,11 @@ export class StudentService {
           githubLink: item.progress?.githubLink || null,
           deployedLink: item.progress?.deployedLink || null,
           DeployedLink: item.progress?.deployedLink || null,
-          assignmentStatus: item.progress?.assignmentStatus || null,
+          assignmentStatus: deriveAssignmentStatus({
+            canSubmitAssignment: item.canSubmitAssignment,
+            assignmentStatus: item.progress?.assignmentStatus,
+            status: item.progress?.status,
+          }),
           teacherRemark: item.progress?.teacherRemark || null,
           videoFeedback: item.progress?.videoFeedback || null,
         }
@@ -492,7 +497,12 @@ export class StudentService {
       throw new Error('Access denied: Assignment submission is disabled for this content item');
     }
 
-    if (details.assignmentStatus !== 'pending') {
+    const effectiveAssignmentStatus = deriveAssignmentStatus({
+      canSubmitAssignment: details.canSubmitAssignment,
+      assignmentStatus: details.assignmentStatus,
+      status: details.progressStatus,
+    });
+    if (effectiveAssignmentStatus !== 'pending') {
       throw new Error('Access denied: You can only submit when assignment status is pending');
     }
 

@@ -2,7 +2,7 @@ import { db } from '../../db/index.js';
 import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress, batchEnrollmentPayments, users, batchLiveSessions } from '../../db/schema.js';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
 import { recalculateEnrollmentAggregates } from '../enrollments/enrollment-aggregates.js';
-import { computeTimeCredit, computeProgressState, normalizeVideoDurationSeconds, type ProgressStatus } from './video-progress.util.js';
+import { computeTimeCredit, deriveAssignmentStatus, computeProgressState, normalizeVideoDurationSeconds, type ProgressStatus } from './video-progress.util.js';
 
 export class StudentRepository {
   public async findEnrolledCourses(userId: string) {
@@ -329,9 +329,13 @@ export class StudentRepository {
       });
 
       const position = params.position ?? existing?.lastWatchedPosition ?? 0;
-      const assignmentStatus =
-        existing?.assignmentStatus ??
-        (params.canSubmitAssignment && next.timeSpent >= 600 ? ('pending' as const) : null);
+      // Persist `pending` as soon as the video is completed (client-reported completion is trusted,
+      // since playback speed varies). Any existing status is kept.
+      const assignmentStatus = deriveAssignmentStatus({
+        canSubmitAssignment: params.canSubmitAssignment,
+        assignmentStatus: existing?.assignmentStatus,
+        status: next.status,
+      });
 
       let record: typeof courseProgress.$inferSelect;
       if (existing) {
