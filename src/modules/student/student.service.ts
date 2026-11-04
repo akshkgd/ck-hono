@@ -242,8 +242,17 @@ export class StudentService {
     };
   }
 
-  public async checkContentAccess(userId: string, batchContentId: string) {
-    const details = await this.studentRepository.getBatchContentAccessDetails(batchContentId, userId);
+  public async checkContentAccess(
+    userId: string,
+    batchContentId: string,
+    options: {
+      /** Already-fetched details, to avoid repeating the same join. */
+      details?: Awaited<ReturnType<StudentRepository['getBatchContentAccessDetails']>>;
+      /** Skip the previous-video gate (content the student has already started). */
+      skipSequentialCheck?: boolean;
+    } = {}
+  ) {
+    const details = options.details ?? await this.studentRepository.getBatchContentAccessDetails(batchContentId, userId);
     if (!details) {
       // Check if ID belongs to a live session
       const liveDetails = await this.studentRepository.getLiveSessionAccessDetails(batchContentId, userId);
@@ -376,7 +385,7 @@ export class StudentService {
     }
 
     // 6. Sequential Learning Checks
-    if (enrollment.sequentialLearning || enrollment.sequentialLearningWithAssignments) {
+    if (!options.skipSequentialCheck && (enrollment.sequentialLearning || enrollment.sequentialLearningWithAssignments)) {
       const contents = await this.studentRepository.getBatchContentWithProgress(details.batchId, userId, enrollment.id!);
       
       let lastVideoItem: any = null;
@@ -442,7 +451,12 @@ export class StudentService {
       throw new Error('Access denied: Course requires a captured enrollment payment');
     }
 
-    const access = await this.checkContentAccess(userId, input.batchContentId);
+    // Reuse the details already fetched above. If the student already has a progress row for this
+    // content they have started it, so the "previous video completed" gate is not re-evaluated on every ping.
+    const access = await this.checkContentAccess(userId, input.batchContentId, {
+      details,
+      skipSequentialCheck: !!details.progressId,
+    });
     if (!access.allowed) {
       throw new Error(`Access denied: ${access.reason}`);
     }
@@ -505,16 +519,8 @@ export class StudentService {
       input
     );
 
-    // 3. Count all contents in the batch
-    const totalContentCount = await this.studentRepository.countBatchContents(details.batchId);
-
-    // 4. Re-derive enrollment aggregates (assignment submission adds no time, but updates completion progress)
-    if (totalContentCount > 0) {
-      await this.studentRepository.updateEnrollmentAggregates(
-        enrollmentId,
-        totalContentCount
-      );
-    }
+    // 3. Re-derive enrollment aggregates (assignment submission adds no time, but updates completion progress)
+    await this.studentRepository.updateEnrollmentAggregates(enrollmentId);
 
     return progressRecord;
   }

@@ -81,10 +81,10 @@ describe('computeProgressState', () => {
 });
 
 describe('normalizeVideoDurationSeconds', () => {
-  it('keeps the legacy unit heuristic in one place', () => {
+  it('treats video_duration as seconds (no minutes heuristic)', () => {
     expect(normalizeVideoDurationSeconds(null)).toBeNull();
     expect(normalizeVideoDurationSeconds(0)).toBeNull();
-    expect(normalizeVideoDurationSeconds(30)).toBe(1800);
-    expect(normalizeVideoDurationSeconds(1800)).toBe(1800);
+    expect(normalizeVideoDurationSeconds(45)).toBe(45);
+    expect(normalizeVideoDurationSeconds(7200)).toBe(7200);
   });
 });

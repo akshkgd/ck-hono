@@ -1,7 +1,7 @@
 import { db } from '../../db/index.js';
 import { batchEnrollments, batches, batchSections, batchContent, contentLibrary, courseProgress, batchEnrollmentPayments, users, batchLiveSessions } from '../../db/schema.js';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
-import { recalculateEnrollmentAggregates, type DbExecutor } from '../enrollments/enrollment-aggregates.js';
+import { recalculateEnrollmentAggregates } from '../enrollments/enrollment-aggregates.js';
 import { computeTimeCredit, computeProgressState, normalizeVideoDurationSeconds, type ProgressStatus } from './video-progress.util.js';
 
 export class StudentRepository {
@@ -184,6 +184,7 @@ export class StudentRepository {
         type: contentLibrary.type,
         xp: contentLibrary.xp,
         assignmentStatus: courseProgress.assignmentStatus,
+        progressId: courseProgress.id,
         enrollment: {
           id: batchEnrollments.id,
           paymentStatus: batchEnrollments.paymentStatus,
@@ -291,21 +292,21 @@ export class StudentRepository {
     const durationSeconds = normalizeVideoDurationSeconds(params.videoDuration);
 
     return db.transaction(async (tx) => {
-      // Serialise all heartbeats of this enrollment.
-      await tx
-        .select({ id: batchEnrollments.id })
+      // Serialise all heartbeats of this enrollment and read the content row in one query.
+      // FOR UPDATE is restricted to the enrollment (the non-nullable side of the join).
+      const [locked] = await tx
+        .select({ row: courseProgress })
         .from(batchEnrollments)
+        .leftJoin(
+          courseProgress,
+          and(
+            eq(courseProgress.enrollmentId, batchEnrollments.id),
+            eq(courseProgress.batchContentId, params.batchContentId)
+          )
+        )
         .where(eq(batchEnrollments.id, params.enrollmentId))
-        .for('update');
-
-      const [existing] = await tx
-        .select()
-        .from(courseProgress)
-        .where(and(
-          eq(courseProgress.enrollmentId, params.enrollmentId),
-          eq(courseProgress.batchContentId, params.batchContentId)
-        ))
-        .limit(1);
+        .for('update', { of: batchEnrollments });
+      const existing = locked?.row ?? undefined;
 
       const now = new Date();
       const credit = computeTimeCredit({
@@ -370,8 +371,7 @@ export class StudentRepository {
         existing.status !== next.status;
 
       if (aggregatesChanged) {
-        const totalContentCount = await this.countBatchContents(params.batchId, tx);
-        await recalculateEnrollmentAggregates(tx, params.enrollmentId, totalContentCount);
+        await recalculateEnrollmentAggregates(tx, params.enrollmentId);
       }
 
       // Award XP on the transition to completed (serialised by the enrollment lock).
@@ -386,17 +386,9 @@ export class StudentRepository {
     });
   }
 
-  public async countBatchContents(batchId: string, executor: DbExecutor = db): Promise<number> {
-    const results = await executor
-      .select({ count: sql<number>`cast(count(*) as integer)` })
-      .from(batchContent)
-      .where(eq(batchContent.batchId, batchId));
-    return results[0]?.count || 0;
-  }
-
   /** Re-derives enrollment progress/time from the per-content rows. */
-  public async updateEnrollmentAggregates(enrollmentId: string, totalContentCount: number) {
-    await recalculateEnrollmentAggregates(db, enrollmentId, totalContentCount);
+  public async updateEnrollmentAggregates(enrollmentId: string) {
+    await recalculateEnrollmentAggregates(db, enrollmentId);
   }
 
   public async upsertAssignmentSubmission(

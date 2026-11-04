@@ -22,14 +22,10 @@ export const COMPLETION_PROGRESS_THRESHOLD = 75;
 
 export type ProgressStatus = 'not_started' | 'learning' | 'completed';
 
-/**
- * `content_library.video_duration` is stored inconsistently: values under 100
- * are treated as minutes, anything else as seconds (legacy heuristic, kept in
- * one place so it can be replaced by a real unit migration).
- */
+/** `content_library.video_duration` is stored in seconds. Missing or non-positive means unknown. */
 export function normalizeVideoDurationSeconds(videoDuration?: number | null): number | null {
   if (!videoDuration || videoDuration <= 0) return null;
-  return videoDuration < 100 ? videoDuration * 60 : videoDuration;
+  return videoDuration;
 }
 
 export interface TimeCreditInput {

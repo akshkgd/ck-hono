@@ -18,8 +18,15 @@ export type DbExecutor = typeof db | Tx;
 export async function recalculateEnrollmentAggregates(
   executor: DbExecutor,
   enrollmentId: string,
-  totalContentCount: number
+  totalContentCount?: number
 ): Promise<void> {
+  // Without an explicit count, take it from the enrollment's own batch inside the same statement
+  // (saves a separate round trip on every heartbeat).
+  const total =
+    totalContentCount !== undefined
+      ? sql`${totalContentCount}::numeric`
+      : sql`(SELECT count(*) FROM batch_content bc WHERE bc.batch_id = ${batchEnrollments.batchId})::numeric`;
+
   await executor
     .update(batchEnrollments)
     .set({
@@ -30,7 +37,7 @@ export async function recalculateEnrollmentAggregates(
       )`,
       progress: sql`(
         SELECT CASE
-          WHEN ${totalContentCount}::numeric > 0 THEN LEAST(100, COALESCE(ROUND(SUM(${courseProgress.progress}) * 1.0 / ${totalContentCount}::numeric), 0))::integer
+          WHEN ${total} > 0 THEN LEAST(100, COALESCE(ROUND(SUM(${courseProgress.progress}) * 1.0 / ${total}), 0))::integer
           ELSE 0
         END
         FROM ${courseProgress}
