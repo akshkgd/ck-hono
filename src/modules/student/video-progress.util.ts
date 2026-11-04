@@ -22,10 +22,15 @@ export const COMPLETION_PROGRESS_THRESHOLD = 75;
 
 export type ProgressStatus = 'not_started' | 'learning' | 'completed';
 
-/** `content_library.video_duration` is stored in seconds. Missing or non-positive means unknown. */
+/**
+ * `content_library.video_duration` is NOT stored consistently: most rows are in seconds, but some
+ * were entered in minutes. A value under 100 is treated as minutes (a real video under 100 seconds is
+ * rare), anything else as seconds. This was added in b1d6f33 after a 1 minute watch showed 50% progress.
+ * Remove it only after every row has been normalised to seconds (see the cleanup query in the PR notes).
+ */
 export function normalizeVideoDurationSeconds(videoDuration?: number | null): number | null {
   if (!videoDuration || videoDuration <= 0) return null;
-  return videoDuration;
+  return videoDuration < 100 ? videoDuration * 60 : videoDuration;
 }
 
 export interface TimeCreditInput {

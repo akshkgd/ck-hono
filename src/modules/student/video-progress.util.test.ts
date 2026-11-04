@@ -81,10 +81,16 @@ describe('computeProgressState', () => {
 });
 
 describe('normalizeVideoDurationSeconds', () => {
-  it('treats video_duration as seconds (no minutes heuristic)', () => {
+  it('treats values under 100 as minutes (mixed legacy data) and the rest as seconds', () => {
     expect(normalizeVideoDurationSeconds(null)).toBeNull();
     expect(normalizeVideoDurationSeconds(0)).toBeNull();
-    expect(normalizeVideoDurationSeconds(45)).toBe(45);
-    expect(normalizeVideoDurationSeconds(7200)).toBe(7200);
+    expect(normalizeVideoDurationSeconds(30)).toBe(1800);
+    expect(normalizeVideoDurationSeconds(2277)).toBe(2277);
+  });
+
+  it('does not complete a minutes-valued video after a short watch', () => {
+    const durationSeconds = normalizeVideoDurationSeconds(30); // stored as 30 minutes
+    const s = computeProgressState({ prevTimeSpent: 40, prevProgress: 2, prevStatus: 'learning', creditedSeconds: 20, inputProgress: 0, inputStatus: 'learning', durationSeconds });
+    expect(s.status).toBe('learning');
   });
 });

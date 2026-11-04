@@ -451,11 +451,12 @@ export class StudentService {
       throw new Error('Access denied: Course requires a captured enrollment payment');
     }
 
-    // Reuse the details already fetched above. If the student already has a progress row for this
-    // content they have started it, so the "previous video completed" gate is not re-evaluated on every ping.
+    // Reuse the details already fetched above. Once the student has actually started this content
+    // (a row that is not just a placeholder, e.g. the 'not_started' row created by unlock-assignments),
+    // the "previous video completed" gate is not re-evaluated on every ping.
     const access = await this.checkContentAccess(userId, input.batchContentId, {
       details,
-      skipSequentialCheck: !!details.progressId,
+      skipSequentialCheck: !!details.progressId && !!details.progressStatus && details.progressStatus !== 'not_started',
     });
     if (!access.allowed) {
       throw new Error(`Access denied: ${access.reason}`);

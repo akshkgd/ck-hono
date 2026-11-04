@@ -185,6 +185,7 @@ export class StudentRepository {
         xp: contentLibrary.xp,
         assignmentStatus: courseProgress.assignmentStatus,
         progressId: courseProgress.id,
+        progressStatus: courseProgress.status,
         enrollment: {
           id: batchEnrollments.id,
           paymentStatus: batchEnrollments.paymentStatus,
