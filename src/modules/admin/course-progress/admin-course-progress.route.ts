@@ -41,4 +41,10 @@ adminProgressRouter.post(
   controller.bulkUpdateProgress
 );
 
+// One-off repair of enrollment totals (dry run unless the body sets "dryRun": false)
+adminProgressRouter.post(
+  '/recalculate-aggregates',
+  controller.recalculateAggregates
+);
+
 export default adminProgressRouter;

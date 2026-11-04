@@ -59,3 +59,14 @@ export const bulkUpdateProgressSchema = z.object({
 export type BulkUpdateProgressInput = z.infer<typeof bulkUpdateProgressSchema>;
 
 
+
+export const recalculateAggregatesSchema = z.object({
+  // Safe by default: nothing is written unless dryRun is explicitly false.
+  dryRun: z.boolean().default(true),
+  // Repair every enrollment of one batch.
+  batchId: z.string().uuid('Invalid batchId').optional().nullable(),
+  // Repair a single enrollment.
+  enrollmentId: z.string().uuid('Invalid enrollmentId').optional().nullable(),
+});
+
+export type RecalculateAggregatesInput = z.infer<typeof recalculateAggregatesSchema>;

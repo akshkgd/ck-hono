@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
 import { AdminCourseProgressService } from './admin-course-progress.service.js';
-import { bulkUpdateProgressSchema } from './admin-course-progress.validation.js';
+import { bulkUpdateProgressSchema, recalculateAggregatesSchema } from './admin-course-progress.validation.js';
 
 export class AdminCourseProgressController {
   private progressService: AdminCourseProgressService;
@@ -77,6 +77,35 @@ export class AdminCourseProgressController {
       return c.json({
         status: 'error',
         message: err.message || 'Failed to update course progress',
+      }, 400);
+    }
+  };
+
+  public recalculateAggregates = async (c: Context) => {
+    try {
+      // Body is optional: an empty request is a safe dry run.
+      const raw = await c.req.json().catch(() => ({}));
+      const parsed = recalculateAggregatesSchema.safeParse(raw ?? {});
+      if (!parsed.success) {
+        return c.json({
+          status: 'error',
+          message: parsed.error.issues.map((i) => i.message).join(', ') || 'Invalid request body',
+        }, 400);
+      }
+
+      const result = await this.progressService.recalculateEnrollmentAggregates(parsed.data);
+
+      return c.json({
+        status: 'success',
+        message: result.dryRun
+          ? `Dry run: ${result.mismatched} of ${result.totalEnrollments} enrollments would be updated. Send {"dryRun": false} to apply.`
+          : `Updated ${result.updated} of ${result.totalEnrollments} enrollments`,
+        data: result,
+      }, 200);
+    } catch (err: any) {
+      return c.json({
+        status: 'error',
+        message: err.message || 'Failed to recalculate enrollment aggregates',
       }, 400);
     }
   };

@@ -435,6 +435,7 @@ export function getDocsHtml(): string {
             <li class="flex items-center gap-2">
               <span class="text-[8px] font-bold px-1 rounded bg-blue-500/10 text-blue-400 font-mono">POST</span>
               <a href="#course-progress-reset-submitted" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Reset Submissions</a>
+              <a href="#course-progress-recalculate" class="block py-1 text-xs text-zinc-400 hover:text-indigo-400 transition font-mono truncate">Recalculate Aggregates</a>
             </li>
           </ul>
         </div>
@@ -4102,6 +4103,64 @@ X-Razorpay-Signature: <HMAC_SHA256_HEX></code></pre>
   "message": "Successfully changed status of 12 assignments from submitted to pending",
   "data": {
     "count": 12
+  }
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <hr class="border-zinc-900" />
+
+        <!-- Endpoint: POST /v1/admin/course-progress/recalculate-aggregates -->
+        <div id="course-progress-recalculate" class="scroll-mt-24 grid grid-cols-1 xl:grid-cols-5 gap-8">
+          <div class="xl:col-span-3 space-y-4">
+            <div class="text-xs text-indigo-400 font-mono tracking-wider font-semibold uppercase">Course Progress</div>
+            <h3 class="text-2xl font-semibold text-zinc-100">Recalculate Enrollment Aggregates</h3>
+            <p class="text-zinc-400 text-sm leading-relaxed">
+              One-off repair. Re-derives each enrollment's <code>timeSpentSeconds</code> and <code>progress</code> from its per-video progress rows so the total matches the sum of its videos. It is a dry run unless the body sets <code>"dryRun": false</code>, and only enrollments whose stored values differ are written. It cannot recover time that was never stored, and it does not modify the per-video rows. Requires Admin Role.
+            </p>
+            <div class="flex items-center gap-2 border border-zinc-900 bg-zinc-950 p-2 rounded-lg text-xs font-mono max-w-xl">
+              <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">POST</span>
+              <span class="text-zinc-200">/v1/admin/course-progress/recalculate-aggregates</span>
+            </div>
+
+            <div class="space-y-2 pt-4">
+              <div class="text-xs uppercase font-bold text-zinc-500 font-mono">Request JSON Body (optional)</div>
+              <table class="w-full text-xs font-mono border-collapse border border-zinc-900 text-left font-normal font-sans">
+                <thead>
+                  <tr class="bg-zinc-900/50 text-zinc-400 border-b border-zinc-900"><th class="p-2 border-r border-zinc-900">Field</th><th class="p-2 border-r border-zinc-900">Type</th><th class="p-2 border-r border-zinc-900">Required</th><th class="p-2">Description</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">dryRun</td><td class="p-2 border-r border-zinc-900 text-zinc-400">boolean</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No (true)</td><td class="p-2 text-zinc-400">When true, only reports the differences. Set false to write them.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">batchId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Limit to every enrollment of one batch. Omit both batchId and enrollmentId to process all batches.</td></tr>
+                  <tr class="border-b border-zinc-900"><td class="p-2 border-r border-zinc-900 text-zinc-300">enrollmentId</td><td class="p-2 border-r border-zinc-900 text-zinc-400">string (UUID)</td><td class="p-2 border-r border-zinc-900 text-zinc-500">No</td><td class="p-2 text-zinc-400">Limit to a single enrollment (try it on one student first).</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="xl:col-span-2 space-y-6">
+            <div class="space-y-1">
+              <div class="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">Response Payload (200 OK)</div>
+              <pre class="bg-zinc-900 border border-zinc-900 p-4 rounded-lg text-xs font-mono text-zinc-300 overflow-x-auto"><code>{
+  "status": "success",
+  "message": "Dry run: 42 of 1200 enrollments would be updated. Send {\"dryRun\": false} to apply.",
+  "data": {
+    "dryRun": true,
+    "totalEnrollments": 1200,
+    "mismatched": 42,
+    "timeWasHigher": 30,
+    "timeWasLower": 12,
+    "updated": 0,
+    "largestDifferences": [
+      {
+        "enrollmentId": "7bec8476-076d-443c-88c2-17c0dab6cdb4",
+        "currentTimeSpentSeconds": 21600,
+        "newTimeSpentSeconds": 4200,
+        "currentProgress": 50,
+        "newProgress": 57
+      }
+    ]
   }
 }</code></pre>
             </div>

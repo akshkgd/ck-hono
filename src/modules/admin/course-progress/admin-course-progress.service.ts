@@ -1,6 +1,7 @@
 import { db } from '../../../db/index.js';
 import { AdminCourseProgressRepository } from './admin-course-progress.repository.js';
-import type { ProgressQueryInput, BulkUpdateProgressInput } from './admin-course-progress.validation.js';
+import type { ProgressQueryInput, BulkUpdateProgressInput, RecalculateAggregatesInput } from './admin-course-progress.validation.js';
+import { backfillEnrollmentAggregates } from '../../enrollments/enrollment-aggregates.js';
 import { calculateDateRange } from '../../../utils/date-range.js';
 import { EnrollmentRepository } from '../../enrollments/enrollment.repository.js';
 import { BatchContentRepository } from '../../batch-content/batch-content.repository.js';
@@ -234,6 +235,18 @@ export class AdminCourseProgressService {
       return {
         updatedCount: items.length,
       };
+    });
+  }
+
+  /**
+   * One-off repair of enrollment totals (time spent + progress) that drifted from
+   * their per-video rows. Dry run unless explicitly told otherwise.
+   */
+  public async recalculateEnrollmentAggregates(input: RecalculateAggregatesInput) {
+    return backfillEnrollmentAggregates(db, {
+      dryRun: input.dryRun,
+      enrollmentId: input.enrollmentId,
+      batchId: input.batchId,
     });
   }
 }

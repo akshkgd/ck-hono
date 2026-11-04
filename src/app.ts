@@ -47,6 +47,7 @@ import { activityMiddleware } from './middleware/activity.middleware.js';
 import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
 import { renderLogsView } from './modules/admin/logs/logs.view.js';
+import { getAggregatesBackfillHtml } from './modules/admin/course-progress/aggregates-backfill.view.js';
 
 export type AppEnv = {
   Variables: {
@@ -142,6 +143,8 @@ app.route('/changelog', changelogRouter);
 app.route('/playground', playgroundRouter);
 app.route('/student-docs', studentDocsRouter);
 app.get('/admin/logs', (c) => c.html(renderLogsView()));
+// One-time repair page for enrollment totals (static HTML; all actions are admin-only API calls)
+app.get('/admin/fix-enrollment-totals', (c) => c.html(getAggregatesBackfillHtml()));
 app.get('/migration-status', (c) => c.html(getMigrationProgressHtml()));
 app.get('/docs/migration-status', (c) => c.html(getMigrationProgressHtml()));
 app.get('/admin/migrations/view', (c) => c.html(getMigrationProgressHtml()));
