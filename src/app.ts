@@ -48,6 +48,8 @@ import { authMiddleware } from './middleware/auth.middleware.js';
 import { adminMiddleware } from './middleware/admin.middleware.js';
 import { renderLogsView } from './modules/admin/logs/logs.view.js';
 import { getAggregatesBackfillHtml } from './modules/admin/course-progress/aggregates-backfill.view.js';
+import adminTerminalRouter from './modules/admin/terminal/admin-terminal.route.js';
+import { getAdminTerminalHtml } from './modules/admin/terminal/admin-terminal.view.js';
 
 export type AppEnv = {
   Variables: {
@@ -77,6 +79,9 @@ app.use('*', cors({
     return allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
   },
   credentials: true,
+  // Let browsers cache the preflight so direct cross-origin API calls don't pay an extra OPTIONS round trip each time
+  // (browsers cap this: Chrome at 2h, Firefox at 24h).
+  maxAge: 86400,
 }));
 app.use('*', secureHeaders());
 app.use('*', compress());
@@ -113,6 +118,7 @@ v1.route('/admin/batch-contents', adminBatchContentRouter);
 v1.route('/admin/logs', adminLogsRouter);
 v1.route('/admin/queues', adminQueuesRouter);
 v1.route('/admin/course-progress', adminProgressRouter);
+v1.route('/admin/terminal', adminTerminalRouter);
 v1.route('/admin/assignments', adminAssignmentsRouter);
 v1.route('/admin/email-settings', adminEmailSettingsRouter);
 v1.route('/admin/migrations', adminMigrationsRouter);
@@ -145,6 +151,8 @@ app.route('/student-docs', studentDocsRouter);
 app.get('/admin/logs', (c) => c.html(renderLogsView()));
 // One-time repair page for enrollment totals (static HTML; all actions are admin-only API calls)
 app.get('/admin/fix-enrollment-totals', (c) => c.html(getAggregatesBackfillHtml()));
+// Admin command runner page (static HTML; commands run through admin-only API endpoints)
+app.get('/admin/terminal', (c) => c.html(getAdminTerminalHtml()));
 app.get('/migration-status', (c) => c.html(getMigrationProgressHtml()));
 app.get('/docs/migration-status', (c) => c.html(getMigrationProgressHtml()));
 app.get('/admin/migrations/view', (c) => c.html(getMigrationProgressHtml()));
