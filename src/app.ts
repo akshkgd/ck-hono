@@ -21,6 +21,7 @@ import adminBatchContentRouter from './modules/admin/batch-content/admin-batch-c
 import adminLogsRouter from './modules/admin/logs/admin-logs.route.js';
 import adminQueuesRouter from './modules/admin/queues/queues.route.js';
 import docsRouter from './modules/docs/docs.route.js';
+import docsV2Router from './modules/docs-v2/docs-v2.route.js';
 import changelogRouter from './modules/changelog/changelog.route.js';
 import playgroundRouter from './modules/playground/playground.route.js';
 import courseProgressRouter from './modules/course-progress/course-progress.route.js';
@@ -144,6 +145,7 @@ app.route('/api', v1);
 app.route('/health', healthRouter);
 app.route('/migration', adminMigrationsRouter);
 app.route('/api/auth', authRouter);
+app.route('/docs/v2', docsV2Router);
 app.route('/docs', docsRouter);
 app.route('/changelog', changelogRouter);
 app.route('/playground', playgroundRouter);
